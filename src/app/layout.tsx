@@ -1,12 +1,8 @@
 import type {Metadata} from "next";
 import "./globals.css";
 import React from "react";
-import { Geist_Mono, Public_Sans } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const publicSansHeading = Public_Sans({subsets:['latin'],variable:'--font-heading'});
-
-const geistMono = Geist_Mono({subsets:['latin'],variable:'--font-mono'});
+import {cn} from "@/lib/utils";
+import {averageSans, splineSansMono} from "@/font";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -20,7 +16,8 @@ export default function RootLayout({
 }>) {
     return (
         <html
-            lang="en" suppressHydrationWarning className={cn("font-mono", geistMono.variable, publicSansHeading.variable)}
+            lang="en" suppressHydrationWarning
+            className={cn("font-mono", averageSans.variable, splineSansMono.variable)}
         >
         <body>
         {children}
