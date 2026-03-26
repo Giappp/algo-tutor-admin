@@ -1,26 +1,24 @@
 "use client"
 import React from "react";
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/dashboard/SideBar";
+import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
+import {SiteHeader} from "@/components/site-header";
+import {AppSidebar} from "@/components/app-sidebar";
 
 const Layout = ({children}: { children: React.ReactNode }) => {
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-muted/40">
-                <AppSidebar/>
-
-                <main className="flex-1 flex flex-col min-w-0">
-                    <header className="flex items-center h-14 lg:h-15 gap-4 border-b bg-muted/40 px-6">
-                        <SidebarTrigger/>
-                        <h1 className="font-semibold text-lg">Admin Dashboard</h1>
-                    </header>
-
-                    <div className="flex-1 p-6">
-                        {children}
-                    </div>
-                </main>
-            </div>
-        </SidebarProvider>
+        <div className="[--header-height:calc(--spacing(14))]">
+            <SidebarProvider className="flex flex-col">
+                <SiteHeader/>
+                <div className="flex flex-1">
+                    <AppSidebar/>
+                    <SidebarInset>
+                        <div className="p-6">
+                            {children}
+                        </div>
+                    </SidebarInset>
+                </div>
+            </SidebarProvider>
+        </div>
     )
 }
 export default Layout
