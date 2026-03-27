@@ -1,11 +1,25 @@
 import axios, {AxiosError} from "axios";
 
-const http = axios.create({
+export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
+    timeout: 10000,
+    headers: {
+        Accept: "application/json",
+    },
     withCredentials: true,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-CSRF-TOKEN",
 });
 
-http.interceptors.response.use(
+export const authApi = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
+    timeout: 10000,
+    headers: {
+        Accept: "application/json",
+    }
+})
+
+api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config;

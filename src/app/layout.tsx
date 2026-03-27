@@ -17,7 +17,7 @@ export default function RootLayout({
     return (
         <html
             lang="en" suppressHydrationWarning
-            className={cn("font-mono", averageSans.variable, splineSansMono.variable)}
+            className={cn("font-sans", averageSans.variable, splineSansMono.variable)}
         >
         <body>
         {children}
