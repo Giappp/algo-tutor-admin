@@ -16,13 +16,16 @@ export const authApi = axios.create({
     timeout: 10000,
     headers: {
         Accept: "application/json",
-    }
+    },
+    withCredentials: true,
 })
 
 api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config;
-
+        if (error.response && error.response.status === 401) {
+            
+        }
     }
 )
