@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     // 1. Lấy token từ cookie (HttpOnly cookie vẫn được gửi lên Middleware)
     const refreshToken = request.cookies.get('refresh-token')?.value; // Thay bằng tên cookie của bạn
     const { pathname } = request.nextUrl;
