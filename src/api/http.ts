@@ -2,6 +2,12 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { toAppError } from "@/api/api-error";
 import { clearAuthenticated } from "@/store/authStore";
 
+// ── Backend response envelope ──────────────────────────────────
+export type ApiResponse<T> = {
+    success: boolean;
+    data: T;
+};
+
 export const api = axios.create({
     baseURL: "http://localhost:8080",
     timeout: 10000,
@@ -9,13 +15,6 @@ export const api = axios.create({
     withCredentials: true,
     // xsrfCookieName: "XSRF-TOKEN",
     // xsrfHeaderName: "X-CSRF-TOKEN",
-});
-
-export const authApi = axios.create({
-    baseURL: "http://localhost:8080",
-    timeout: 10000,
-    headers: { Accept: "application/json" },
-    withCredentials: true,
 });
 
 const retriedRequests = new WeakSet<object>();
@@ -65,7 +64,7 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-            await authApi.post('/api/auth/refresh');
+            await api.post('/api/auth/refresh');
 
             processQueue(null);
 
@@ -79,7 +78,7 @@ api.interceptors.response.use(
             processQueue(err);
 
             try {
-                await authApi.post('/api/auth/logout');
+                await api.post('/api/auth/logout');
             } finally {
                 clearAuthenticated();
             }
@@ -98,12 +97,15 @@ api.interceptors.response.use(
 
 type Cfg = AxiosRequestConfig & { signal?: AbortSignal };
 
-export const get = async <T>(url: string, config?: Cfg) => (await api.get<T>(url, config)).data;
+// Unwrap backend envelope: axios response.data = { success, data } → return data
+export const get = async <T>(url: string, config?: Cfg) =>
+    (await api.get<ApiResponse<T>>(url, config)).data.data;
 
 export const post = async <T, B = unknown>(url: string, body?: B, config?: Cfg) =>
-    (await api.post<T>(url, body, config)).data;
+    (await api.post<ApiResponse<T>>(url, body, config)).data.data;
 
 export const put = async <T, B = unknown>(url: string, body?: B, config?: Cfg) =>
-    (await api.put<T>(url, body, config)).data;
+    (await api.put<ApiResponse<T>>(url, body, config)).data.data;
 
-export const del = async <T>(url: string, config?: Cfg) => (await api.delete<T>(url, config)).data;
+export const del = async <T>(url: string, config?: Cfg) =>
+    (await api.delete<ApiResponse<T>>(url, config)).data.data;

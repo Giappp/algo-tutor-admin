@@ -13,28 +13,20 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SignInSchema } from "@/types/auth/schema"
 import { LoginCredentials } from "@/types/auth/auth"
-import { authApi, get } from "@/api/http"
 import { toAppError } from "@/api/api-error"
-import { setAuthenticated } from "@/store/authStore"
-import { useRouter } from "next/navigation"
-
-type UserInfoResponse = {
-    userId: number;
-    email: string;
-    username: string;
-};
+import { useAuth } from "@/hooks/use-auth-hook"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const router = useRouter();
+    const { login, isLoggingIn } = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<LoginCredentials>({
         resolver: zodResolver(SignInSchema),
         defaultValues: {
@@ -46,29 +38,14 @@ export function LoginForm({
     const onSubmit = async (data: LoginCredentials) => {
         try {
             setServerError(null);
-
-            // 1. Sign in — backend sets auth cookies
-            await authApi.post("/api/v1/iam/signin", data);
-
-            // 2. Fetch authenticated user info
-            const userInfo = await get<UserInfoResponse>("/api/v1/iam/me");
-
-            // 3. Persist to Zustand store
-            setAuthenticated({
-                userId: userInfo.userId,
-                email: userInfo.email,
-                username: userInfo.username,
-                isAuthenticated: true,
-            });
-
-            // 4. Redirect to dashboard
-            router.push("/dashboard");
+            await login(data);
         } catch (error) {
             const appError = toAppError(error);
-            console.log(appError);
             setServerError(appError.message);
         }
     };
+
+    const isSubmitting = isLoggingIn;
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
