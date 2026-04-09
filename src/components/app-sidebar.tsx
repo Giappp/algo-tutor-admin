@@ -18,6 +18,7 @@ import {
 import {
     BookOpenIcon,
     BotIcon,
+    CodeIcon,
     FrameIcon,
     LifeBuoyIcon,
     MapIcon,
@@ -31,6 +32,24 @@ import Link from "next/link";
 
 const data = {
     navMain: [
+        {
+            title: "Problems",
+            url: "/dashboard/problems",
+            icon: (
+                <CodeIcon />
+            ),
+            isActive: true,
+            items: [
+                {
+                    title: "All Problems",
+                    url: "/dashboard/problems",
+                },
+                {
+                    title: "Create Problem",
+                    url: "/dashboard/problems/create",
+                },
+            ],
+        },
         {
             title: "Playground",
             url: "#",

@@ -1,11 +1,11 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { get, post } from "@/api/http";
-import { setAuthenticated, clearAuthenticated } from "@/store/authStore";
-import { LoginCredentials } from "@/types/auth/auth";
-import { SignInSchema } from "@/types/auth/schema";
-import { useRouter } from "next/navigation";
+import {useMutation} from "@tanstack/react-query";
+import {get, post} from "@/api/http";
+import {clearAuthenticated, setAuthenticated} from "@/store/authStore";
+import {LoginCredentials} from "@/types/auth/auth";
+import {SignInSchema} from "@/types/auth/schema";
+import {useRouter} from "next/navigation";
 
 type UserInfoResponse = {
     userId: number;
@@ -20,8 +20,7 @@ export function useAuth() {
         mutationFn: async (credentials: LoginCredentials) => {
             const body = SignInSchema.parse(credentials);
             await post("/api/v1/iam/signin", body);
-            const userInfo = await get<UserInfoResponse>("/api/v1/iam/me");
-            return userInfo;
+            return await get<UserInfoResponse>("/api/v1/iam/me");
         },
         onSuccess: (userInfo) => {
             setAuthenticated({
