@@ -1,6 +1,7 @@
-import {create} from "zustand";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type UserInfo = {
+export type UserInfo = {
     userId: number | null;
     email: string;
     username: string;
@@ -19,14 +20,27 @@ const initialState: UserInfo = {
     isAuthenticated: false,
 };
 
-export const userAuthStore = create<UserInfo & UserAction>((set) => ({
-    ...initialState,
-    setAuthenticated: (state: UserInfo) => set({...initialState, ...state, isAuthenticated: true}),
-    clearAuthenticated: () => set(initialState)
-}));
+export const userAuthStore = create<UserInfo & UserAction>()(
+    persist(
+        (set) => ({
+            ...initialState,
+            setAuthenticated: (state: UserInfo) => set({ ...initialState, ...state, isAuthenticated: true }),
+            clearAuthenticated: () => set(initialState),
+        }),
+        {
+            name: "auth-store",
+            partialize: (state) => ({
+                userId: state.userId,
+                email: state.email,
+                username: state.username,
+                isAuthenticated: state.isAuthenticated,
+            }),
+        }
+    )
+);
 
 export const setAuthenticated = (state: UserInfo) => {
-    userAuthStore.setState({...state, isAuthenticated: true});
+    userAuthStore.setState({ ...state, isAuthenticated: true });
 }
 export const clearAuthenticated = () => {
     userAuthStore.getState().clearAuthenticated();

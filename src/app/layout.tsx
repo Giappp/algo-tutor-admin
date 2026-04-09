@@ -3,6 +3,8 @@ import "./globals.css";
 import React from "react";
 import {cn} from "@/lib/utils";
 import {averageSans, splineSansMono} from "@/font";
+import {QueryProvider} from "@/components/shared/query-provider";
+import {Toaster} from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
     title: "Algo Tutor | Management Portal",
@@ -20,7 +22,10 @@ export default function RootLayout({
             className={cn("font-sans", averageSans.variable, splineSansMono.variable)}
         >
         <body>
-        {children}
+        <QueryProvider>
+            {children}
+        </QueryProvider>
+        <Toaster richColors closeButton position="top-right" />
         </body>
         </html>
     );
