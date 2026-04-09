@@ -1,7 +1,7 @@
 "use client";
 
 import {useCallback, useEffect, useState} from "react";
-import {Controller, useForm, useWatch} from "react-hook-form";
+import {Control, Controller, useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import slugify from "slugify";
@@ -19,17 +19,39 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Badge} from "@/components/ui/badge";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 
-import {AlertCircleIcon, ChevronRightIcon, ChevronsUpDownIcon, Loader2Icon, XIcon,} from "lucide-react";
+import {AlertCircleIcon, ChevronRightIcon, ChevronsUpDownIcon, Loader2Icon, XIcon} from "lucide-react";
 
 type Tag = { id: number; name: string };
 
-// ── Component ──────────────────────────────────────────────────
+function StatementPreview({control}: Readonly<{ control: Control<Step1Data> }>) {
+    const statementValue = useWatch({control, name: "statement"});
+
+    return (
+        <div
+            className="rounded-xl border border-input bg-input/10 p-4 min-h-60 prose prose-sm dark:prose-invert max-w-none">
+            {statementValue ? (
+                <ReactMarkdown
+                    remarkPlugins={[remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
+                >
+                    {statementValue}
+                </ReactMarkdown>
+            ) : (
+                <p className="text-muted-foreground italic">
+                    Nothing to preview. Start typing in the Edit tab.
+                </p>
+            )}
+        </div>
+    );
+}
+
+// ── Main Component ─────────────────────────────────────────────
 export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
     const {step1Data, setStep1, setProblemId} = useProblemDraftStore();
     const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
@@ -39,8 +61,8 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         register,
         handleSubmit,
         control,
-        watch,
         setValue,
+        getValues,
         formState: {errors},
     } = useForm<Step1Data>({
         resolver: zodResolver(step1Schema),
@@ -53,12 +75,10 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         },
     });
 
-    // ── Auto-save Draft to Store (Updated to useWatch) ─────────
-    // Subscribing to the entire form state using useWatch
+    // ── Auto-save Draft to Store ───────────────────────────────
     const formValues = useWatch({control});
 
     useEffect(() => {
-        // Only save if we have actual data
         if (formValues.title !== undefined) {
             setStep1(formValues as Step1Data);
         }
@@ -68,7 +88,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     useEffect(() => {
-        if (slugManuallyEdited) return;
+        if (slugManuallyEdited || !titleValue) return;
         const timeout = setTimeout(() => {
             const generated = slugify(titleValue, {lower: true, strict: true});
             setValue("slug", generated, {shouldValidate: true});
@@ -105,34 +125,32 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         [createProblem, setStep1, setProblemId, onNext]
     );
 
-    // ── Selected tags helper ───────────────────────────────────
+    // ── Selected tags helper (RESTORED) ────────────────────────
     const selectedTagIds = useWatch({control, name: "tagIds"}) || [];
     const selectedTags = tags.filter((t) => selectedTagIds.includes(t.id));
 
     const toggleTag = useCallback(
         (tagId: number) => {
-            const current = selectedTagIds;
+            const current = getValues("tagIds") || [];
             const next = current.includes(tagId)
                 ? current.filter((id) => id !== tagId)
                 : [...current, tagId];
             setValue("tagIds", next, {shouldValidate: true});
         },
-        [selectedTagIds, setValue]
+        [getValues, setValue]
     );
 
     const removeTag = useCallback(
         (tagId: number) => {
+            const current = getValues("tagIds") || [];
             setValue(
                 "tagIds",
-                selectedTagIds.filter((id) => id !== tagId),
+                current.filter((id) => id !== tagId),
                 {shouldValidate: true}
             );
         },
-        [selectedTagIds, setValue]
+        [getValues, setValue]
     );
-
-    // ── statement preview ──────────────────────────────────────
-    const statementValue = watch("statement");
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -196,8 +214,8 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="EASY">
-                                        <span className="flex items-center gap-2"><span
-                                            className="size-2 rounded-full bg-emerald-500"/>Easy
+                                        <span className="flex items-center gap-2">
+                                            <span className="size-2 rounded-full bg-emerald-500"/>Easy
                                         </span>
                                     </SelectItem>
                                     <SelectItem value="MEDIUM">
@@ -222,19 +240,22 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                 {/* Tags */}
                 <Field>
                     <FieldLabel>Tags</FieldLabel>
+                    {/* ADDED: asChild here */}
                     <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
-                        <PopoverTrigger>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full justify-between"
-                                disabled={createProblem.isPending}
-                            >
-                                {selectedTags.length > 0
-                                    ? `${selectedTags.length} tag(s) selected`
-                                    : "Select tags…"}
-                                <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50"/>
-                            </Button>
+                        <PopoverTrigger
+                            render={
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-between"
+                                    disabled={createProblem.isPending}
+                                />
+                            }
+                        >
+                            {selectedTags.length > 0
+                                ? `${selectedTags.length} tag(s) selected`
+                                : "Select tags…"}
+                            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50"/>
                         </PopoverTrigger>
                         <PopoverContent className="w-72 p-0">
                             <Command>
@@ -303,21 +324,8 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                             />
                         </TabsContent>
                         <TabsContent value="preview">
-                            <div
-                                className="rounded-xl border border-input bg-input/10 p-4 min-h-60 prose prose-sm dark:prose-invert max-w-none">
-                                {statementValue ? (
-                                    <ReactMarkdown
-                                        remarkPlugins={[remarkMath]}
-                                        rehypePlugins={[rehypeKatex]}
-                                    >
-                                        {statementValue}
-                                    </ReactMarkdown>
-                                ) : (
-                                    <p className="text-muted-foreground italic">
-                                        Nothing to preview. Start typing in the Edit tab.
-                                    </p>
-                                )}
-                            </div>
+                            {/* Uses the isolated component */}
+                            <StatementPreview control={control}/>
                         </TabsContent>
                     </Tabs>
                     {errors.statement && (

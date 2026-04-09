@@ -1,86 +1,80 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import {useCallback, useState} from "react";
+import {Controller, useFieldArray, useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useMutation} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import "katex/dist/katex.min.css";
 
-import { step2Schema, type Step2Data } from "@/schemas/problem-wizard.schema";
-import { useProblemDraftStore } from "@/store/problem-wizard.store";
-import { post } from "@/api/http";
-import { toAppError } from "@/api/api-error";
+import {type Step2Data, step2Schema} from "@/schemas/problem-wizard.schema";
+import {useProblemDraftStore} from "@/store/problem-wizard.store";
+import {post} from "@/api/http";
+import {toAppError} from "@/api/api-error";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-    Field,
-    FieldGroup,
-    FieldLabel,
-    FieldError,
-    FieldDescription,
-} from "@/components/ui/field";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Switch} from "@/components/ui/switch";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Field, FieldError, FieldLabel,} from "@/components/ui/field";
+import {Card, CardContent} from "@/components/ui/card";
+import {Label} from "@/components/ui/label";
+import {Separator} from "@/components/ui/separator";
 
 import {
+    AlertCircleIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    EyeIcon,
+    EyeOffIcon,
+    Loader2Icon,
     PlusIcon,
     Trash2Icon,
-    Loader2Icon,
-    AlertCircleIcon,
-    EyeOffIcon,
-    EyeIcon,
 } from "lucide-react";
 
 // ── Lazy-load Monaco Editor ────────────────────────────────────
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
     ssr: false,
     loading: () => (
-        <div className="flex items-center justify-center h-[400px] rounded-xl border border-input bg-input/10">
-            <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
+        <div className="flex items-center justify-center h-100 rounded-xl border border-input bg-input/10">
+            <Loader2Icon className="size-5 animate-spin text-muted-foreground"/>
         </div>
     ),
 });
 
 // ── Language config ────────────────────────────────────────────
 const LANGUAGES = [
-    { key: "cpp" as const, label: "C++", monacoLang: "cpp" },
-    { key: "python" as const, label: "Python", monacoLang: "python" },
-    { key: "java" as const, label: "Java", monacoLang: "java" },
+    {key: "cpp" as const, label: "C++", monacoLang: "cpp"},
+    {key: "python" as const, label: "Python", monacoLang: "python"},
+    {key: "java" as const, label: "Java", monacoLang: "java"},
 ];
 
 // ── Component ──────────────────────────────────────────────────
 export function Step2TestsCode({
-    onNext,
-    onBack,
-}: {
+                                   onNext,
+                                   onBack,
+                               }: Readonly<{
     onNext: () => void;
     onBack: () => void;
-}) {
-    const { problemId, step2Data, setStep2 } = useProblemDraftStore();
+}>) {
+    const {problemId, step2Data, setStep2} = useProblemDraftStore();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
         control,
-        formState: { errors },
+        formState: {errors},
     } = useForm<Step2Data>({
         resolver: zodResolver(step2Schema),
         defaultValues: step2Data ?? {
-            testCases: [{ input: "", output: "", isHidden: false, scoreWeight: 1 }],
-            solutions: { cpp: "", python: "", java: "" },
+            testCases: [{input: "", output: "", isHidden: false, scoreWeight: 1}],
+            solutions: {cpp: "", python: "", java: ""},
         },
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const {fields, append, remove} = useFieldArray({
         control,
         name: "testCases",
     });
@@ -88,7 +82,7 @@ export function Step2TestsCode({
     // ── Mutations ──────────────────────────────────────────────
     const submitTestCases = useMutation({
         mutationFn: async (testCases: Step2Data["testCases"]) => {
-            return post(`/api/v1/problems/${problemId}/test-cases`, { testCases });
+            return post(`/api/v1/problems/${problemId}/test-cases`, {testCases});
         },
     });
 
@@ -126,7 +120,7 @@ export function Step2TestsCode({
                     className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-300"
                     role="alert"
                 >
-                    <AlertCircleIcon className="size-4 shrink-0" />
+                    <AlertCircleIcon className="size-4 shrink-0"/>
                     <p>{serverError}</p>
                 </div>
             )}
@@ -146,11 +140,11 @@ export function Step2TestsCode({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                            append({ input: "", output: "", isHidden: false, scoreWeight: 1 })
+                            append({input: "", output: "", isHidden: false, scoreWeight: 1})
                         }
                         disabled={isPending}
                     >
-                        <PlusIcon className="size-4" />
+                        <PlusIcon className="size-4"/>
                         Add Test Case
                     </Button>
                 </div>
@@ -169,12 +163,12 @@ export function Step2TestsCode({
                                         <Controller
                                             control={control}
                                             name={`testCases.${index}.isHidden`}
-                                            render={({ field: switchField }) => (
+                                            render={({field: switchField}) => (
                                                 <div className="flex items-center gap-2">
                                                     {switchField.value ? (
-                                                        <EyeOffIcon className="size-3.5 text-muted-foreground" />
+                                                        <EyeOffIcon className="size-3.5 text-muted-foreground"/>
                                                     ) : (
-                                                        <EyeIcon className="size-3.5 text-muted-foreground" />
+                                                        <EyeIcon className="size-3.5 text-muted-foreground"/>
                                                     )}
                                                     <Label className="text-xs text-muted-foreground cursor-pointer">
                                                         Hidden
@@ -198,7 +192,7 @@ export function Step2TestsCode({
                                                 disabled={isPending}
                                                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                             >
-                                                <Trash2Icon className="size-4" />
+                                                <Trash2Icon className="size-4"/>
                                             </Button>
                                         )}
                                     </div>
@@ -211,7 +205,7 @@ export function Step2TestsCode({
                                         <Textarea
                                             rows={4}
                                             placeholder="Enter test input…"
-                                            className="font-mono text-xs min-h-[80px]"
+                                            className="font-mono text-xs min-h-20"
                                             disabled={isPending}
                                             aria-invalid={!!errors.testCases?.[index]?.input}
                                             {...register(`testCases.${index}.input`)}
@@ -229,7 +223,7 @@ export function Step2TestsCode({
                                         <Textarea
                                             rows={4}
                                             placeholder="Enter expected output…"
-                                            className="font-mono text-xs min-h-[80px]"
+                                            className="font-mono text-xs min-h-20"
                                             disabled={isPending}
                                             aria-invalid={!!errors.testCases?.[index]?.output}
                                             {...register(`testCases.${index}.output`)}
@@ -243,7 +237,7 @@ export function Step2TestsCode({
                                 </div>
 
                                 {/* Score weight */}
-                                <Field className="max-w-[200px]">
+                                <Field className="max-w-50">
                                     <FieldLabel className="text-xs">Score Weight</FieldLabel>
                                     <Input
                                         type="number"
@@ -273,7 +267,7 @@ export function Step2TestsCode({
                 )}
             </section>
 
-            <Separator />
+            <Separator/>
 
             {/* ── Solutions Section ── */}
             <section>
@@ -299,7 +293,7 @@ export function Step2TestsCode({
                             <Controller
                                 control={control}
                                 name={`solutions.${lang.key}`}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <div className="rounded-xl border border-input overflow-hidden">
                                         <MonacoEditor
                                             height="400px"
@@ -308,14 +302,14 @@ export function Step2TestsCode({
                                             value={field.value}
                                             onChange={(val) => field.onChange(val ?? "")}
                                             options={{
-                                                minimap: { enabled: false },
+                                                minimap: {enabled: false},
                                                 fontSize: 14,
                                                 lineNumbers: "on",
                                                 scrollBeyondLastLine: false,
                                                 automaticLayout: true,
                                                 tabSize: 4,
                                                 wordWrap: "on",
-                                                padding: { top: 12 },
+                                                padding: {top: 12},
                                             }}
                                         />
                                     </div>
@@ -342,19 +336,19 @@ export function Step2TestsCode({
                     onClick={onBack}
                     disabled={isPending}
                 >
-                    <ChevronLeftIcon />
+                    <ChevronLeftIcon/>
                     Back
                 </Button>
                 <Button type="submit" disabled={isPending}>
                     {isPending ? (
                         <>
-                            <Loader2Icon className="animate-spin" />
+                            <Loader2Icon className="animate-spin"/>
                             Saving…
                         </>
                     ) : (
                         <>
                             Next: AI Context & Publish
-                            <ChevronRightIcon />
+                            <ChevronRightIcon/>
                         </>
                     )}
                 </Button>
