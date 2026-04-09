@@ -1,62 +1,37 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {useCallback, useEffect, useState} from "react";
+import {Controller, useForm, useWatch} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import slugify from "slugify";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 
-import { step1Schema, type Step1Data } from "@/schemas/problem-wizard.schema";
-import { useProblemDraftStore } from "@/store/problem-wizard.store";
-import { get, post } from "@/api/http";
-import { toAppError } from "@/api/api-error";
+import {type Step1Data, step1Schema} from "@/schemas/problem-wizard.schema";
+import {useProblemDraftStore} from "@/store/problem-wizard.store";
+import {get, post} from "@/api/http";
+import {toAppError} from "@/api/api-error";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-    Field,
-    FieldGroup,
-    FieldLabel,
-    FieldError,
-    FieldDescription,
-} from "@/components/ui/field";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Badge} from "@/components/ui/badge";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
 
-import {
-    ChevronRightIcon,
-    ChevronsUpDownIcon,
-    XIcon,
-    Loader2Icon,
-    AlertCircleIcon,
-} from "lucide-react";
+import {AlertCircleIcon, ChevronRightIcon, ChevronsUpDownIcon, Loader2Icon, XIcon,} from "lucide-react";
 
 type Tag = { id: number; name: string };
 
 // ── Component ──────────────────────────────────────────────────
-export function Step1Basic({ onNext }: { onNext: () => void }) {
-    const { step1Data, setStep1, setProblemId } = useProblemDraftStore();
+export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
+    const {step1Data, setStep1, setProblemId} = useProblemDraftStore();
     const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -66,7 +41,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
         control,
         watch,
         setValue,
-        formState: { errors },
+        formState: {errors},
     } = useForm<Step1Data>({
         resolver: zodResolver(step1Schema),
         defaultValues: step1Data ?? {
@@ -78,21 +53,31 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
         },
     });
 
-    // ── Auto-slug from title with debounce ─────────────────────
-    const titleValue = watch("title");
+    // ── Auto-save Draft to Store (Updated to useWatch) ─────────
+    // Subscribing to the entire form state using useWatch
+    const formValues = useWatch({control});
+
+    useEffect(() => {
+        // Only save if we have actual data
+        if (formValues.title !== undefined) {
+            setStep1(formValues as Step1Data);
+        }
+    }, [formValues, setStep1]);
+
+    const titleValue = useWatch({control, name: "title"});
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     useEffect(() => {
         if (slugManuallyEdited) return;
         const timeout = setTimeout(() => {
-            const generated = slugify(titleValue, { lower: true, strict: true });
-            setValue("slug", generated, { shouldValidate: true });
+            const generated = slugify(titleValue, {lower: true, strict: true});
+            setValue("slug", generated, {shouldValidate: true});
         }, 300);
         return () => clearTimeout(timeout);
     }, [titleValue, slugManuallyEdited, setValue]);
 
     // ── Fetch tags ─────────────────────────────────────────────
-    const { data: tags = [], isLoading: tagsLoading } = useQuery<Tag[]>({
+    const {data: tags = [], isLoading: tagsLoading} = useQuery<Tag[]>({
         queryKey: ["admin-tags"],
         queryFn: () => get<Tag[]>("/api/v1/admin/tags"),
     });
@@ -121,7 +106,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
     );
 
     // ── Selected tags helper ───────────────────────────────────
-    const selectedTagIds = watch("tagIds");
+    const selectedTagIds = useWatch({control, name: "tagIds"}) || [];
     const selectedTags = tags.filter((t) => selectedTagIds.includes(t.id));
 
     const toggleTag = useCallback(
@@ -130,7 +115,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
             const next = current.includes(tagId)
                 ? current.filter((id) => id !== tagId)
                 : [...current, tagId];
-            setValue("tagIds", next, { shouldValidate: true });
+            setValue("tagIds", next, {shouldValidate: true});
         },
         [selectedTagIds, setValue]
     );
@@ -140,7 +125,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
             setValue(
                 "tagIds",
                 selectedTagIds.filter((id) => id !== tagId),
-                { shouldValidate: true }
+                {shouldValidate: true}
             );
         },
         [selectedTagIds, setValue]
@@ -158,7 +143,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                         className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-300"
                         role="alert"
                     >
-                        <AlertCircleIcon className="size-4 shrink-0" />
+                        <AlertCircleIcon className="size-4 shrink-0"/>
                         <p>{serverError}</p>
                     </div>
                 )}
@@ -200,32 +185,29 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                     <Controller
                         control={control}
                         name="difficulty"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <Select
                                 value={field.value}
                                 onValueChange={(val) => field.onChange(val)}
                                 disabled={createProblem.isPending}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select difficulty" />
+                                    <SelectValue placeholder="Select difficulty"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="EASY">
-                                        <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-emerald-500" />
-                                            Easy
+                                        <span className="flex items-center gap-2"><span
+                                            className="size-2 rounded-full bg-emerald-500"/>Easy
                                         </span>
                                     </SelectItem>
                                     <SelectItem value="MEDIUM">
                                         <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-amber-500" />
-                                            Medium
+                                            <span className="size-2 rounded-full bg-amber-500"/>Medium
                                         </span>
                                     </SelectItem>
                                     <SelectItem value="HARD">
                                         <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-red-500" />
-                                            Hard
+                                            <span className="size-2 rounded-full bg-red-500"/>Hard
                                         </span>
                                     </SelectItem>
                                 </SelectContent>
@@ -251,12 +233,12 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                                 {selectedTags.length > 0
                                     ? `${selectedTags.length} tag(s) selected`
                                     : "Select tags…"}
-                                <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
+                                <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50"/>
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-72 p-0">
                             <Command>
-                                <CommandInput placeholder="Search tags…" />
+                                <CommandInput placeholder="Search tags…"/>
                                 <CommandList>
                                     <CommandEmpty>
                                         {tagsLoading ? "Loading…" : "No tags found."}
@@ -289,7 +271,7 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                                         className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 transition-colors"
                                         aria-label={`Remove ${tag.name}`}
                                     >
-                                        <XIcon className="size-3" />
+                                        <XIcon className="size-3"/>
                                     </button>
                                 </Badge>
                             ))}
@@ -314,14 +296,15 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                                 id="statement"
                                 rows={12}
                                 placeholder={`# Two Sum\n\nGiven an array of integers **nums** and an integer **target**, return indices of the two numbers such that they add up to target.\n\n## Constraints\n- $2 \\leq n \\leq 10^4$\n- $-10^9 \\leq nums[i] \\leq 10^9$`}
-                                className="min-h-[240px] font-mono text-sm"
+                                className="min-h-60 font-mono text-sm"
                                 aria-invalid={!!errors.statement}
                                 disabled={createProblem.isPending}
                                 {...register("statement")}
                             />
                         </TabsContent>
                         <TabsContent value="preview">
-                            <div className="rounded-xl border border-input bg-input/10 p-4 min-h-[240px] prose prose-sm dark:prose-invert max-w-none">
+                            <div
+                                className="rounded-xl border border-input bg-input/10 p-4 min-h-60 prose prose-sm dark:prose-invert max-w-none">
                                 {statementValue ? (
                                     <ReactMarkdown
                                         remarkPlugins={[remarkMath]}
@@ -348,13 +331,13 @@ export function Step1Basic({ onNext }: { onNext: () => void }) {
                 <Button type="submit" disabled={createProblem.isPending}>
                     {createProblem.isPending ? (
                         <>
-                            <Loader2Icon className="animate-spin" />
+                            <Loader2Icon className="animate-spin"/>
                             Creating…
                         </>
                     ) : (
                         <>
                             Next: Test Cases & Solutions
-                            <ChevronRightIcon />
+                            <ChevronRightIcon/>
                         </>
                     )}
                 </Button>

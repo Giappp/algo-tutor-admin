@@ -1,10 +1,8 @@
 import z from "zod";
 
-// ── Enums ──────────────────────────────────────────────────────
 export const DifficultyEnum = z.enum(["EASY", "MEDIUM", "HARD"]);
 export type Difficulty = z.infer<typeof DifficultyEnum>;
 
-// ── Step 1: Basic Information ──────────────────────────────────
 export const step1Schema = z.object({
     title: z.string().min(1, "Title is required.").max(200, "Title must be 200 characters or less."),
     slug: z
@@ -18,7 +16,6 @@ export const step1Schema = z.object({
 
 export type Step1Data = z.infer<typeof step1Schema>;
 
-// ── Step 2: Test Cases & Solutions ─────────────────────────────
 const testCaseSchema = z.object({
     input: z.string().min(1, "Input is required."),
     output: z.string().min(1, "Expected output is required."),
@@ -54,7 +51,7 @@ export const step2Schema = z
 
 export type Step2Data = z.infer<typeof step2Schema>;
 
-// ── Step 3: AI Context ─────────────────────────────────────────
+
 export const step3Schema = z.object({
     aiContext: z.string(),
 });

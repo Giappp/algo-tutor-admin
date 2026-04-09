@@ -1,23 +1,22 @@
 "use client";
 
-import { useCallback } from "react";
-import { useProblemDraftStore } from "@/store/problem-wizard.store";
-import { Step1Basic } from "@/components/admin/problem/wizard/step-1-basic";
-import { Step2TestsCode } from "@/components/admin/problem/wizard/step-2-tests-code";
-import { Step3AiPublish } from "@/components/admin/problem/wizard/step-3-ai-publish";
-import { cn } from "@/lib/utils";
+import {useCallback} from "react";
+import {useProblemDraftStore} from "@/store/problem-wizard.store";
+import {Step1Basic} from "@/components/admin/problem/wizard/step-1-basic";
+import {Step2TestsCode} from "@/components/admin/problem/wizard/step-2-tests-code";
+import {Step3AiPublish} from "@/components/admin/problem/wizard/step-3-ai-publish";
+import {cn} from "@/lib/utils";
 
-import { CheckIcon, FileTextIcon, FlaskConicalIcon, SparklesIcon } from "lucide-react";
+import {CheckIcon, FileTextIcon, FlaskConicalIcon, SparklesIcon} from "lucide-react";
 
 // ── Step definitions ───────────────────────────────────────────
 const STEPS = [
-    { number: 1, label: "Basic Information", icon: FileTextIcon },
-    { number: 2, label: "Test Cases & Solutions", icon: FlaskConicalIcon },
-    { number: 3, label: "AI Context & Publish", icon: SparklesIcon },
+    {number: 1, label: "Basic Information", icon: FileTextIcon},
+    {number: 2, label: "Test Cases & Solutions", icon: FlaskConicalIcon},
+    {number: 3, label: "AI Context & Publish", icon: SparklesIcon},
 ] as const;
 
-// ── Stepper UI ─────────────────────────────────────────────────
-function WizardStepper({ currentStep }: { currentStep: number }) {
+function WizardStepper({currentStep}: Readonly<{ currentStep: number }>) {
     return (
         <nav aria-label="Progress" className="mb-8">
             <ol className="flex items-center w-full">
@@ -40,18 +39,18 @@ function WizardStepper({ currentStep }: { currentStep: number }) {
                                     className={cn(
                                         "flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300",
                                         isCompleted &&
-                                            "border-primary bg-primary text-primary-foreground",
+                                        "border-primary bg-primary text-primary-foreground",
                                         isCurrent &&
-                                            "border-primary bg-primary/10 text-primary ring-4 ring-primary/20",
+                                        "border-primary bg-primary/10 text-primary ring-4 ring-primary/20",
                                         !isCompleted &&
-                                            !isCurrent &&
-                                            "border-muted-foreground/30 text-muted-foreground"
+                                        !isCurrent &&
+                                        "border-muted-foreground/30 text-muted-foreground"
                                     )}
                                 >
                                     {isCompleted ? (
-                                        <CheckIcon className="size-5" />
+                                        <CheckIcon className="size-5"/>
                                     ) : (
-                                        <StepIcon className="size-4.5" />
+                                        <StepIcon className="size-4.5"/>
                                     )}
                                 </div>
 
@@ -62,8 +61,8 @@ function WizardStepper({ currentStep }: { currentStep: number }) {
                                         isCurrent && "text-foreground",
                                         isCompleted && "text-primary",
                                         !isCompleted &&
-                                            !isCurrent &&
-                                            "text-muted-foreground"
+                                        !isCurrent &&
+                                        "text-muted-foreground"
                                     )}
                                 >
                                     {step.label}
@@ -89,7 +88,7 @@ function WizardStepper({ currentStep }: { currentStep: number }) {
 
 // ── Main Wizard ────────────────────────────────────────────────
 export function CreateProblemWizard() {
-    const { currentStep, setCurrentStep } = useProblemDraftStore();
+    const {currentStep, setCurrentStep} = useProblemDraftStore();
 
     const goToNext = useCallback(() => {
         setCurrentStep(Math.min(currentStep + 1, 3));
@@ -110,15 +109,15 @@ export function CreateProblemWizard() {
             </div>
 
             {/* Stepper */}
-            <WizardStepper currentStep={currentStep} />
+            <WizardStepper currentStep={currentStep}/>
 
             {/* Step Content */}
             <div className="bg-card rounded-2xl border p-6 shadow-sm">
-                {currentStep === 1 && <Step1Basic onNext={goToNext} />}
+                {currentStep === 1 && <Step1Basic onNext={goToNext}/>}
                 {currentStep === 2 && (
-                    <Step2TestsCode onNext={goToNext} onBack={goToBack} />
+                    <Step2TestsCode onNext={goToNext} onBack={goToBack}/>
                 )}
-                {currentStep === 3 && <Step3AiPublish onBack={goToBack} />}
+                {currentStep === 3 && <Step3AiPublish onBack={goToBack}/>}
             </div>
         </div>
     );

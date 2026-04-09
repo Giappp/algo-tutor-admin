@@ -1,6 +1,6 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { toAppError } from "@/api/api-error";
-import { clearAuthenticated } from "@/store/authStore";
+import axios, {AxiosError, AxiosRequestConfig} from "axios";
+import {toAppError} from "@/api/api-error";
+import {clearAuthenticated} from "@/store/authStore";
 
 // ── Backend response envelope ──────────────────────────────────
 export type ApiResponse<T> = {
@@ -8,25 +8,33 @@ export type ApiResponse<T> = {
     data: T;
 };
 
-export const api = axios.create({
+// 1. Create a base configuration object to share between instances
+const baseConfig: AxiosRequestConfig = {
     baseURL: "http://localhost:8080",
     timeout: 10000,
-    headers: { Accept: "application/json" },
+    headers: {Accept: "application/json"},
     withCredentials: true,
     // xsrfCookieName: "XSRF-TOKEN",
     // xsrfHeaderName: "X-CSRF-TOKEN",
-});
+};
+
+// 2. Create a "plain" instance for auth operations (NO INTERCEPTORS)
+const plainApi = axios.create(baseConfig);
+
+// 3. Create the main instance that will have interceptors attached
+export const api = axios.create(baseConfig);
 
 const retriedRequests = new WeakSet<object>();
 let isRefreshing = false;
 
 interface QueueItem {
     resolve: (value: void | PromiseLike<void>) => void;
-    reject: (reason: Error | AxiosError) => void;
+    reject: (reason: AxiosError | Error) => void;
 }
+
 let failedQueue: QueueItem[] = [];
 
-const processQueue = (error: Error | AxiosError | null) => {
+const processQueue = (error: AxiosError | Error | null) => {
     failedQueue.forEach((prom) => {
         if (error) {
             prom.reject(error);
@@ -40,56 +48,57 @@ const processQueue = (error: Error | AxiosError | null) => {
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        // 1. Kiểm tra điều kiện lỗi 401
+        // 1. Check for 401 Unauthorized
         if (!axios.isAxiosError(error) || !error.config || error.response?.status !== 401) {
             return Promise.reject(toAppError(error));
         }
 
-        // 2. Kiểm tra xem request này đã được retry trước đó chưa (Chống Infinite Loop)
+        // 2. Prevent infinite loop on the same request
         if (retriedRequests.has(error.config)) {
             return Promise.reject(toAppError(error));
         }
 
-        // 3. Nếu đang có một request refresh chạy rồi, đẩy các request khác vào Queue
+        // 3. If currently refreshing, queue this request
         if (isRefreshing) {
             return new Promise<void>((resolve, reject) => {
-                failedQueue.push({ resolve, reject });
+                failedQueue.push({resolve, reject});
             })
-                .then(() => api(error.config!)) // Gọi lại request ban đầu khi queue được resolve
-                .catch((err: Error | AxiosError) => Promise.reject(toAppError(err)));
+                .then(() => api(error.config!))
+                .catch((err) => {
+                    return Promise.reject(toAppError(err));
+                });
         }
 
-        // 4. Bắt đầu quá trình Refresh Token
+        // 4. Start the Refresh Token process
         retriedRequests.add(error.config);
         isRefreshing = true;
 
         try {
-            await api.post('/api/auth/refresh');
-
+            await plainApi.post('/api/auth/refresh');
             processQueue(null);
 
+            // Re-fire the original request
             return api(error.config);
 
         } catch (refreshError) {
-            const err = refreshError instanceof Error || axios.isAxiosError(refreshError)
+            const err = axios.isAxiosError(refreshError) || refreshError instanceof Error
                 ? refreshError
                 : new Error(String(refreshError));
 
             processQueue(err);
 
             try {
-                await api.post('/api/auth/logout');
+                await plainApi.post('/api/auth/logout');
             } finally {
                 clearAuthenticated();
             }
 
-            if (typeof window !== "undefined") {
-                window.location.href = "/login";
+            if (globalThis.window !== undefined) {
+                globalThis.location.href = "/login";
             }
 
-            return Promise.reject(toAppError(err));
+            return Promise.reject(toAppError(err)); // FIX: Return rejected promise
         } finally {
-            // Đặt lại trạng thái khi hoàn tất (dù thành công hay thất bại)
             isRefreshing = false;
         }
     }
@@ -97,7 +106,7 @@ api.interceptors.response.use(
 
 type Cfg = AxiosRequestConfig & { signal?: AbortSignal };
 
-// Unwrap backend envelope: axios response.data = { success, data } → return data
+// Unwrap backend envelope
 export const get = async <T>(url: string, config?: Cfg) =>
     (await api.get<ApiResponse<T>>(url, config)).data.data;
 
