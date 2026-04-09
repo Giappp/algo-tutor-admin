@@ -1,36 +1,36 @@
 "use client";
 
-import {useCallback, useEffect, useState} from "react";
-import {Control, Controller, useForm, useWatch} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
+import { Control, Controller, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import slugify from "slugify";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 
-import {type Step1Data, step1Schema} from "@/schemas/problem-wizard.schema";
-import {useProblemDraftStore} from "@/store/problem-wizard.store";
-import {get, post} from "@/api/http";
-import {toAppError} from "@/api/api-error";
+import { type Step1Data, step1Schema } from "@/schemas/problem-wizard.schema";
+import { useProblemDraftStore } from "@/store/problem-wizard.store";
+import { get, post } from "@/api/http";
+import { toAppError } from "@/api/api-error";
 
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Badge} from "@/components/ui/badge";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-import {AlertCircleIcon, ChevronRightIcon, ChevronsUpDownIcon, Loader2Icon, XIcon} from "lucide-react";
+import { AlertCircleIcon, ChevronRightIcon, ChevronsUpDownIcon, Loader2Icon, XIcon } from "lucide-react";
 
 type Tag = { id: number; name: string };
 
-function StatementPreview({control}: Readonly<{ control: Control<Step1Data> }>) {
-    const statementValue = useWatch({control, name: "statement"});
+function StatementPreview({ control }: Readonly<{ control: Control<Step1Data> }>) {
+    const statementValue = useWatch({ control, name: "statement" });
 
     return (
         <div
@@ -52,8 +52,8 @@ function StatementPreview({control}: Readonly<{ control: Control<Step1Data> }>) 
 }
 
 // ── Main Component ─────────────────────────────────────────────
-export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
-    const {step1Data, setStep1, setProblemId} = useProblemDraftStore();
+export function Step1Basic({ onNext }: Readonly<{ onNext: () => void }>) {
+    const { step1Data, setStep1, setProblemId } = useProblemDraftStore();
     const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -63,7 +63,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         control,
         setValue,
         getValues,
-        formState: {errors},
+        formState: { errors },
     } = useForm<Step1Data>({
         resolver: zodResolver(step1Schema),
         defaultValues: step1Data ?? {
@@ -71,12 +71,11 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
             slug: "",
             statement: "",
             difficulty: "EASY",
-            tagIds: [],
+            tags: [],
         },
     });
 
-    // ── Auto-save Draft to Store ───────────────────────────────
-    const formValues = useWatch({control});
+    const formValues = useWatch({ control });
 
     useEffect(() => {
         if (formValues.title !== undefined) {
@@ -84,20 +83,20 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         }
     }, [formValues, setStep1]);
 
-    const titleValue = useWatch({control, name: "title"});
+    const titleValue = useWatch({ control, name: "title" });
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     useEffect(() => {
         if (slugManuallyEdited || !titleValue) return;
         const timeout = setTimeout(() => {
-            const generated = slugify(titleValue, {lower: true, strict: true});
-            setValue("slug", generated, {shouldValidate: true});
+            const generated = slugify(titleValue, { lower: true, strict: true });
+            setValue("slug", generated, { shouldValidate: true });
         }, 300);
         return () => clearTimeout(timeout);
     }, [titleValue, slugManuallyEdited, setValue]);
 
     // ── Fetch tags ─────────────────────────────────────────────
-    const {data: tags = [], isLoading: tagsLoading} = useQuery<Tag[]>({
+    const { data: tags = [], isLoading: tagsLoading } = useQuery<Tag[]>({
         queryKey: ["admin-tags"],
         queryFn: () => get<Tag[]>("/api/v1/admin/tags"),
     });
@@ -105,7 +104,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
     // ── Submit mutation ────────────────────────────────────────
     const createProblem = useMutation({
         mutationFn: async (data: Step1Data) => {
-            return post<{ id: number }>("/api/v1/problems", data);
+            return post<{ id: number }>("/api/v1/admin/problems", data);
         },
     });
 
@@ -125,28 +124,29 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
         [createProblem, setStep1, setProblemId, onNext]
     );
 
-    // ── Selected tags helper (RESTORED) ────────────────────────
-    const selectedTagIds = useWatch({control, name: "tagIds"}) || [];
-    const selectedTags = tags.filter((t) => selectedTagIds.includes(t.id));
+    // ── Selected tags helper ────────────────────────────────────
+    const selectedTags = useWatch({ control, name: "tags" }) || [];
+    const selectedTagIds = selectedTags.map((t) => t.id);
 
     const toggleTag = useCallback(
-        (tagId: number) => {
-            const current = getValues("tagIds") || [];
-            const next = current.includes(tagId)
-                ? current.filter((id) => id !== tagId)
-                : [...current, tagId];
-            setValue("tagIds", next, {shouldValidate: true});
+        (tag: Tag) => {
+            const current = getValues("tags") || [];
+            const exists = current.some((t) => t.id === tag.id);
+            const next = exists
+                ? current.filter((t) => t.id !== tag.id)
+                : [...current, { id: tag.id, name: tag.name }];
+            setValue("tags", next, { shouldValidate: true });
         },
         [getValues, setValue]
     );
 
     const removeTag = useCallback(
         (tagId: number) => {
-            const current = getValues("tagIds") || [];
+            const current = getValues("tags") || [];
             setValue(
-                "tagIds",
-                current.filter((id) => id !== tagId),
-                {shouldValidate: true}
+                "tags",
+                current.filter((t) => t.id !== tagId),
+                { shouldValidate: true }
             );
         },
         [getValues, setValue]
@@ -161,7 +161,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                         className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-300"
                         role="alert"
                     >
-                        <AlertCircleIcon className="size-4 shrink-0"/>
+                        <AlertCircleIcon className="size-4 shrink-0" />
                         <p>{serverError}</p>
                     </div>
                 )}
@@ -203,29 +203,29 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                     <Controller
                         control={control}
                         name="difficulty"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <Select
                                 value={field.value}
                                 onValueChange={(val) => field.onChange(val)}
                                 disabled={createProblem.isPending}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select difficulty"/>
+                                    <SelectValue placeholder="Select difficulty" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="EASY">
                                         <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-emerald-500"/>Easy
+                                            <span className="size-2 rounded-full bg-emerald-500" />Easy
                                         </span>
                                     </SelectItem>
                                     <SelectItem value="MEDIUM">
                                         <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-amber-500"/>Medium
+                                            <span className="size-2 rounded-full bg-amber-500" />Medium
                                         </span>
                                     </SelectItem>
                                     <SelectItem value="HARD">
                                         <span className="flex items-center gap-2">
-                                            <span className="size-2 rounded-full bg-red-500"/>Hard
+                                            <span className="size-2 rounded-full bg-red-500" />Hard
                                         </span>
                                     </SelectItem>
                                 </SelectContent>
@@ -255,11 +255,11 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                             {selectedTags.length > 0
                                 ? `${selectedTags.length} tag(s) selected`
                                 : "Select tags…"}
-                            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50"/>
+                            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
                         </PopoverTrigger>
                         <PopoverContent className="w-72 p-0">
                             <Command>
-                                <CommandInput placeholder="Search tags…"/>
+                                <CommandInput placeholder="Search tags…" />
                                 <CommandList>
                                     <CommandEmpty>
                                         {tagsLoading ? "Loading…" : "No tags found."}
@@ -269,7 +269,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                                             <CommandItem
                                                 key={tag.id}
                                                 value={tag.name}
-                                                onSelect={() => toggleTag(tag.id)}
+                                                onSelect={() => toggleTag(tag)}
                                                 data-checked={selectedTagIds.includes(tag.id)}
                                             >
                                                 {tag.name}
@@ -292,7 +292,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                                         className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 transition-colors"
                                         aria-label={`Remove ${tag.name}`}
                                     >
-                                        <XIcon className="size-3"/>
+                                        <XIcon className="size-3" />
                                     </button>
                                 </Badge>
                             ))}
@@ -325,7 +325,7 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                         </TabsContent>
                         <TabsContent value="preview">
                             {/* Uses the isolated component */}
-                            <StatementPreview control={control}/>
+                            <StatementPreview control={control} />
                         </TabsContent>
                     </Tabs>
                     {errors.statement && (
@@ -339,13 +339,13 @@ export function Step1Basic({onNext}: Readonly<{ onNext: () => void }>) {
                 <Button type="submit" disabled={createProblem.isPending}>
                     {createProblem.isPending ? (
                         <>
-                            <Loader2Icon className="animate-spin"/>
+                            <Loader2Icon className="animate-spin" />
                             Creating…
                         </>
                     ) : (
                         <>
                             Next: Test Cases & Solutions
-                            <ChevronRightIcon/>
+                            <ChevronRightIcon />
                         </>
                     )}
                 </Button>

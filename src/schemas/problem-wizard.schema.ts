@@ -11,7 +11,7 @@ export const step1Schema = z.object({
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and hyphen-separated."),
     statement: z.string().min(10, "Problem statement must be at least 10 characters."),
     difficulty: DifficultyEnum,
-    tagIds: z.array(z.number()),
+    tags: z.array(z.object({ id: z.number(), name: z.string() })),
 });
 
 export type Step1Data = z.infer<typeof step1Schema>;

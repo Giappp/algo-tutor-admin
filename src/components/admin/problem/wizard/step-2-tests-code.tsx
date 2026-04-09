@@ -82,13 +82,13 @@ export function Step2TestsCode({
     // ── Mutations ──────────────────────────────────────────────
     const submitTestCases = useMutation({
         mutationFn: async (testCases: Step2Data["testCases"]) => {
-            return post(`/api/v1/problems/${problemId}/test-cases`, {testCases});
+            return post(`/api/v1/admin/problems/${problemId}/test-cases`, {testCases});
         },
     });
 
     const submitSolutions = useMutation({
         mutationFn: async (solutions: Step2Data["solutions"]) => {
-            return post(`/api/v1/problems/${problemId}/model-solution`, solutions);
+            return post(`/api/v1/admin/problems/${problemId}/model-solution`, solutions);
         },
     });
 
