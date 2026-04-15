@@ -48,6 +48,10 @@ const data = {
                     title: "Create Problem",
                     url: "/dashboard/problems/create",
                 },
+                {
+                    title: "Tags Management",
+                    url: "/dashboard/tags",
+                },
             ],
         },
         {

@@ -1,7 +1,7 @@
 "use client";
 
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {get, post} from "@/api/http";
+import {get, post} from "@/api/core/http";
 import {clearAuthenticated, setAuthenticated} from "@/store/authStore";
 import {LoginCredentials} from "@/types/auth/auth";
 import {SignInSchema} from "@/types/auth/schema";

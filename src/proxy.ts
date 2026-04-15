@@ -1,10 +1,9 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type {NextRequest} from 'next/server';
+import {NextResponse} from 'next/server';
 
 export function proxy(request: NextRequest) {
     const accessToken = request.cookies.get('access-token')?.value;
-    console.log("Access Token: " + accessToken);
-    const { pathname } = request.nextUrl;
+    const {pathname} = request.nextUrl;
 
     const isPublicPath = pathname === '/login' || pathname === '/register';
 

@@ -3,14 +3,13 @@
 import {useCallback, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 
 import {type Step3Data, step3Schema} from "@/schemas/problem-wizard.schema";
 import {useProblemDraftStore} from "@/store/problem-wizard.store";
-import {post, put} from "@/api/http";
-import {toAppError} from "@/api/api-error";
+import {toAppError} from "@/api/core/api-error";
+import {usePublishProblem, useUpsertAiContext} from "@/hooks/use-problem";
 
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
@@ -20,31 +19,25 @@ import {AlertCircleIcon, ChevronLeftIcon, Loader2Icon, RocketIcon, SaveIcon, Spa
 
 export function Step3AiPublish({onBack}: Readonly<{ onBack: () => void }>) {
     const router = useRouter();
-    const {problemId, setStep3, reset} = useProblemDraftStore();
+    const {problemId, step3Data, setStep3, reset} = useProblemDraftStore();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
+        formState: {errors}
     } = useForm<Step3Data>({
         resolver: zodResolver(step3Schema),
-        defaultValues: {
-            aiContext: "",
+        defaultValues: step3Data ?? {
+            algorithmicConcept: "",
+            predefinedHints: "",
+            edgeCasesToRemind: "",
         },
     });
 
     // ── Mutations ──────────────────────────────────────────────
-    const saveAiContext = useMutation({
-        mutationFn: async (aiContext: string) => {
-            return put(`/api/v1/problems/${problemId}/ai-context`, {aiContext});
-        },
-    });
-
-    const publishProblem = useMutation({
-        mutationFn: async () => {
-            return post(`/api/v1/problems/${problemId}/publish`);
-        },
-    });
+    const saveAiContext = useUpsertAiContext(problemId!);
+    const publishProblem = usePublishProblem(problemId!);
 
     const isPending = saveAiContext.isPending || publishProblem.isPending;
 
@@ -53,7 +46,7 @@ export function Step3AiPublish({onBack}: Readonly<{ onBack: () => void }>) {
         async (data: Step3Data) => {
             try {
                 setServerError(null);
-                await saveAiContext.mutateAsync(data.aiContext);
+                await saveAiContext.mutateAsync(data);
                 setStep3(data);
                 toast.success("Problem saved as draft!", {
                     description: "You can continue editing it later.",
@@ -73,7 +66,7 @@ export function Step3AiPublish({onBack}: Readonly<{ onBack: () => void }>) {
         async (data: Step3Data) => {
             try {
                 setServerError(null);
-                await saveAiContext.mutateAsync(data.aiContext);
+                await saveAiContext.mutateAsync(data);
                 await publishProblem.mutateAsync();
                 setStep3(data);
                 toast.success("Problem published!", {
@@ -113,27 +106,58 @@ export function Step3AiPublish({onBack}: Readonly<{ onBack: () => void }>) {
                     students toward the right approach without spoiling the solution.
                 </p>
 
-                <FieldGroup>
+                <FieldGroup className="gap-6">
                     <Field>
-                        <FieldLabel htmlFor="aiContext">
-                            Prompt Instructions
+                        <FieldLabel htmlFor="algorithmicConcept">
+                            Algorithmic Concept
                         </FieldLabel>
                         <FieldDescription>
-                            Describe the key algorithmic concepts, common pitfalls, and
-                            hints the AI should reference. Avoid including the actual solution
-                            code.
+                            What is the core algorithm or data structure expected? (e.g., Hash Map, Dynamic Programming)
                         </FieldDescription>
                         <Textarea
-                            id="aiContext"
-                            rows={12}
-                            placeholder={`Example:
-- This problem requires the use of a hash map for O(n) time complexity.
-- Students often try brute-force O(n²) first — guide them toward thinking about "what complement do I need?"
-- Key hint: "For each number, check if (target - number) exists in your seen values."
-- Don't reveal the two-pass vs one-pass optimization upfront.`}
-                            className="min-h-[240px] font-mono text-sm"
+                            id="algorithmicConcept"
+                            rows={4}
+                            placeholder="- Requires the use of a hash map for O(n) time complexity."
+                            className="font-mono text-sm"
                             disabled={isPending}
-                            {...register("aiContext")}
+                            aria-invalid={!!errors.algorithmicConcept}
+                            {...register("algorithmicConcept")}
+                        />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel htmlFor="predefinedHints">
+                            Predefined Hints
+                        </FieldLabel>
+                        <FieldDescription>
+                            Hints the AI mentor can give when the student is stuck.
+                        </FieldDescription>
+                        <Textarea
+                            id="predefinedHints"
+                            rows={4}
+                            placeholder={'1. Guide them toward thinking about "what complement do I need?"\n2. For each number, check if (target - number) exists in seen values.'}
+                            className="font-mono text-sm"
+                            disabled={isPending}
+                            aria-invalid={!!errors.predefinedHints}
+                            {...register("predefinedHints")}
+                        />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel htmlFor="edgeCasesToRemind">
+                            Edge Cases
+                        </FieldLabel>
+                        <FieldDescription>
+                            Important constraints or potential pitfalls to remind students about if they hit errors.
+                        </FieldDescription>
+                        <Textarea
+                            id="edgeCasesToRemind"
+                            rows={4}
+                            placeholder="- Handle duplicate elements or negative arrays."
+                            className="font-mono text-sm"
+                            disabled={isPending}
+                            aria-invalid={!!errors.edgeCasesToRemind}
+                            {...register("edgeCasesToRemind")}
                         />
                     </Field>
                 </FieldGroup>

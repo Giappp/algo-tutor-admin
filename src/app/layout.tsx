@@ -1,10 +1,10 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
-import {cn} from "@/lib/utils";
-import {averageSans, splineSansMono} from "@/font";
-import {QueryProvider} from "@/components/shared/query-provider";
-import {Toaster} from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
+import { averageSans, splineSansMono } from "@/font";
+import { QueryProvider } from "@/components/shared/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
     title: "Algo Tutor | Management Portal",
@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
@@ -21,12 +21,12 @@ export default function RootLayout({
             lang="en" suppressHydrationWarning
             className={cn("font-sans", averageSans.variable, splineSansMono.variable)}
         >
-        <body>
-        <QueryProvider>
-            {children}
-        </QueryProvider>
-        <Toaster richColors closeButton position="top-right" />
-        </body>
+            <body>
+                <QueryProvider>
+                    {children}
+                </QueryProvider>
+                <Toaster richColors closeButton position="top-right" />
+            </body>
         </html>
     );
 }

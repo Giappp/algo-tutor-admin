@@ -1,32 +1,32 @@
 "use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Code2, ShieldAlert, Loader2, AlertCircle } from "lucide-react"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent} from "@/components/ui/card"
+import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field"
+import {Input} from "@/components/ui/input"
+import {AlertCircle, Code2, Loader2, ShieldAlert} from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SignInSchema } from "@/types/auth/schema"
-import { LoginCredentials } from "@/types/auth/auth"
-import { toAppError } from "@/api/api-error"
-import { useAuth } from "@/hooks/use-auth-hook"
+import {useState} from "react"
+import {useForm} from "react-hook-form"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {SignInSchema} from "@/types/auth/schema"
+import {LoginCredentials} from "@/types/auth/auth"
+import {toAppError} from "@/api/core/api-error"
+import {useAuth} from "@/hooks/use-auth-hook"
 
 export function LoginForm({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
-    const { login, isLoggingIn } = useAuth();
+                              className,
+                              ...props
+                          }: React.ComponentProps<"div">) {
+    const {login, isLoggingIn} = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<LoginCredentials>({
         resolver: zodResolver(SignInSchema),
         defaultValues: {
@@ -38,7 +38,7 @@ export function LoginForm({
     const onSubmit = async (data: LoginCredentials) => {
         try {
             setServerError(null);
-            await login(data);
+            login(data);
         } catch (error) {
             const appError = toAppError(error);
             setServerError(appError.message);
@@ -61,13 +61,13 @@ export function LoginForm({
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <div
                                     className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 mb-2">
-                                    <Code2 className="w-6 h-6 text-emerald-500" />
+                                    <Code2 className="w-6 h-6 text-emerald-500"/>
                                 </div>
                                 <h1 className="text-2xl font-bold tracking-tight">
                                     AlgoTutor Admin
                                 </h1>
                                 <p className="text-balance text-sm text-muted-foreground flex items-center justify-center gap-1.5">
-                                    <ShieldAlert className="w-4 h-4 text-destructive" />
+                                    <ShieldAlert className="w-4 h-4 text-destructive"/>
                                     Restricted Access. Staff only.
                                 </p>
                             </div>
@@ -78,7 +78,7 @@ export function LoginForm({
                                     className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-300"
                                     role="alert"
                                 >
-                                    <AlertCircle className="size-4 shrink-0" />
+                                    <AlertCircle className="size-4 shrink-0"/>
                                     <p>{serverError}</p>
                                 </div>
                             )}
@@ -134,7 +134,7 @@ export function LoginForm({
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <Loader2 className="animate-spin" />
+                                            <Loader2 className="animate-spin"/>
                                             Authenticating…
                                         </>
                                     ) : (
@@ -165,8 +165,8 @@ export function LoginForm({
                             <div className="p-4 border border-zinc-800 rounded-xl bg-zinc-950/50 backdrop-blur-sm">
                                 <pre className="text-xs font-mono text-emerald-400 text-left">
                                     <code>
-                                        {`function optimize(algo) {`} <br />
-                                        {`  return BigO.O(1);`} <br />
+                                        {`function optimize(algo) {`} <br/>
+                                        {`  return BigO.O(1);`} <br/>
                                         {`}`}
                                     </code>
                                 </pre>

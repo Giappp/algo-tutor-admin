@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import type { Step1Data, Step2Data, Step3Data } from "@/schemas/problem-wizard.schema";
+import type { BasicInfo, Step2Data, Step3Data } from "@/schemas/problem-wizard.schema";
 
 type ProblemDraftState = {
     problemId: number | null;
     currentStep: number;
-    step1Data: Step1Data | null;
+    step1Data: BasicInfo | null;
     step2Data: Step2Data | null;
     step3Data: Step3Data | null;
 };
@@ -12,7 +12,7 @@ type ProblemDraftState = {
 type ProblemDraftActions = {
     setProblemId: (id: number) => void;
     setCurrentStep: (step: number) => void;
-    setStep1: (data: Step1Data) => void;
+    setStep1: (data: BasicInfo) => void;
     setStep2: (data: Step2Data) => void;
     setStep3: (data: Step3Data) => void;
     reset: () => void;

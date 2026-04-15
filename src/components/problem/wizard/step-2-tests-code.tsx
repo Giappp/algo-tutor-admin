@@ -3,20 +3,17 @@
 import {useCallback, useState} from "react";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import "katex/dist/katex.min.css";
 
 import {type Step2Data, step2Schema} from "@/schemas/problem-wizard.schema";
 import {useProblemDraftStore} from "@/store/problem-wizard.store";
-import {post} from "@/api/http";
-import {toAppError} from "@/api/api-error";
+import {toAppError} from "@/api/core/api-error";
+import {useUpsertTestCases} from "@/hooks/use-problem";
 
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Switch} from "@/components/ui/switch";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Field, FieldError, FieldLabel,} from "@/components/ui/field";
 import {Card, CardContent} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
@@ -33,7 +30,6 @@ import {
     Trash2Icon,
 } from "lucide-react";
 
-// ── Lazy-load Monaco Editor ────────────────────────────────────
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
     ssr: false,
     loading: () => (
@@ -43,14 +39,12 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
     ),
 });
 
-// ── Language config ────────────────────────────────────────────
 const LANGUAGES = [
     {key: "cpp" as const, label: "C++", monacoLang: "cpp"},
     {key: "python" as const, label: "Python", monacoLang: "python"},
     {key: "java" as const, label: "Java", monacoLang: "java"},
 ];
 
-// ── Component ──────────────────────────────────────────────────
 export function Step2TestsCode({
                                    onNext,
                                    onBack,
@@ -69,8 +63,9 @@ export function Step2TestsCode({
     } = useForm<Step2Data>({
         resolver: zodResolver(step2Schema),
         defaultValues: step2Data ?? {
-            testCases: [{input: "", output: "", isHidden: false, scoreWeight: 1}],
-            solutions: {cpp: "", python: "", java: ""},
+            testCases: [{input: "", expectedOutput: "", isSample: false, explanation: ""}],
+            authorSolutionLanguage: "CPP",
+            authorSolutionCode: "",
         },
     });
 
@@ -79,37 +74,47 @@ export function Step2TestsCode({
         name: "testCases",
     });
 
-    // ── Mutations ──────────────────────────────────────────────
-    const submitTestCases = useMutation({
-        mutationFn: async (testCases: Step2Data["testCases"]) => {
-            return post(`/api/v1/admin/problems/${problemId}/test-cases`, {testCases});
-        },
-    });
+    const upsertTestCases = useUpsertTestCases(problemId!);
 
-    const submitSolutions = useMutation({
-        mutationFn: async (solutions: Step2Data["solutions"]) => {
-            return post(`/api/v1/admin/problems/${problemId}/model-solution`, solutions);
+    const submitTestCases = {
+        isPending: upsertTestCases.isPending,
+        mutateAsync: async (data: Step2Data) => {
+            return upsertTestCases.mutateAsync({
+                language: data.authorSolutionLanguage,
+                authorSolution: data.authorSolutionCode,
+                testCases: data.testCases.map((tc, index) => ({
+                    ...tc,
+                    orderIndex: index
+                })),
+            });
         },
-    });
+    };
 
-    const isPending = submitTestCases.isPending || submitSolutions.isPending;
+    const isPending = submitTestCases.isPending;
 
     const onSubmit = useCallback(
         async (data: Step2Data) => {
             try {
                 setServerError(null);
-                await Promise.all([
-                    submitTestCases.mutateAsync(data.testCases),
-                    submitSolutions.mutateAsync(data.solutions),
-                ]);
+                await submitTestCases.mutateAsync(data);
                 setStep2(data);
                 onNext();
             } catch (error) {
                 const appError = toAppError(error);
-                setServerError(appError.message);
+                let errorMessage = appError.message;
+
+                // If it's a validation error, we might be able to format the details
+                const axiosError = error as any;
+                const responseData = axiosError?.response?.data;
+                if (responseData?.error_code === "TESTCASE_VALIDATION_FAILED" && responseData?.details) {
+                    const details = responseData.details;
+                    errorMessage = `Test cases validation failed: ` + details.map((d: any) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
+                }
+
+                setServerError(errorMessage);
             }
         },
-        [submitTestCases, submitSolutions, setStep2, onNext]
+        [submitTestCases, setStep2, onNext]
     );
 
     return (
@@ -131,8 +136,8 @@ export function Step2TestsCode({
                     <div>
                         <h3 className="text-lg font-semibold">Test Cases</h3>
                         <p className="text-sm text-muted-foreground">
-                            Add at least one test case. Hidden test cases are not visible to
-                            students.
+                            Add at least one test case. Sample test cases are visible to
+                            students as examples.
                         </p>
                     </div>
                     <Button
@@ -140,7 +145,7 @@ export function Step2TestsCode({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                            append({input: "", output: "", isHidden: false, scoreWeight: 1})
+                            append({input: "", expectedOutput: "", isSample: false, explanation: ""})
                         }
                         disabled={isPending}
                     >
@@ -159,19 +164,19 @@ export function Step2TestsCode({
                                         Test Case #{index + 1}
                                     </span>
                                     <div className="flex items-center gap-3">
-                                        {/* Hidden toggle */}
+                                        {/* Sample toggle */}
                                         <Controller
                                             control={control}
-                                            name={`testCases.${index}.isHidden`}
+                                            name={`testCases.${index}.isSample`}
                                             render={({field: switchField}) => (
                                                 <div className="flex items-center gap-2">
                                                     {switchField.value ? (
-                                                        <EyeOffIcon className="size-3.5 text-muted-foreground"/>
-                                                    ) : (
                                                         <EyeIcon className="size-3.5 text-muted-foreground"/>
+                                                    ) : (
+                                                        <EyeOffIcon className="size-3.5 text-muted-foreground"/>
                                                     )}
                                                     <Label className="text-xs text-muted-foreground cursor-pointer">
-                                                        Hidden
+                                                        Sample Test
                                                     </Label>
                                                     <Switch
                                                         checked={switchField.value}
@@ -225,33 +230,31 @@ export function Step2TestsCode({
                                             placeholder="Enter expected output…"
                                             className="font-mono text-xs min-h-20"
                                             disabled={isPending}
-                                            aria-invalid={!!errors.testCases?.[index]?.output}
-                                            {...register(`testCases.${index}.output`)}
+                                            aria-invalid={!!errors.testCases?.[index]?.expectedOutput}
+                                            {...register(`testCases.${index}.expectedOutput`)}
                                         />
-                                        {errors.testCases?.[index]?.output && (
+                                        {errors.testCases?.[index]?.expectedOutput && (
                                             <FieldError>
-                                                {errors.testCases[index].output.message}
+                                                {errors.testCases[index].expectedOutput.message}
                                             </FieldError>
                                         )}
                                     </Field>
                                 </div>
 
-                                {/* Score weight */}
-                                <Field className="max-w-50">
-                                    <FieldLabel className="text-xs">Score Weight</FieldLabel>
-                                    <Input
-                                        type="number"
-                                        min={0}
-                                        step={1}
+                                {/* Explanation */}
+                                <Field>
+                                    <FieldLabel className="text-xs">Explanation (Optional)</FieldLabel>
+                                    <Textarea
+                                        rows={2}
+                                        placeholder="Explain the testcase..."
+                                        className="text-xs min-h-12"
                                         disabled={isPending}
-                                        aria-invalid={!!errors.testCases?.[index]?.scoreWeight}
-                                        {...register(`testCases.${index}.scoreWeight`, {
-                                            valueAsNumber: true,
-                                        })}
+                                        aria-invalid={!!errors.testCases?.[index]?.explanation}
+                                        {...register(`testCases.${index}.explanation`)}
                                     />
-                                    {errors.testCases?.[index]?.scoreWeight && (
+                                    {errors.testCases?.[index]?.explanation && (
                                         <FieldError>
-                                            {errors.testCases[index].scoreWeight.message}
+                                            {errors.testCases[index].explanation.message}
                                         </FieldError>
                                     )}
                                 </Field>
@@ -272,60 +275,69 @@ export function Step2TestsCode({
             {/* ── Solutions Section ── */}
             <section>
                 <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Model Solutions</h3>
+                    <h3 className="text-lg font-semibold">Author Solution</h3>
                     <p className="text-sm text-muted-foreground">
-                        Provide at least one solution in any language. These are used for
-                        verifying test case correctness.
+                        Provide the primary solution. This is used for verifying test case correctness.
                     </p>
                 </div>
 
-                <Tabs defaultValue="cpp">
-                    <TabsList>
-                        {LANGUAGES.map((lang) => (
-                            <TabsTrigger key={lang.key} value={lang.key}>
-                                {lang.label}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
+                <div className="space-y-4">
+                    <Field className="max-w-[200px]">
+                        <FieldLabel>Language</FieldLabel>
+                        <Controller
+                            control={control}
+                            name="authorSolutionLanguage"
+                            render={({field}) => (
+                                <select
+                                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    disabled={isPending}
+                                >
+                                    <option value="CPP">C++</option>
+                                    <option value="JAVA">Java</option>
+                                    <option value="PYTHON">Python</option>
+                                </select>
+                            )}
+                        />
+                    </Field>
 
-                    {LANGUAGES.map((lang) => (
-                        <TabsContent key={lang.key} value={lang.key}>
-                            <Controller
-                                control={control}
-                                name={`solutions.${lang.key}`}
-                                render={({field}) => (
-                                    <div className="rounded-xl border border-input overflow-hidden">
-                                        <MonacoEditor
-                                            height="400px"
-                                            language={lang.monacoLang}
-                                            theme="vs-dark"
-                                            value={field.value}
-                                            onChange={(val) => field.onChange(val ?? "")}
-                                            options={{
-                                                minimap: {enabled: false},
-                                                fontSize: 14,
-                                                lineNumbers: "on",
-                                                scrollBeyondLastLine: false,
-                                                automaticLayout: true,
-                                                tabSize: 4,
-                                                wordWrap: "on",
-                                                padding: {top: 12},
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            />
-                        </TabsContent>
-                    ))}
-                </Tabs>
+                    <Controller
+                        control={control}
+                        name="authorSolutionCode"
+                        render={({field}) => {
+                            const selectedLanguage = control._formValues.authorSolutionLanguage;
+                            const monacoLang = LANGUAGES.find(l => l.key.toUpperCase() === selectedLanguage)?.monacoLang || "cpp";
+                            return (
+                                <div className="rounded-xl border border-input overflow-hidden relative">
+                                    <MonacoEditor
+                                        height="400px"
+                                        language={monacoLang}
+                                        theme="vs-dark"
+                                        value={field.value}
+                                        onChange={(val) => field.onChange(val ?? "")}
+                                        options={{
+                                            minimap: {enabled: false},
+                                            fontSize: 14,
+                                            lineNumbers: "on",
+                                            scrollBeyondLastLine: false,
+                                            automaticLayout: true,
+                                            tabSize: 4,
+                                            wordWrap: "on",
+                                            padding: {top: 12},
+                                        }}
+                                    />
+                                </div>
+                            );
+                        }}
+                    />
 
-                {errors.solutions && (
-                    <FieldError className="mt-2">
-                        {typeof errors.solutions === "object" && "message" in errors.solutions
-                            ? (errors.solutions as { message: string }).message
-                            : "Please provide at least one solution."}
-                    </FieldError>
-                )}
+                    {errors.authorSolutionCode && (
+                        <FieldError className="mt-2">
+                            {errors.authorSolutionCode.message}
+                        </FieldError>
+                    )}
+                </div>
             </section>
 
             {/* ── Actions ── */}

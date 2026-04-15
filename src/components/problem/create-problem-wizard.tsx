@@ -2,9 +2,9 @@
 
 import {useCallback} from "react";
 import {useProblemDraftStore} from "@/store/problem-wizard.store";
-import {Step1Basic} from "@/components/admin/problem/wizard/step-1-basic";
-import {Step2TestsCode} from "@/components/admin/problem/wizard/step-2-tests-code";
-import {Step3AiPublish} from "@/components/admin/problem/wizard/step-3-ai-publish";
+import {Step1Basic} from "@/components/problem/wizard/step-1-basic";
+import {Step2TestsCode} from "@/components/problem/wizard/step-2-tests-code";
+import {Step3AiPublish} from "@/components/problem/wizard/step-3-ai-publish";
 import {cn} from "@/lib/utils";
 
 import {CheckIcon, FileTextIcon, FlaskConicalIcon, SparklesIcon} from "lucide-react";

@@ -1,14 +1,8 @@
 import axios, {AxiosError, AxiosRequestConfig} from "axios";
-import {toAppError} from "@/api/api-error";
+import {toAppError} from "@/api/core/api-error";
 import {clearAuthenticated} from "@/store/authStore";
+import {ApiResponse} from "@/types/shared";
 
-// ── Backend response envelope ──────────────────────────────────
-export type ApiResponse<T> = {
-    success: boolean;
-    data: T;
-};
-
-// 1. Create a base configuration object to share between instances
 const baseConfig: AxiosRequestConfig = {
     baseURL: "http://localhost:8080",
     timeout: 10000,
@@ -106,7 +100,6 @@ api.interceptors.response.use(
 
 type Cfg = AxiosRequestConfig & { signal?: AbortSignal };
 
-// Unwrap backend envelope
 export const get = async <T>(url: string, config?: Cfg) =>
     (await api.get<ApiResponse<T>>(url, config)).data.data;
 
