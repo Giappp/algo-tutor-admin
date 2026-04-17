@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /.idea/copilot.data.migration.ask2agent.xml
+/.agent/
+/.agents/
+/.cursorrules/
+/.cusor/
+/.agent/**/&&

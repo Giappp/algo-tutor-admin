@@ -20,6 +20,7 @@ import { ChevronRightIcon } from "lucide-react"
 
 export function NavMain({
   items,
+  label = "Platform",
 }: {
   items: {
     title: string
@@ -31,10 +32,11 @@ export function NavMain({
       url: string
     }[]
   }[]
+  label?: string
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -55,8 +57,7 @@ export function NavMain({
                   render={<CollapsibleTrigger />}
                   className="aria-expanded:rotate-90"
                 >
-                  <ChevronRightIcon
-                  />
+                  <ChevronRightIcon />
                   <span className="sr-only">Toggle</span>
                 </SidebarMenuAction>
                 <CollapsibleContent>

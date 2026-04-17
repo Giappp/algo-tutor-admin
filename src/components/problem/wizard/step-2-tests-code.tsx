@@ -1,10 +1,11 @@
 "use client";
 
-import {useCallback, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import "katex/dist/katex.min.css";
+import type {AxiosError} from "axios";
 
 import {type Step2Data, step2Schema} from "@/schemas/problem-wizard.schema";
 import {useProblemDraftStore} from "@/store/problem-wizard.store";
@@ -76,7 +77,7 @@ export function Step2TestsCode({
 
     const upsertTestCases = useUpsertTestCases(problemId!);
 
-    const submitTestCases = {
+    const submitTestCases = useMemo(() => ({
         isPending: upsertTestCases.isPending,
         mutateAsync: async (data: Step2Data) => {
             return upsertTestCases.mutateAsync({
@@ -88,7 +89,7 @@ export function Step2TestsCode({
                 })),
             });
         },
-    };
+    }), [upsertTestCases]);
 
     const isPending = submitTestCases.isPending;
 
@@ -103,12 +104,11 @@ export function Step2TestsCode({
                 const appError = toAppError(error);
                 let errorMessage = appError.message;
 
-                // If it's a validation error, we might be able to format the details
-                const axiosError = error as any;
-                const responseData = axiosError?.response?.data;
+                const axiosError = error as AxiosError<{error_code?: string; details?: Array<{testcaseIndex: number; status: string}>}>;
+                const responseData = axiosError.response?.data;
                 if (responseData?.error_code === "TESTCASE_VALIDATION_FAILED" && responseData?.details) {
                     const details = responseData.details;
-                    errorMessage = `Test cases validation failed: ` + details.map((d: any) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
+                    errorMessage = `Test cases validation failed: ` + details.map((d) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
                 }
 
                 setServerError(errorMessage);

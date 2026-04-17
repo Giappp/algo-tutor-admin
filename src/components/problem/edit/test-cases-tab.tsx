@@ -3,10 +3,10 @@
 import {useState} from "react";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useQueryClient} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import {toast} from "sonner";
 import "katex/dist/katex.min.css";
+import type {AxiosError} from "axios";
 
 
 import {type Step2Data, step2Schema} from "@/schemas/problem-wizard.schema";
@@ -22,6 +22,7 @@ import {Card, CardContent} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 
 import {AlertCircleIcon, EyeIcon, EyeOffIcon, Loader2Icon, PlusIcon, SaveIcon, Trash2Icon,} from "lucide-react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
     ssr: false,
@@ -40,7 +41,6 @@ const LANGUAGES = [
 
 export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
     const [serverError, setServerError] = useState<string | null>(null);
-    const queryClient = useQueryClient();
 
     const {
         register,
@@ -89,11 +89,14 @@ export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
                     const appError = toAppError(err);
                     let errorMessage = appError.message;
 
-                    const axiosError = err as any;
-                    const responseData = axiosError?.response?.data;
+                    const axiosError = err as AxiosError<{
+                        error_code?: string;
+                        details?: Array<{ testcaseIndex: number; status: string }>
+                    }>;
+                    const responseData = axiosError.response?.data;
                     if (responseData?.error_code === "TESTCASE_VALIDATION_FAILED" && responseData?.details) {
                         const details = responseData.details;
-                        errorMessage = `Test cases validation failed: ` + details.map((d: any) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
+                        errorMessage = `Test cases validation failed: ` + details.map((d) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
                     }
 
                     setServerError(errorMessage);
@@ -151,7 +154,7 @@ export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
                         onClick={() => append({input: "", expectedOutput: "", isSample: false, explanation: ""})}
                         disabled={isPending}
                     >
-                        <PlusIcon className="size-4"/>
+                        <PlusIcon data-icon="inline-start"/>
                         Add Test Case
                     </Button>
                 </div>
@@ -171,9 +174,11 @@ export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
                                             render={({field: switchField}) => (
                                                 <div className="flex items-center gap-2">
                                                     {switchField.value ? (
-                                                        <EyeIcon className="size-3.5 text-muted-foreground"/>
+                                                        <EyeIcon className="size-3.5 text-muted-foreground"
+                                                                 data-icon="inline-start"/>
                                                     ) : (
-                                                        <EyeOffIcon className="size-3.5 text-muted-foreground"/>
+                                                        <EyeOffIcon className="size-3.5 text-muted-foreground"
+                                                                    data-icon="inline-start"/>
                                                     )}
                                                     <Label className="text-xs text-muted-foreground cursor-pointer">
                                                         Sample Test
@@ -196,7 +201,8 @@ export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
                                                 disabled={isPending}
                                                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                             >
-                                                <Trash2Icon className="size-4"/>
+                                                <Trash2Icon className="size-4" data-icon="inline-start"/>
+                                                Delete
                                             </Button>
                                         )}
                                     </div>
@@ -274,16 +280,17 @@ export function TestCasesTab({problem}: { problem: ProblemDetailAdmin }) {
                             control={control}
                             name="authorSolutionLanguage"
                             render={({field}) => (
-                                <select
-                                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    disabled={isPending}
-                                >
-                                    <option value="CPP">C++</option>
-                                    <option value="JAVA">Java</option>
-                                    <option value="PYTHON">Python</option>
-                                </select>
+                                <Select value={field.value} onValueChange={(val) => field.onChange(val)}
+                                        disabled={isPending}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select language"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="CPP">C++</SelectItem>
+                                        <SelectItem value="JAVA">Java</SelectItem>
+                                        <SelectItem value="PYTHON">Python</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             )}
                         />
                     </Field>

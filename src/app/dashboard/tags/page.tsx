@@ -1,53 +1,29 @@
 "use client"
 import {columns} from "./columns"
 import {DataTable} from "./data-table"
-import {useAdminTags} from "@/hooks/use-tags";
-import {DebouncedInput} from "@/components/shared/debounced-input";
-import {useTagSearchUrl} from "@/hooks/use-tag-search-url";
-import {Pagination} from "@/components/shared/Pagination";
-
+import {useAdminTags} from "@/hooks/use-tags"
+import {CreateTagDialog} from "@/components/tags/create-tag-dialog"
 
 export default function AdminTagPage() {
+    const {data: tags, isLoading} = useAdminTags()
 
-    const {params, updateParams} = useTagSearchUrl();
-
-
-    const {data: response, isLoading} = useAdminTags(params);
-
-    const tags = response?.data || [];
-    const totalPages = response?.totalPages || 1;
-
-    const handleSearch = (value: string | number) => {
-        updateParams({
-            name: String(value),
-            page: 1
-        });
-    };
-
-    const handlePageChange = (newPage: number) => {
-        updateParams({page: newPage});
-    };
     return (
-        <div className="container mx-auto py-10">
-            {/* --- Thanh Công Cụ (Toolbar) --- */}
+        <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-                <DebouncedInput
-                    placeholder="Tìm kiếm tag..."
-                    value={params.name || ''}
-                    onChange={handleSearch}
-                    className="max-w-sm border p-2 rounded"
-                />
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Tags</h1>
+                    <p className="text-muted-foreground">Manage your problem tags.</p>
+                </div>
+                <CreateTagDialog/>
             </div>
+
             {isLoading ? (
-                <div>Đang tải dữ liệu...</div>
+                <div className="flex items-center justify-center h-48 text-muted-foreground">
+                    Loading tags...
+                </div>
             ) : (
-                <DataTable columns={columns} data={tags}/>
+                <DataTable columns={columns} data={tags || []}/>
             )}
-            <Pagination
-                currentPage={params.page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
         </div>
     )
 }

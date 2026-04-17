@@ -10,12 +10,14 @@ import {toAppError} from "@/api/core/api-error";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "@/components/ui/breadcrumb";
 import {ChevronLeftIcon, Loader2Icon, RocketIcon} from "lucide-react";
 
 import {BasicInfoTab} from "@/components/problem/edit/basic-info-tab";
 import {TestCasesTab} from "@/components/problem/edit/test-cases-tab";
 import {EditorialTab} from "@/components/problem/edit/editorial-tab";
 import {AiContextTab} from "@/components/problem/edit/ai-context-tab";
+import {getBreadcrumbs} from "@/lib/breadcrumbs";
 
 export default function ProblemEditPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -42,20 +44,36 @@ export default function ProblemEditPage(props: { params: Promise<{ id: string }>
 
     return (
         <div className="p-6 space-y-6 max-w-5xl mx-auto w-full">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb>
+                <BreadcrumbList>
+                    {getBreadcrumbs(`/dashboard/problems/${problem.id}`).map((item, index) => (
+                        <BreadcrumbItem key={index}>
+                            {item.href ? (
+                                <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                            ) : (
+                                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                            )}
+                            {index < getBreadcrumbs(`/dashboard/problems/${problem.id}`).length - 1 && (
+                                <BreadcrumbSeparator />
+                            )}
+                        </BreadcrumbItem>
+                    ))}
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Button nativeButton={false} variant="ghost" size="icon"
-                            render={<Link href="/dashboard/problems"/>}>
-                        <ChevronLeftIcon className="w-4 h-4"/>
+                    <Button render={<Link href="/dashboard/problems"/>} variant="ghost" size="icon">
+                        <ChevronLeftIcon className="w-4 h-4" data-icon="inline-center" />
                     </Button>
                     <div>
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold tracking-tight">{problem.title}</h1>
                             {problem.status === 'PUBLISHED' ? (
-                                <Badge className="bg-emerald-500/10 text-emerald-500">Published</Badge>
+                                <Badge variant="default">Published</Badge>
                             ) : problem.status === 'ARCHIVED' ? (
-                                <Badge variant="destructive"
-                                       className="bg-destructive/10 text-destructive">Archived</Badge>
+                                <Badge variant="destructive">Archived</Badge>
                             ) : (
                                 <Badge variant="secondary">Draft</Badge>
                             )}
@@ -66,15 +84,18 @@ export default function ProblemEditPage(props: { params: Promise<{ id: string }>
 
                 {problem.status !== 'PUBLISHED' && problem.status !== 'ARCHIVED' && (
                     <Button onClick={() => publishProblem.mutate()} disabled={publishProblem.isPending}>
-                        {publishProblem.isPending ? <Loader2Icon className="w-4 h-4 mr-2 animate-spin"/> :
-                            <RocketIcon className="w-4 h-4 mr-2"/>}
+                        {publishProblem.isPending ? (
+                            <Loader2Icon className="w-4 h-4 mr-2 animate-spin"/>
+                        ) : (
+                            <RocketIcon className="w-4 h-4 mr-2"/>
+                        )}
                         Publish Problem
                     </Button>
                 )}
             </div>
 
             <Tabs defaultValue="basic" className="space-y-6">
-                <TabsList className="bg-muted text-muted-foreground p-1">
+                <TabsList>
                     <TabsTrigger value="basic">Basic Info</TabsTrigger>
                     <TabsTrigger value="testcases">Test Cases & Solution</TabsTrigger>
                     <TabsTrigger value="editorial">Editorials</TabsTrigger>

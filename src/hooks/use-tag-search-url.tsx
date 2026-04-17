@@ -1,3 +1,5 @@
+"use client"
+
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import {TagSearch, tagSearchSchema} from "@/schemas/tag-search-schema";
 

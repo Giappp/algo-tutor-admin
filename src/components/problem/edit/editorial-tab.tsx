@@ -3,10 +3,10 @@
 import {useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useQueryClient} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import {toast} from "sonner";
 import z from "zod";
+import type {AxiosError} from "axios";
 
 
 import {toAppError} from "@/api/core/api-error";
@@ -43,7 +43,6 @@ type EditorialData = z.infer<typeof editorialSchema>;
 
 export function EditorialTab({problem}: { problem: ProblemDetailAdmin }) {
     const [serverError, setServerError] = useState<string | null>(null);
-    const queryClient = useQueryClient();
 
     const {
         handleSubmit,
@@ -71,11 +70,11 @@ export function EditorialTab({problem}: { problem: ProblemDetailAdmin }) {
                     const appError = toAppError(err);
                     let errorMessage = appError.message;
 
-                    const axiosError = err as any;
-                    const responseData = axiosError?.response?.data;
+                    const axiosError = err as AxiosError<{error_code?: string; details?: Array<{testcaseIndex: number; status: string}>}>;
+                    const responseData = axiosError.response?.data;
                     if (responseData?.error_code === "TESTCASE_VALIDATION_FAILED" && responseData?.details) {
                         const details = responseData.details;
-                        errorMessage = `Editorial validation failed: ` + details.map((d: any) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
+                        errorMessage = `Editorial validation failed: ` + details.map((d) => `Case #${d.testcaseIndex + 1}: ${d.status}`).join(', ');
                     }
 
                     setServerError(errorMessage);

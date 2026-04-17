@@ -175,12 +175,9 @@ export function BasicInfoTab({problem}: { problem: ProblemDetailAdmin }) {
                                     <SelectValue placeholder="Select difficulty"/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="EASY"><span className="flex items-center gap-2"><span
-                                        className="size-2 rounded-full bg-emerald-500"/>Easy</span></SelectItem>
-                                    <SelectItem value="MEDIUM"><span className="flex items-center gap-2"><span
-                                        className="size-2 rounded-full bg-amber-500"/>Medium</span></SelectItem>
-                                    <SelectItem value="HARD"><span className="flex items-center gap-2"><span
-                                        className="size-2 rounded-full bg-red-500"/>Hard</span></SelectItem>
+                                    <SelectItem value="EASY"><Badge variant="default" className="px-2 py-0.5 text-xs">Easy</Badge></SelectItem>
+                                    <SelectItem value="MEDIUM"><Badge variant="secondary" className="px-2 py-0.5 text-xs">Medium</Badge></SelectItem>
+                                    <SelectItem value="HARD"><Badge variant="destructive" className="px-2 py-0.5 text-xs">Hard</Badge></SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
@@ -195,7 +192,7 @@ export function BasicInfoTab({problem}: { problem: ProblemDetailAdmin }) {
                             render={<Button type="button" variant="outline" className="w-full justify-between"
                                             disabled={updateBasicInfo.isPending}/>}>
                             {selectedTags.length > 0 ? `${selectedTags.length} tag(s) selected` : "Select tags…"}
-                            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50"/>
+                            <ChevronsUpDownIcon data-icon="inline-end" className="ml-2 shrink-0 opacity-50" />
                         </PopoverTrigger>
                         <PopoverContent className="w-72 p-0">
                             <Command>

@@ -48,9 +48,9 @@ function WizardStepper({currentStep}: Readonly<{ currentStep: number }>) {
                                     )}
                                 >
                                     {isCompleted ? (
-                                        <CheckIcon className="size-5"/>
+                                        <CheckIcon className="size-5" data-icon="inline-center" />
                                     ) : (
-                                        <StepIcon className="size-4.5"/>
+                                        <StepIcon className="size-4.5" data-icon="inline-center" />
                                     )}
                                 </div>
 

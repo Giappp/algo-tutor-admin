@@ -22,7 +22,7 @@ export const columns: ColumnDef<Tag>[] = [
     {
         id: "actions",
         header: "Actions",
-        cell: ({row}) => {
+        cell: () => {
 
         }
     }
