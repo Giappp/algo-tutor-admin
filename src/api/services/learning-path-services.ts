@@ -10,7 +10,7 @@ export interface LearningPathListParams {
 
 export const learningPathService = {
     list: (params?: LearningPathListParams) =>
-        getPage<LearningPath>("/api/v1/learning-paths", {params}),
+        getPage<LearningPath[]>("/api/v1/learning-paths", {params}),
 
     getById: (id: number) =>
         get<LearningPath>(`/api/v1/learning-paths/${id}`),

@@ -64,7 +64,7 @@ export default function LearningPathsPage() {
     const togglePublishMutation = useTogglePublishLearningPath();
 
     const meta = data?.meta;
-    const learningPaths = data?.data ?? [];
+    const learningPaths: LearningPath[] = data?.data ?? [] as LearningPath[];
 
     const handleSearchChange = (value: string) => {
         setParams((prev) => ({...prev, search: value, page: 0}));
@@ -113,7 +113,7 @@ export default function LearningPathsPage() {
     const hasActiveFilters = params.search || params.level;
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 mx-auto p-4">
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export default function LearningPathsPage() {
                         </p>
                     </div>
                 </div>
-                <Button render={<Link href="/dashboard/learning-paths/create"/>}>
+                <Button nativeButton={false} render={<Link href="/dashboard/learning-paths/create"/>}>
                     <PlusIcon data-icon="inline-start"/>
                     New Learning Path
                 </Button>
