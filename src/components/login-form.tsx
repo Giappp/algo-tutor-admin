@@ -1,32 +1,31 @@
 "use client";
 
-import {cn} from "@/lib/utils"
-import {Button} from "@/components/ui/button"
-import {Card, CardContent} from "@/components/ui/card"
-import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field"
-import {Input} from "@/components/ui/input"
-import {AlertCircle, Code2, Loader2, ShieldAlert} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { AlertCircle, Loader2, LockKeyhole, Sparkles } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
-import {useState} from "react"
-import {useForm} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {SignInSchema} from "@/types/auth/schema"
-import {LoginCredentials} from "@/types/auth/auth"
-import {toAppError} from "@/api/core/api-error"
-import {useAuth} from "@/hooks/use-auth-hook"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { SignInSchema } from "@/types/auth/schema"
+import { LoginCredentials } from "@/types/auth/auth"
+import { toAppError } from "@/api/core/api-error"
+import { useAuth } from "@/hooks/use-auth-hook"
 
 export function LoginForm({
-                              className,
-                              ...props
-                          }: React.ComponentProps<"div">) {
-    const {login, isLoggingIn} = useAuth();
+    className,
+    ...props
+}: React.ComponentProps<"div">) {
+    const { login, isLoggingIn } = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm<LoginCredentials>({
         resolver: zodResolver(SignInSchema),
         defaultValues: {
@@ -48,137 +47,168 @@ export function LoginForm({
     const isSubmitting = isLoggingIn;
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="overflow-hidden p-0 border-primary/20 shadow-lg">
-                <CardContent className="grid p-0 md:grid-cols-2">
+        <div className={cn("flex flex-col gap-8", className)} {...props}>
+            {/* ── Branding Header ── */}
+            <div className="flex flex-col items-center gap-3 text-center">
+                <div className="relative">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
+                        <Sparkles className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 border-2 border-background">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    </div>
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                        AlgoTutor
+                    </h1>
+                    <p className="text-sm text-muted-foreground font-medium">
+                        Admin Portal
+                    </p>
+                </div>
+            </div>
+
+            {/* ── Card with Form ── */}
+            <Card className="border-0 shadow-xl shadow-zinc-200/50 dark:shadow-zinc-900/50 overflow-hidden">
+                <CardContent className="p-8">
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="p-6 md:p-8 flex flex-col justify-center"
+                        className="flex flex-col gap-6"
                     >
-                        <FieldGroup className="gap-6">
-
-                            {/* ── Header ── */}
-                            <div className="flex flex-col items-center gap-2 text-center">
-                                <div
-                                    className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 mb-2">
-                                    <Code2 className="w-6 h-6 text-emerald-500"/>
-                                </div>
-                                <h1 className="text-2xl font-bold tracking-tight">
-                                    AlgoTutor Admin
-                                </h1>
-                                <p className="text-balance text-sm text-muted-foreground flex items-center justify-center gap-1.5">
-                                    <ShieldAlert className="w-4 h-4 text-destructive"/>
-                                    Restricted Access. Staff only.
-                                </p>
-                            </div>
+                        <FieldGroup className="gap-5">
 
                             {/* ── Server Error Banner ── */}
                             {serverError && (
-                                <div
-                                    className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                                    role="alert"
-                                >
-                                    <AlertCircle className="size-4 shrink-0"/>
+                                <div className="flex items-center gap-3 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/30 px-4 py-3.5 text-sm text-rose-600 dark:text-rose-400 transition-all duration-200">
+                                    <AlertCircle className="size-4 shrink-0" />
                                     <p>{serverError}</p>
                                 </div>
                             )}
 
+                            {/* ── Welcome Text ── */}
+                            <div className="text-center pb-2">
+                                <h2 className="text-lg font-semibold text-foreground">
+                                    Welcome back
+                                </h2>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Enter your credentials to access the admin panel
+                                </p>
+                            </div>
+
                             {/* ── Username Field ── */}
-                            <Field className="space-y-2">
-                                <FieldLabel htmlFor="userName">Username</FieldLabel>
-                                <Input
-                                    id="userName"
-                                    type="text"
-                                    placeholder="admin"
-                                    className="font-mono text-sm"
-                                    aria-invalid={!!errors.userName}
-                                    disabled={isSubmitting}
-                                    {...register("userName")}
-                                />
+                            <Field className="space-y-2.5">
+                                <FieldLabel
+                                    htmlFor="userName"
+                                    className="text-sm font-medium text-foreground/80"
+                                >
+                                    Username
+                                </FieldLabel>
+                                <div className="relative">
+                                    <Input
+                                        id="userName"
+                                        type="text"
+                                        placeholder="Enter your username"
+                                        className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                                        aria-invalid={!!errors.userName}
+                                        disabled={isSubmitting}
+                                        {...register("userName")}
+                                    />
+                                </div>
                                 {errors.userName && (
-                                    <FieldError>{errors.userName.message}</FieldError>
+                                    <FieldError className="text-xs">{errors.userName.message}</FieldError>
                                 )}
                             </Field>
 
                             {/* ── Password Field ── */}
-                            <Field className="space-y-2">
-                                <div className="flex items-center">
-                                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                            <Field className="space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                    <FieldLabel
+                                        htmlFor="password"
+                                        className="text-sm font-medium text-foreground/80"
+                                    >
+                                        Password
+                                    </FieldLabel>
                                     <Link
                                         href="#"
-                                        className="ml-auto text-xs font-medium text-primary underline-offset-4 hover:underline"
+                                        className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
                                     >
                                         Forgot password?
                                     </Link>
                                 </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    className="font-mono text-sm"
-                                    aria-invalid={!!errors.password}
-                                    disabled={isSubmitting}
-                                    {...register("password")}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                                        aria-invalid={!!errors.password}
+                                        disabled={isSubmitting}
+                                        {...register("password")}
+                                    />
+                                </div>
                                 {errors.password && (
-                                    <FieldError>{errors.password.message}</FieldError>
+                                    <FieldError className="text-xs">{errors.password.message}</FieldError>
                                 )}
                             </Field>
 
                             {/* ── Submit Button ── */}
-                            <Field>
+                            <Field className="pt-2">
                                 <Button
                                     type="submit"
-                                    className="w-full font-semibold"
+                                    className="w-full h-11 rounded-xl font-semibold text-sm bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="animate-spin"/>
-                                            Authenticating…
-                                        </>
+                                        <span className="flex items-center gap-2">
+                                            <Loader2 className="size-4 animate-spin" />
+                                            Authenticating...
+                                        </span>
                                     ) : (
-                                        "Authenticate Session"
+                                        <span className="flex items-center gap-2">
+                                            <LockKeyhole className="size-4" />
+                                            Sign in to Dashboard
+                                        </span>
                                     )}
                                 </Button>
                             </Field>
 
-                            <p className="text-center text-xs text-muted-foreground mt-4">
-                                By logging in, you agree to the platform&#39;s strictly
-                                confidential data handling policy.
+                            {/* ── Divider ── */}
+                            <div className="relative py-2">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+                                </div>
+                                <div className="relative flex justify-center">
+                                    <span className="bg-background px-3 text-xs text-muted-foreground">
+                                        Secure admin access only
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* ── Footer Note ── */}
+                            <p className="text-center text-xs text-muted-foreground leading-relaxed">
+                                By signing in, you agree to the platform&apos;s{" "}
+                                <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                    Terms of Service
+                                </Link>{" "}
+                                and{" "}
+                                <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                    Privacy Policy
+                                </Link>
                             </p>
                         </FieldGroup>
                     </form>
-
-                    {/* ── Right Side — Image / Graphic ── */}
-                    <div className="relative hidden bg-zinc-950 md:flex items-center justify-center p-8">
-                        <Image
-                            src={"/placeholder.avif"}
-                            alt="Algorithm Code Visualization"
-                            className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-overlay"
-                            fill
-                            sizes={"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
-                            priority
-                        />
-                        {/* Overlay Graphic / Quote */}
-                        <div className="relative z-10 flex flex-col items-center text-center space-y-4 text-zinc-300">
-                            <div className="p-4 border border-zinc-800 rounded-xl bg-zinc-950/50 backdrop-blur-sm">
-                                <pre className="text-xs font-mono text-emerald-400 text-left">
-                                    <code>
-                                        {`function optimize(algo) {`} <br/>
-                                        {`  return BigO.O(1);`} <br/>
-                                        {`}`}
-                                    </code>
-                                </pre>
-                            </div>
-                            <blockquote className="text-sm font-medium leading-relaxed max-w-xs">
-                                &quot;Manage course modules, monitor student execution times, and oversee platform
-                                analytics.&quot;
-                            </blockquote>
-                        </div>
-                    </div>
                 </CardContent>
             </Card>
+
+            {/* ── Security Badge ── */}
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Encrypted connection</span>
+                </div>
+                <span className="text-zinc-300 dark:text-zinc-700">|</span>
+                <span>SOC 2 compliant</span>
+            </div>
         </div>
     )
 }

@@ -5,6 +5,15 @@ export interface BreadcrumbItem {
 
 const BREADCRUMB_MAP: Record<string, BreadcrumbItem[]> = {
   "/dashboard": [{ label: "Dashboard" }],
+  "/dashboard/learning-paths": [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Learning Paths" },
+  ],
+  "/dashboard/learning-paths/create": [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Learning Paths", href: "/dashboard/learning-paths" },
+    { label: "Create" },
+  ],
   "/dashboard/problems": [{ label: "Dashboard", href: "/dashboard" }, { label: "Problems" }],
   "/dashboard/problems/create": [
     { label: "Dashboard", href: "/dashboard" },
@@ -20,6 +29,31 @@ const BREADCRUMB_MAP: Record<string, BreadcrumbItem[]> = {
 }
 
 const DYNAMIC_PATTERNS: Array<{ pattern: RegExp; build: (matches: string[]) => BreadcrumbItem[] }> = [
+  {
+    pattern: /^\/dashboard\/learning-paths\/(\d+)$/,
+    build: () => [
+      { label: "Dashboard", href: "/dashboard" },
+      { label: "Learning Paths", href: "/dashboard/learning-paths" },
+      { label: "Details" },
+    ],
+  },
+  {
+    pattern: /^\/dashboard\/learning-paths\/(\d+)\/lessons\/(\d+)$/,
+    build: () => [
+      { label: "Dashboard", href: "/dashboard" },
+      { label: "Learning Paths", href: "/dashboard/learning-paths" },
+      { label: "Lesson" },
+    ],
+  },
+  {
+    pattern: /^\/dashboard\/learning-paths\/(\d+)\/topics\/(\d+)\/lessons\/create$/,
+    build: (matches) => [
+      { label: "Dashboard", href: "/dashboard" },
+      { label: "Learning Paths", href: "/dashboard/learning-paths" },
+      { label: "Details", href: `/dashboard/learning-paths/${matches[1]}` },
+      { label: "Add Lesson" },
+    ],
+  },
   {
     pattern: /^\/dashboard\/problems\/([^/]+)$/,
     build: () => [

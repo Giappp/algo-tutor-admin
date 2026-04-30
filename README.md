@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Objectives
 
-## Getting Started
+AlgoTutor is a smart online learning platform that combines algorithmic theory with hands-on coding through specialized
+learning roadmaps. It guides learners systematically from foundational concepts to advanced problem-solving.
 
-First, run the development server:
+# Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Specialized Roadmaps & Knowledge Isolation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Lessons are clearly divided into core topics based on Data Structure and Algorithm (Arrays, Strings, Linked Lists,
+  Trees, Graphs, Dynamic Programming,
+  etc.).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Coding exercises are strictly isolated to the current topic, preventing confusion from advanced concepts the user
+  hasn't learned yet.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Multi-Layered Lesson Structure
 
-## Learn More
+- Theory: Foundational concepts with visuals and pseudocode.
+- Quizzes: Quick assessments to reinforce the theory.
+- Coding: Auto-graded practice problems focused entirely on the active topic.
 
-To learn more about Next.js, take a look at the following resources:
+## Progressive Difficulty
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Problems scale from Easy (basic implementation) to Medium (logic application) and Hard (performance optimization).
+- Learners must complete basic milestones to unlock advanced content.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Context-Aware AI Assistant
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Powered by LLMs and vector databases to analyze the user's code and intent.
+- Provides helpful hints strictly within the scope of the current lesson. This helps students debug and solve problems
+  on their own without being overwhelmed by overly complex, out-of-scope solutions.

@@ -126,6 +126,70 @@
     }
 
     html {
-        @apply font-mono;
+        @apply font-sans;
     }
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom selection color */
+::selection {
+    background-color: oklch(0.577 0.245 27.325 / 0.2);
+    color: oklch(0.141 0.005 285.823);
+}
+
+.dark ::selection {
+    background-color: oklch(0.637 0.237 25.331 / 0.3);
+    color: oklch(0.985 0 0);
+}
+
+/* Fade in animation for page elements */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+    opacity: 0;
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 75ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 225ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 375ms; }
+
+/* Subtle pulse for status indicators */
+@keyframes subtle-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.animate-subtle-pulse {
+    animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+/* Focus visible styles */
+.focus-ring {
+    @apply outline-none ring-2 ring-ring/50 ring-offset-2 ring-offset-background;
 }

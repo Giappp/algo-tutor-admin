@@ -60,105 +60,116 @@ interface OverviewChartProps {
 
 export function OverviewChart({ type = "bar", title, description }: OverviewChartProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+    <Card className="transition-all duration-300 hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-base font-semibold">{title}</CardTitle>
+            {description && <CardDescription className="text-xs mt-1">{description}</CardDescription>}
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2">
         {type === "bar" && (
-          <ChartContainer config={chartConfig} className="h-64 w-full">
+          <ChartContainer config={chartConfig} className="h-56 w-full">
             <BarChart data={weeklyData} accessibilityLayer>
-              <CartesianGrid vertical={false} />
+              <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-800" />
               <XAxis
                 dataKey="week"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               />
               <YAxis
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               />
               <Bar
                 dataKey="problems"
-                fill="var(--color-problems)"
-                radius={4}
+                fill="var(--color-chart-1)"
+                radius={[6, 6, 0, 0]}
                 name="Problems"
               />
               <Bar
                 dataKey="users"
-                fill="var(--color-users)"
-                radius={4}
+                fill="var(--color-chart-2)"
+                radius={[6, 6, 0, 0]}
                 name="Users"
               />
             </BarChart>
           </ChartContainer>
         )}
         {type === "pie" && (
-          <div className="flex items-center gap-8">
-            <ChartContainer config={chartConfig} className="h-52 w-52">
+          <div className="flex items-center gap-6">
+            <ChartContainer config={chartConfig} className="h-48 w-48">
               <PieChart accessibilityLayer>
                 <Pie
                   data={difficultyData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={55}
+                  outerRadius={85}
                   dataKey="value"
                   nameKey="name"
                   labelLine={false}
+                  paddingAngle={3}
                 >
                   {difficultyData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                    <Cell key={`cell-${index}`} fill={entry.fill} className="transition-all duration-200 hover:opacity-80" />
                   ))}
                 </Pie>
               </PieChart>
             </ChartContainer>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {difficultyData.map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
+                <div key={item.name} className="flex items-center gap-3">
                   <div
-                    className="size-3 rounded-full"
+                    className="w-3 h-3 rounded-full shadow-sm"
                     style={{ backgroundColor: item.fill }}
                   />
-                  <span className="text-sm">{item.name}</span>
-                  <span className="text-sm font-medium">{item.value}%</span>
+                  <span className="text-sm font-medium text-foreground">{item.name}</span>
+                  <span className="text-sm text-muted-foreground ml-auto">{item.value}%</span>
                 </div>
               ))}
             </div>
           </div>
         )}
         {type === "line" && (
-          <ChartContainer config={chartConfig} className="h-64 w-full">
+          <ChartContainer config={chartConfig} className="h-56 w-full">
             <LineChart data={trendData} accessibilityLayer>
-              <CartesianGrid vertical={false} />
+              <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-800" />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               />
               <YAxis
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               />
               <Line
                 type="monotone"
                 dataKey="published"
-                stroke="var(--color-problems)"
-                strokeWidth={2}
-                dot={false}
+                stroke="var(--color-chart-1)"
+                strokeWidth={2.5}
+                dot={{ fill: "var(--color-chart-1)", strokeWidth: 0, r: 4 }}
+                activeDot={{ fill: "var(--color-chart-1)", strokeWidth: 0, r: 6 }}
                 name="Published"
               />
               <Line
                 type="monotone"
                 dataKey="drafts"
-                stroke="var(--color-drafts)"
-                strokeWidth={2}
-                dot={false}
+                stroke="var(--color-chart-5)"
+                strokeWidth={2.5}
+                dot={{ fill: "var(--color-chart-5)", strokeWidth: 0, r: 4 }}
+                activeDot={{ fill: "var(--color-chart-5)", strokeWidth: 0, r: 6 }}
                 name="Drafts"
               />
             </LineChart>

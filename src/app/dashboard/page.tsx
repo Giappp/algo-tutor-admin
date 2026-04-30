@@ -1,7 +1,7 @@
 "use client"
-import {OverviewChart, RecentActivityTable, StatCard} from "@/components/dashboard"
-import {ArchiveIcon, CodeIcon, FileTextIcon, RocketIcon} from "lucide-react"
-import type {ActivityItem} from "@/components/dashboard/recent-activity-table"
+import { OverviewChart, RecentActivityTable, StatCard } from "@/components/dashboard"
+import { ArchiveIcon, CodeIcon, FileTextIcon, RocketIcon } from "lucide-react"
+import type { ActivityItem } from "@/components/dashboard/recent-activity-table"
 
 const mockActivities: ActivityItem[] = [
     {
@@ -58,13 +58,15 @@ const mockActivities: ActivityItem[] = [
 
 export default function DashboardPage() {
     return (
-        <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">Welcome to AlgoTutor Admin Dashboard.</p>
+        <div className="flex flex-col gap-8">
+            {/* Page Header */}
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
+                <p className="text-muted-foreground">Welcome back. Here&apos;s an overview of your platform.</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Stats Grid */}
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Total Problems"
                     value="142"
@@ -92,7 +94,8 @@ export default function DashboardPage() {
                 />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Charts Grid */}
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <OverviewChart
                     type="bar"
                     title="Weekly Activity"
@@ -110,6 +113,7 @@ export default function DashboardPage() {
                 />
             </div>
 
+            {/* Activity Table */}
             <RecentActivityTable
                 title="Recent Activity"
                 activities={mockActivities}

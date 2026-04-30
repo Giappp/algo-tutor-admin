@@ -6,8 +6,18 @@ export type PageResponse<T> = {
     currentPage: number,
 }
 
+export type PaginationMeta = {
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+}
+
 export type ApiResponse<T> = {
     success: boolean;
     data: T;
     message?: string;
+    meta?: PaginationMeta;
 }
