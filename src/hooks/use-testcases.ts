@@ -2,11 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {
-    TestCase,
-    CreateTestCaseRequest,
-    UpdateTestCaseRequest,
-} from "@/types/learning-path";
+import {CreateTestCaseRequest, UpdateTestCaseRequest,} from "@/types/learning-path";
 import {testCaseService} from "@/api/services/testcase-services";
 
 export const QUERY_KEYS = {
@@ -18,8 +14,7 @@ export function useTestCasesByLesson(lessonId: number) {
     return useQuery({
         queryKey: QUERY_KEYS.testCases(lessonId),
         queryFn: async () => {
-            const response = await testCaseService.listByLesson(lessonId);
-            return response.data;
+            return await testCaseService.listByLesson(lessonId);
         },
         enabled: !!lessonId,
     });

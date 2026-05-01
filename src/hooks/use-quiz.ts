@@ -2,7 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {QuizQuestion, CreateQuestionRequest} from "@/types/learning-path";
+import {CreateQuestionRequest} from "@/types/learning-path";
 import {quizService} from "@/api/services/quiz-services";
 
 export const QUERY_KEYS = {
@@ -14,8 +14,7 @@ export function useQuestionsByLesson(lessonId: number) {
     return useQuery({
         queryKey: QUERY_KEYS.questions(lessonId),
         queryFn: async () => {
-            const response = await quizService.listByLesson(lessonId);
-            return response.data;
+            return await quizService.listByLesson(lessonId);
         },
         enabled: !!lessonId,
     });

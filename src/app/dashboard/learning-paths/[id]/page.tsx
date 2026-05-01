@@ -76,7 +76,7 @@ function TopicAccordionItem({
     const togglePublishLessonMutation = useTogglePublishLesson();
 
     const {data: lessonsData} = useLessonsByTopic(topic.id);
-    const lessons: Lesson[] = lessonsData ?? [];
+    const lessons: Lesson[] = lessonsData || [] as Lesson[];
 
     return (
         <div className="rounded-xl border bg-card overflow-hidden">
@@ -148,7 +148,7 @@ function TopicAccordionItem({
                             variant="outline"
                             size="xs"
                             render={
-                                <Link href={`/dashboard/learning-paths/${pathId}/topics/${topic.id}/lessons/create`} />
+                                <Link href={`/dashboard/learning-paths/${pathId}/topics/${topic.id}/lessons/create`}/>
                             }
                         >
                             <PlusIcon data-icon="inline-start"/>

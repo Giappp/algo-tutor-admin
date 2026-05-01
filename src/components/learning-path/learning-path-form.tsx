@@ -2,33 +2,15 @@
 
 import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {ChevronDownIcon, ChevronUpIcon, SettingsIcon} from "lucide-react";
+import {ChevronDownIcon, SettingsIcon} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
+import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
-import {
-    CreateLearningPathSchema,
-    CreateLearningPath,
-} from "@/types/learning-path/schema";
+import {CreateLearningPath, CreateLearningPathSchema,} from "@/types/learning-path/schema";
 import {Level} from "@/types/learning-path";
 
 interface LearningPathFormProps {
@@ -39,19 +21,18 @@ interface LearningPathFormProps {
     showPreview?: boolean;
 }
 
-const LEVEL_OPTIONS: {value: Level; label: string; description: string}[] = [
+const LEVEL_OPTIONS: { value: Level; label: string; description: string }[] = [
     {value: "BEGINNER", label: "Beginner", description: "New to the topic"},
     {value: "INTERMEDIATE", label: "Intermediate", description: "Some experience"},
     {value: "ADVANCED", label: "Advanced", description: "Expert level"},
 ];
 
 export function LearningPathForm({
-    defaultValues,
-    onSubmit,
-    isPending,
-    submitLabel = "Save",
-    showPreview = false,
-}: LearningPathFormProps) {
+                                     defaultValues,
+                                     onSubmit,
+                                     isPending,
+                                     submitLabel = "Save",
+                                 }: LearningPathFormProps) {
     const {
         register,
         handleSubmit,
@@ -152,14 +133,15 @@ export function LearningPathForm({
                                 size="sm"
                                 className="gap-2 text-muted-foreground hover:text-foreground"
                             >
-                                <SettingsIcon data-icon="inline-start" className="size-4" />
+                                <SettingsIcon data-icon="inline-start" className="size-4"/>
                                 Advanced Settings
-                                <ChevronDownIcon className="size-4 transition-transform data-[state=open]:rotate-180" />
+                                <ChevronDownIcon className="size-4 transition-transform data-[state=open]:rotate-180"/>
                             </Button>
                         }
                     />
 
-                    <CollapsibleContent className="contents space-y-4 pt-4 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+                    <CollapsibleContent
+                        className="contents space-y-4 pt-4 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
                         <Field>
                             <FieldLabel htmlFor="goal">Learning Goal</FieldLabel>
                             <FieldContent>

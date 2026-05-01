@@ -1,10 +1,9 @@
-import {get, post, put, del, getPage} from "@/api/core/http";
-import {TestCase, CreateTestCaseRequest, UpdateTestCaseRequest} from "@/types/learning-path";
-import {PaginatedResponse} from "@/api/core/http";
+import {del, get, post, put} from "@/api/core/http";
+import {CreateTestCaseRequest, TestCase, UpdateTestCaseRequest} from "@/types/learning-path";
 
 export const testCaseService = {
-    listByLesson: (lessonId: number): Promise<PaginatedResponse<TestCase>> =>
-        getPage<TestCase>(`/api/v1/testcases/lessons/${lessonId}`),
+    listByLesson: (lessonId: number): Promise<TestCase[]> =>
+        get<TestCase[]>(`/api/v1/testcases/lessons/${lessonId}`),
 
     create: (lessonId: number, data: CreateTestCaseRequest) =>
         post<TestCase>(`/api/v1/testcases/lessons/${lessonId}`, data),

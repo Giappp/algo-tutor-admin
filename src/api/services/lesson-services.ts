@@ -3,7 +3,7 @@ import {CreateLessonRequest, Lesson, UpdateLessonRequest} from "@/types/learning
 
 export const lessonService = {
     listByTopic: (topicId: number, publishedOnly = false) =>
-        get<Lesson>(`/api/v1/lessons/topics/${topicId}`, {
+        get<Lesson[]>(`/api/v1/lessons/topics/${topicId}`, {
             params: {publishedOnly},
         }),
 

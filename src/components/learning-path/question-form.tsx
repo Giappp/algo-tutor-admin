@@ -2,31 +2,13 @@
 
 import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useState} from "react";
 import {Plus, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import {Switch} from "@/components/ui/switch";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
-import {
-    CreateQuestionSchema,
-    CreateQuestion,
-} from "@/types/learning-path/schema";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
+import {CreateQuestion, CreateQuestionSchema,} from "@/types/learning-path/schema";
 import {QuestionType} from "@/types/learning-path";
 
 interface QuestionFormProps {
@@ -37,19 +19,19 @@ interface QuestionFormProps {
     onCancel?: () => void;
 }
 
-const QUESTION_TYPE_OPTIONS: {value: QuestionType; label: string}[] = [
+const QUESTION_TYPE_OPTIONS: { value: QuestionType; label: string }[] = [
     {value: "SINGLE_CHOICE", label: "Single Choice"},
     {value: "MULTIPLE_CHOICE", label: "Multiple Choice"},
     {value: "TRUE_FALSE", label: "True / False"},
 ];
 
 export function QuestionForm({
-    defaultValues,
-    onSubmit,
-    isPending,
-    submitLabel = "Save Question",
-    onCancel,
-}: QuestionFormProps) {
+                                 defaultValues,
+                                 onSubmit,
+                                 isPending,
+                                 submitLabel = "Save Question",
+                                 onCancel,
+                             }: QuestionFormProps) {
     const {
         register,
         handleSubmit,
@@ -80,7 +62,7 @@ export function QuestionForm({
     const watchedType = watch("type");
     const watchedChoices = watch("choices");
 
-    const handleCorrectChange = (index: number, checked: boolean) => {
+    const handleCorrectChange = (index: number) => {
         const updated = watchedChoices.map((c, i) => ({
             ...c,
             isCorrect: watchedType === "MULTIPLE_CHOICE" ? c.isCorrect : i === index,
@@ -120,7 +102,7 @@ export function QuestionForm({
                                 disabled={isPending}
                             >
                                 <SelectTrigger aria-label="Select type">
-                                    <SelectValue />
+                                    <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {QUESTION_TYPE_OPTIONS.map((opt) => (
@@ -181,7 +163,7 @@ export function QuestionForm({
                                             type={watchedType === "MULTIPLE_CHOICE" ? "checkbox" : "radio"}
                                             checked={watchedChoices[index]?.isCorrect ?? false}
                                             onChange={(e) =>
-                                                handleCorrectChange(index, e.target.checked)
+                                                handleCorrectChange(index)
                                             }
                                             className="size-4 rounded"
                                             disabled={isPending}
@@ -199,7 +181,7 @@ export function QuestionForm({
                                                 onClick={() => remove(index)}
                                                 disabled={isPending}
                                             >
-                                                <Trash2 data-icon="inline-start" />
+                                                <Trash2 data-icon="inline-start"/>
                                             </Button>
                                         )}
                                     </div>
@@ -231,7 +213,7 @@ export function QuestionForm({
                             }
                             disabled={isPending}
                         >
-                            <Plus data-icon="inline-start" />
+                            <Plus data-icon="inline-start"/>
                             Add Choice
                         </Button>
                     </FieldContent>

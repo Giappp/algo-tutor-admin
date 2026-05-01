@@ -2,8 +2,8 @@
 
 import {useState} from "react";
 import Link from "next/link";
-import {useReactTable, getCoreRowModel, flexRender} from "@tanstack/react-table";
-import {ChevronDown, ChevronRight, Globe, MoreHorizontal, Pencil, Rocket, Trash2, EyeIcon} from "lucide-react";
+import {flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {EyeIcon, Globe, MoreHorizontal, Pencil, Rocket, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Checkbox} from "@/components/ui/checkbox";
@@ -14,14 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {LearningPath, Level} from "@/types/learning-path";
 
 const LEVEL_COLORS: Record<Level, string> = {
@@ -41,14 +34,14 @@ interface LearningPathTableProps {
 }
 
 export function LearningPathTable({
-    data,
-    isLoading,
-    onTogglePublish,
-    onDelete,
-    selectedIds = [],
-    onSelect,
-    onPreview,
-}: LearningPathTableProps) {
+                                      data,
+                                      isLoading,
+                                      onTogglePublish,
+                                      onDelete,
+                                      selectedIds = [],
+                                      onSelect,
+                                      onPreview,
+                                  }: LearningPathTableProps) {
     const [rowSelection, setRowSelection] = useState({});
 
     const table = useReactTable({
@@ -60,9 +53,9 @@ export function LearningPathTable({
                     <Checkbox
                         checked={t.getIsAllPageRowsSelected() ? true : t.getIsSomePageRowsSelected() ? undefined : false}
                         onCheckedChange={(val) => {
-                            t.toggleAllPageRowsSelected(!!val);
+                            t.toggleAllPageRowsSelected(val);
                             const allIds = t.getRowModel().rows.map((r) => r.original.id);
-                            if (!!val) {
+                            if (val) {
                                 allIds.forEach((id) => onSelect?.(id, true));
                             } else {
                                 allIds.forEach((id) => onSelect?.(id, false));
@@ -75,8 +68,8 @@ export function LearningPathTable({
                     <Checkbox
                         checked={selectedIds.includes(row.original.id)}
                         onCheckedChange={(val) => {
-                            row.toggleSelected(!!val);
-                            onSelect?.(row.original.id, !!val);
+                            row.toggleSelected(val);
+                            onSelect?.(row.original.id, val);
                         }}
                         aria-label={`Select ${row.original.name}`}
                     />
@@ -149,35 +142,35 @@ export function LearningPathTable({
                     <DropdownMenu>
                         <DropdownMenuTrigger
                             render={
-                                <Button variant="ghost" size="icon-sm" />
+                                <Button variant="ghost" size="icon-sm"/>
                             }
                         >
-                            <MoreHorizontal data-icon="inline-start" />
+                            <MoreHorizontal data-icon="inline-start"/>
                             <span className="sr-only">Open menu</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => onPreview?.(row.original)}>
-                                <EyeIcon data-icon="inline-start" />
+                                <EyeIcon data-icon="inline-start"/>
                                 Preview
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 render={
-                                    <Link href={`/dashboard/learning-paths/${row.original.id}`} />
+                                    <Link href={`/dashboard/learning-paths/${row.original.id}`}/>
                                 }
                             >
-                                <Pencil data-icon="inline-start" />
+                                <Pencil data-icon="inline-start"/>
                                 Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => onTogglePublish(row.original.id)}>
-                                <Rocket data-icon="inline-start" />
+                                <Rocket data-icon="inline-start"/>
                                 Toggle Publish
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+                            <DropdownMenuSeparator/>
                             <DropdownMenuItem
                                 onClick={() => onDelete(row.original.id)}
                                 variant="destructive"
                             >
-                                <Trash2 data-icon="inline-start" />
+                                <Trash2 data-icon="inline-start"/>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -200,7 +193,7 @@ export function LearningPathTable({
                         <TableRow>
                             {table.getHeaderGroups()[0]?.headers.map((header) => (
                                 <TableHead key={header.id}>
-                                    <div className="h-5 w-24 rounded bg-muted animate-pulse" />
+                                    <div className="h-5 w-24 rounded bg-muted animate-pulse"/>
                                 </TableHead>
                             ))}
                         </TableRow>
@@ -210,7 +203,7 @@ export function LearningPathTable({
                             <TableRow key={i}>
                                 {table.getHeaderGroups()[0]?.headers.map((header) => (
                                     <TableCell key={header.id}>
-                                        <div className="h-5 w-24 rounded bg-muted animate-pulse" />
+                                        <div className="h-5 w-24 rounded bg-muted animate-pulse"/>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -225,7 +218,7 @@ export function LearningPathTable({
         return (
             <div className="border rounded-xl p-12 text-center">
                 <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-muted">
-                    <Globe className="size-8 text-muted-foreground" />
+                    <Globe className="size-8 text-muted-foreground"/>
                 </div>
                 <p className="text-lg font-medium text-foreground">No learning paths found</p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -234,7 +227,7 @@ export function LearningPathTable({
                 <div className="mt-6">
                     <Button
                         render={
-                            <Link href="/dashboard/learning-paths/create" />
+                            <Link href="/dashboard/learning-paths/create"/>
                         }
                     >
                         Create your first learning path

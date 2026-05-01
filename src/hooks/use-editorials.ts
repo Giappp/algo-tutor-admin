@@ -2,11 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {
-    Editorial,
-    CreateEditorialRequest,
-    UpdateEditorialRequest,
-} from "@/types/learning-path";
+import {CreateEditorialRequest, UpdateEditorialRequest,} from "@/types/learning-path";
 import {editorialService} from "@/api/services/editorial-services";
 
 export const QUERY_KEYS = {

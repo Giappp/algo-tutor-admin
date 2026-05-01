@@ -4,26 +4,10 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import {Button} from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
-import {
-    CreateEditorialSchema,
-    CreateEditorial,
-} from "@/types/learning-path/schema";
+import {Field, FieldContent, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
+import {CreateEditorial, CreateEditorialSchema,} from "@/types/learning-path/schema";
 import {ProgrammingLanguage} from "@/types/learning-path";
 
 const MonacoEditor = dynamic(
@@ -31,7 +15,7 @@ const MonacoEditor = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="h-64 rounded-xl border border-input bg-muted animate-pulse" />
+            <div className="h-64 rounded-xl border border-input bg-muted animate-pulse"/>
         ),
     }
 );
@@ -44,7 +28,7 @@ interface EditorialFormProps {
     onCancel?: () => void;
 }
 
-const LANGUAGE_OPTIONS: {value: ProgrammingLanguage; label: string}[] = [
+const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string }[] = [
     {value: "JAVA", label: "Java"},
     {value: "PYTHON", label: "Python"},
 ];
@@ -55,12 +39,12 @@ const LANGUAGE_MAP: Record<ProgrammingLanguage, string> = {
 };
 
 export function EditorialForm({
-    defaultValues,
-    onSubmit,
-    isPending,
-    submitLabel = "Save Editorial",
-    onCancel,
-}: EditorialFormProps) {
+                                  defaultValues,
+                                  onSubmit,
+                                  isPending,
+                                  submitLabel = "Save Editorial",
+                                  onCancel,
+                              }: EditorialFormProps) {
     const {
         register,
         handleSubmit,
@@ -95,7 +79,7 @@ export function EditorialForm({
                             disabled={isPending}
                         >
                             <SelectTrigger aria-label="Select language">
-                                <SelectValue />
+                                <SelectValue/>
                             </SelectTrigger>
                             <SelectContent>
                                 {LANGUAGE_OPTIONS.map((opt) => (
