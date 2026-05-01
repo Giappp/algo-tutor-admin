@@ -49,6 +49,7 @@ export function useUpdateTopic(topicId: number) {
         onSuccess: () => {
             toast.success("Topic updated successfully");
             queryClient.invalidateQueries({queryKey: QUERY_KEYS.topic(topicId)});
+            queryClient.invalidateQueries({queryKey: ["learning-path"]});
         },
     });
 }
@@ -61,6 +62,7 @@ export function useDeleteTopic() {
         onSuccess: () => {
             toast.success("Topic deleted successfully");
             queryClient.invalidateQueries({queryKey: ["topics"]});
+            queryClient.invalidateQueries({queryKey: ["learning-path"]});
         },
     });
 }
