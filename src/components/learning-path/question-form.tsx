@@ -162,7 +162,7 @@ export function QuestionForm({
                                         <input
                                             type={watchedType === "MULTIPLE_CHOICE" ? "checkbox" : "radio"}
                                             checked={watchedChoices[index]?.isCorrect ?? false}
-                                            onChange={(e) =>
+                                            onChange={() =>
                                                 handleCorrectChange(index)
                                             }
                                             className="size-4 rounded"

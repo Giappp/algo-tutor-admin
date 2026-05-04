@@ -109,7 +109,6 @@ export function QuizForm({
     const watchedDifficulty = watch("difficulty");
     const watchedQuestions = watch("questions") as unknown as QuestionInput[] ?? [];
     const watchedPassingScore = watch("passingScore");
-    const watchedTimeLimit = watch("timeLimitMinutes");
 
     useEffect(() => {
         if (defaultValues) {
