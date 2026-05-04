@@ -1,12 +1,7 @@
 import axios, {AxiosError, AxiosRequestConfig} from "axios";
 import {toAppError} from "@/api/core/api-error";
 import {clearAuthenticated} from "@/store/authStore";
-import {ApiResponse, PaginationMeta} from "@/types/shared";
-
-export type PaginatedResponse<T> = {
-    data: T[];
-    meta: PaginationMeta;
-};
+import {ApiResponse, PageResponse} from "@/types/shared";
 
 const baseConfig: AxiosRequestConfig = {
     baseURL: "http://localhost:8080",
@@ -120,8 +115,11 @@ export const del = async <T>(url: string, config?: Cfg) =>
 export const patch = async <T, B = unknown>(url: string, body?: B, config?: Cfg) =>
     (await api.patch<ApiResponse<T>>(url, body, config)).data.data;
 
-export const getPage = async <T>(url: string, config?: Cfg) =>
-    (await api.get<ApiResponse<T>>(url, config)).data;
-
-export const postPage = async <T, B = unknown>(url: string, body?: B, config?: Cfg) =>
-    (await api.post<ApiResponse<T>>(url, body, config)).data;
+export const getPage = async <T>(url: string, config?: Cfg) => {
+    const response = (await api.get<PageResponse<T>>(url, config)).data;
+    return {
+        ...response,
+        hasNext: response.currentPage < response.totalPages - 1,
+        hasPrevious: response.currentPage > 0,
+    };
+};

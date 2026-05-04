@@ -159,7 +159,6 @@ export default function LearningPathsPage() {
     const deleteMutation = useDeleteLearningPath();
     const togglePublishMutation = useTogglePublishLearningPath();
 
-    const meta = data?.meta;
     const learningPaths: LearningPath[] = data?.data ?? ([] as LearningPath[]);
 
     const handleSearchChange = (value: string) => {
@@ -200,8 +199,8 @@ export default function LearningPathsPage() {
 
     // Calculate stats from data
     const stats = {
-        total: meta?.totalElements ?? 0,
-        published: learningPaths.filter((lp) => !lp.deleted).length,
+        total: data?.totalElements ?? 0,
+        published: learningPaths.filter((lp) => lp.isPublished).length,
         totalLessons: learningPaths.reduce((sum, lp) => sum + (lp.totalLessonCount || 0), 0),
         totalEnrollments: learningPaths.reduce((sum, lp) => sum + (lp.enrollmentCount || 0), 0),
     };
@@ -435,20 +434,18 @@ export default function LearningPathsPage() {
             )}
 
             {/* Pagination */}
-            {meta && (
-                <Pagination
-                    meta={{
-                        page: meta.page,
-                        size: meta.size,
-                        totalElements: meta.totalElements,
-                        totalPages: meta.totalPages,
-                        hasNext: meta.hasNext,
-                        hasPrevious: meta.hasPrevious,
-                    }}
-                    onPageChange={handlePageChange}
-                    isLoading={isFetching && !isLoading}
-                />
-            )}
+            <Pagination
+                meta={{
+                    page: data?.currentPage ?? 0,
+                    size: data?.pageSize ?? 10,
+                    totalElements: data?.totalElements ?? 0,
+                    totalPages: data?.totalPages ?? 0,
+                    hasNext: data?.hasNext ?? false,
+                    hasPrevious: data?.hasPrevious ?? false,
+                }}
+                onPageChange={handlePageChange}
+                isLoading={isFetching && !isLoading}
+            />
 
             {/* Preview Side Panel */}
             <Sheet open={!!previewLp} onOpenChange={(open) => !open && setPreviewLp(null)}>
@@ -580,14 +577,14 @@ export default function LearningPathsPage() {
                                         <Pencil data-icon="inline-start" className="size-4"/>
                                         Edit Learning Path
                                     </Button>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => togglePublishMutation.mutate(previewLp.id)}
-                                        className="w-full"
-                                    >
-                                        <Rocket data-icon="inline-start" className="size-4"/>
-                                        {previewLp.deleted ? "Publish" : "Unpublish"}
-                                    </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => togglePublishMutation.mutate(previewLp.id)}
+                                            className="w-full"
+                                        >
+                                            <Rocket data-icon="inline-start" className="size-4"/>
+                                            {previewLp.isPublished ? "Unpublish" : "Publish"}
+                                        </Button>
                                 </div>
                             </div>
                         </>

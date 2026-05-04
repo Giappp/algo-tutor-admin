@@ -1,9 +1,9 @@
-import {del, get, patch, post, put} from "@/api/core/http";
+import {del, get, getPage, patch, post, put} from "@/api/core/http";
 import {CreateLessonRequest, Lesson, UpdateLessonRequest} from "@/types/learning-path";
 
 export const lessonService = {
     listByTopic: (topicId: number, publishedOnly = false) =>
-        get<Lesson[]>(`/api/v1/lessons/topics/${topicId}`, {
+        getPage<Lesson>(`/api/v1/lessons/topics/${topicId}`, {
             params: {publishedOnly},
         }),
 

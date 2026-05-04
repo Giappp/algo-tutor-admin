@@ -57,26 +57,32 @@ export const LessonExampleSchema = z.object({
 // ---------------------------------------------------------------------------
 const BaseLessonFields = {
     title: z.string().min(1, "Title is required"),
-    content: z.string().optional(),
     difficulty: DifficultySchema.optional(),
     orderIndex: z.number().int().optional(),
 };
 
-// Coding-specific fields
-const CodingLessonFields = {
-    timeLimit: z.number().int().min(1).max(300000).optional(),
-    memoryLimit: z.number().int().min(1).max(1024).optional(),
-    constraints: z.string().optional(),
-    starterCode: z.record(z.string(), z.string()).optional(),
-    hints: z.array(z.string()).max(10).optional(),
-    examples: z.array(LessonExampleSchema).max(5).optional(),
-    keyInsights: z.array(z.string()).max(20).optional(),
+// Theory-specific fields
+const TheoryLessonFields = {
+    content: z.string().optional(),
 };
 
 // Quiz-specific fields
 const QuizLessonFields = {
+    content: z.string().optional(),
     passingScore: z.number().int().min(0).max(100).optional(),
     timeLimitMinutes: z.number().int().optional(),
+};
+
+// Coding-specific fields
+const CodingLessonFields = {
+    statement: z.string().min(1, "Statement is required"),
+    baseTimeLimitMs: z.number().int().min(1).max(300000).optional(),
+    baseMemoryLimitMb: z.number().int().min(1).max(1024).optional(),
+    constraints: z.array(z.string()).max(10).optional(),
+    starterCode: z.record(z.string(), z.string()).optional(),
+    hints: z.array(z.string()).max(10).optional(),
+    examples: z.array(LessonExampleSchema).max(5).optional(),
+    keyInsights: z.array(z.string()).max(20).optional(),
 };
 
 // Question schema
@@ -96,6 +102,7 @@ export const CreateQuestionSchema = z.object({
 export const CreateTheoryLessonSchema = z.object({
     type: z.literal("THEORY"),
     ...BaseLessonFields,
+    ...TheoryLessonFields,
 });
 
 export const CreateQuizLessonSchema = z.object({
@@ -155,3 +162,6 @@ export type CreateTestCase = z.infer<typeof CreateTestCaseSchema>;
 export type UpdateTestCase = z.infer<typeof UpdateTestCaseSchema>;
 export type CreateEditorial = z.infer<typeof CreateEditorialSchema>;
 export type UpdateEditorial = z.infer<typeof UpdateEditorialSchema>;
+export type CreateCodingLesson = z.infer<typeof CreateCodingLessonSchema>;
+export type CreateQuizLesson = z.infer<typeof CreateQuizLessonSchema>;
+export type CreateTheoryLesson = z.infer<typeof CreateTheoryLessonSchema>;

@@ -4,6 +4,9 @@ export type PageResponse<T> = {
     totalPages: number,
     totalElements: number,
     currentPage: number,
+    success?: boolean,
+    hasNext: boolean,
+    hasPrevious: boolean,
 }
 
 export type PaginationMeta = {

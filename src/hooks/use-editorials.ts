@@ -13,10 +13,7 @@ export const QUERY_KEYS = {
 export function useEditorialsByLesson(lessonId: number) {
     return useQuery({
         queryKey: QUERY_KEYS.editorials(lessonId),
-        queryFn: async () => {
-            const response = await editorialService.listByLesson(lessonId);
-            return response.data;
-        },
+        queryFn: () => editorialService.listByLesson(lessonId),
         enabled: !!lessonId,
     });
 }

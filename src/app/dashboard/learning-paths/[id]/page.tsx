@@ -76,7 +76,7 @@ function TopicAccordionItem({
     const togglePublishLessonMutation = useTogglePublishLesson();
 
     const {data: lessonsData} = useLessonsByTopic(topic.id);
-    const lessons: Lesson[] = lessonsData || [] as Lesson[];
+    const lessons: Lesson[] = lessonsData?.data ?? [];
 
     return (
         <div className="rounded-xl border bg-card overflow-hidden">

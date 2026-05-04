@@ -66,9 +66,10 @@ export interface Lesson {
     isPublished: boolean;
     difficulty?: Difficulty;
     // Coding-specific
-    timeLimit?: number;
-    memoryLimit?: number;
-    constraints?: string;
+    statement?: string;
+    baseTimeLimitMs?: number;
+    baseMemoryLimitMb?: number;
+    constraints?: string[];
     starterCode?: Record<string, string>;
     testCases?: TestCase[];
     hints?: string[];
@@ -107,6 +108,7 @@ export interface LearningPath {
     goal: string;
     thumbnailUrl?: string;
     deleted: boolean;
+    isPublished: boolean;
     topicCount: number;
     totalLessonCount: number;
     publishedLessonCount: number;
@@ -153,12 +155,14 @@ export interface UpdateTopicRequest {
 export interface CreateLessonRequest {
     type: LessonType;
     title: string;
-    content?: string;
     difficulty?: Difficulty;
     orderIndex?: number;
+    // Theory
+    content?: string;
     // Coding
-    timeLimit?: number;
-    memoryLimit?: number;
+    statement?: string;
+    baseTimeLimitMs?: number;
+    baseMemoryLimitMb?: number;
     constraints?: string;
     starterCode?: Record<string, string>;
     hints?: string[];

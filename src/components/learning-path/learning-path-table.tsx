@@ -126,13 +126,13 @@ export function LearningPathTable({
                 ),
             },
             {
-                accessorKey: "deleted",
+                accessorKey: "isPublished",
                 header: "Status",
                 cell: ({row}) =>
-                    row.original.deleted ? (
-                        <Badge variant="destructive">Deleted</Badge>
+                    row.original.isPublished ? (
+                        <Badge variant="default" className="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">Published</Badge>
                     ) : (
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">Draft</Badge>
                     ),
             },
             {

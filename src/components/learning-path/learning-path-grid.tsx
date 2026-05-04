@@ -186,11 +186,11 @@ function LearningPathCard({
                     </span>
                 </div>
 
-                {/* Status badge */}
-                {lp.deleted && (
+                {/* Publish status badge */}
+                {!lp.isPublished && (
                     <div className="absolute left-3 bottom-3">
-                        <Badge variant="destructive" className="text-[10px]">
-                            Deleted
+                        <Badge variant="secondary" className="text-[10px]">
+                            Draft
                         </Badge>
                     </div>
                 )}
@@ -272,7 +272,7 @@ function LearningPathCard({
                             variant="ghost"
                             size="icon-sm"
                             onClick={onTogglePublish}
-                            title={lp.deleted ? "Publish" : "Unpublish"}
+                            title={lp.isPublished ? "Unpublish" : "Publish"}
                             className="text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400"
                         >
                             <Rocket className="size-4"/>

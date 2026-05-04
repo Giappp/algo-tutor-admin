@@ -1,69 +1,79 @@
 "use client";
 
-import {useRef, useState} from "react";
+import {useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeftIcon,
     BookOpenIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
     CodeIcon,
     GraduationCapIcon,
+    ChevronRightIcon,
+    CheckCircle2,
+    PenLineIcon,
+    FileQuestionIcon,
+    TerminalIcon,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
 import {LessonForm} from "@/components/learning-path/lesson-form";
-import {StepIndicator} from "@/components/learning-path/step-indicator";
+import {TheoryForm} from "@/components/learning-path/theory-form";
+import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useCreateLesson} from "@/hooks/use-lessons";
 import {CreateLessonRequest, LessonType} from "@/types/learning-path";
-// Steps for CODING lessons
-const CODING_STEPS = [
-    {id: "basic", label: "Basic Info", description: "Title & description"},
-    {id: "setup", label: "Problem Setup", description: "Limits & constraints"},
-    {id: "starter", label: "Starter Code", description: "Code templates"},
-    {id: "examples", label: "Examples", description: "Test cases & hints"},
+
+type CreationPhase = "type-selection" | "form-creation";
+
+const LESSON_TYPES = [
+    {
+        type: "THEORY" as const,
+        label: "Theory",
+        description: "Text-based lessons with rich content",
+        icon: BookOpenIcon,
+        color: "blue",
+        bgColor: "bg-blue-500/10",
+        borderColor: "border-blue-500/30",
+        iconColor: "text-blue-500",
+        hoverBg: "hover:bg-blue-500/10",
+        features: [
+            {icon: PenLineIcon, text: "Rich text editor with live preview"},
+            {icon: CheckCircle2, text: "Structured content with headings & lists"},
+            {icon: CheckCircle2, text: "Markdown & LaTeX support"},
+        ],
+    },
+    {
+        type: "QUIZ" as const,
+        label: "Quiz",
+        description: "Knowledge checks with multiple choice questions",
+        icon: GraduationCapIcon,
+        color: "amber",
+        bgColor: "bg-amber-500/10",
+        borderColor: "border-amber-500/30",
+        iconColor: "text-amber-500",
+        hoverBg: "hover:bg-amber-500/10",
+        features: [
+            {icon: FileQuestionIcon, text: "Single, multiple choice & true/false"},
+            {icon: CheckCircle2, text: "Configurable passing score & time limit"},
+            {icon: CheckCircle2, text: "Add questions after creation"},
+        ],
+    },
+    {
+        type: "CODING" as const,
+        label: "Coding",
+        description: "Programming challenges with test cases and solutions",
+        icon: CodeIcon,
+        color: "emerald",
+        bgColor: "bg-emerald-500/10",
+        borderColor: "border-emerald-500/30",
+        iconColor: "text-emerald-500",
+        hoverBg: "hover:bg-emerald-500/10",
+        features: [
+            {icon: TerminalIcon, text: "Test cases with verification"},
+            {icon: CheckCircle2, text: "Author solution with Monaco editor"},
+            {icon: CheckCircle2, text: "Starter code for Java, C++, Python"},
+        ],
+    },
 ];
-
-// Steps for QUIZ lessons
-const QUIZ_STEPS = [
-    {id: "basic", label: "Basic Info", description: "Title & content"},
-    {id: "settings", label: "Quiz Settings", description: "Time & passing score"},
-];
-
-// Steps for THEORY lessons
-const THEORY_STEPS = [
-    {id: "content", label: "Content", description: "Write your lesson"},
-];
-
-const LESSON_TYPE_ICONS: Record<LessonType, React.ReactNode> = {
-    THEORY: <BookOpenIcon className="size-5" />,
-    QUIZ: <GraduationCapIcon className="size-5" />,
-    CODING: <CodeIcon className="size-5" />,
-};
-
-const LESSON_TYPE_LABELS: Record<LessonType, string> = {
-    THEORY: "Theory",
-    QUIZ: "Quiz",
-    CODING: "Coding",
-};
-
-const LESSON_TYPE_COLORS: Record<LessonType, string> = {
-    THEORY: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    QUIZ: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    CODING: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-};
-
-function getStepsForType(type: LessonType) {
-    switch (type) {
-        case "CODING":
-            return CODING_STEPS;
-        case "QUIZ":
-            return QUIZ_STEPS;
-        default:
-            return THEORY_STEPS;
-    }
-}
 
 export default function CreateLessonPage() {
     const params = useParams();
@@ -73,28 +83,124 @@ export default function CreateLessonPage() {
 
     const createLessonMutation = useCreateLesson(topicId);
 
-    const [currentStep, setCurrentStep] = useState(0);
-    const [lessonType, setLessonType] = useState<LessonType>("THEORY");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formRef = useRef<any>(null);
+    const [phase, setPhase] = useState<CreationPhase>("type-selection");
+    const [selectedType, setSelectedType] = useState<LessonType | null>(null);
 
-    const steps = getStepsForType(lessonType);
-    const totalSteps = steps.length;
-
-    const handleSubmit = async () => {
-        if (!formRef.current) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (formRef.current as any)();
+    const handleTypeSelect = (type: LessonType) => {
+        setSelectedType(type);
+        setPhase("form-creation");
     };
 
-    const handleLessonTypeChange = (type: LessonType) => {
-        setLessonType(type);
-        setCurrentStep(0);
+    const handleBackToSelection = () => {
+        setPhase("type-selection");
+        setSelectedType(null);
     };
+
+    const handleSubmit = async (data: unknown) => {
+        const result = await createLessonMutation.mutateAsync(
+            data as unknown as CreateLessonRequest
+        );
+        router.push(
+            `/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`
+        );
+    };
+
+    // Phase 1: Type Selection
+    if (phase === "type-selection") {
+        return (
+            <div className="flex flex-col gap-6">
+                {/* Header */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-4">
+                            <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="shrink-0"
+                                render={<Link href={`/dashboard/learning-paths/${learningPathId}`} />}
+                            >
+                                <ArrowLeftIcon data-icon="inline-start" />
+                            </Button>
+                            <div>
+                                <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                                    Create Lesson
+                                </h1>
+                                <p className="text-muted-foreground">
+                                    Choose the type of lesson you want to create.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Type Selection Cards */}
+                <div className="grid gap-4 sm:grid-cols-3">
+                    {LESSON_TYPES.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.type}
+                                type="button"
+                                onClick={() => handleTypeSelect(item.type)}
+                                className={`
+                                    group relative flex flex-col rounded-2xl border-2 
+                                    ${item.borderColor} ${item.bgColor} ${item.hoverBg}
+                                    p-6 text-left transition-all duration-200
+                                    hover:scale-[1.02] hover:shadow-lg
+                                    active:scale-[0.98]
+                                `}
+                            >
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className={`
+                                        flex items-center justify-center size-12 rounded-xl
+                                        bg-background/80 shadow-sm
+                                        transition-transform duration-200 group-hover:scale-110
+                                    `}>
+                                        <Icon className={`size-6 ${item.iconColor}`} />
+                                    </div>
+                                    <ChevronRightIcon className={`
+                                        size-5 text-muted-foreground
+                                        opacity-0 transition-opacity duration-200
+                                        group-hover:opacity-100
+                                    `} />
+                                </div>
+
+                                <div className="mb-4">
+                                    <h3 className="text-lg font-bold text-foreground mb-1">
+                                        {item.label}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        {item.description}
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2 mt-auto">
+                                    {item.features.map((feature, idx) => {
+                                        const FeatureIcon = feature.icon;
+                                        return (
+                                            <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <FeatureIcon className={`size-3.5 ${item.iconColor} shrink-0`} />
+                                                <span>{feature.text}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+
+    // Phase 2: Form Creation
+    const selectedItem = LESSON_TYPES.find((t) => t.type === selectedType);
+    const SelectedIcon = selectedItem!.icon;
 
     return (
-        <div className="flex flex-col gap-8">
-            {/* Hero Header */}
+        <div className="flex flex-col gap-6">
+            {/* Header */}
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]" />
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -103,220 +209,54 @@ export default function CreateLessonPage() {
                             variant="ghost"
                             size="icon-sm"
                             className="shrink-0"
-                            render={<Link href={`/dashboard/learning-paths/${learningPathId}`} />}
+                            onClick={handleBackToSelection}
                         >
                             <ArrowLeftIcon data-icon="inline-start" />
                         </Button>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center size-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/20">
-                                {LESSON_TYPE_ICONS[lessonType]}
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                                    Add Lesson
-                                </h1>
-                                <p className="text-muted-foreground">
-                                    Fill in the lesson details below.
-                                </p>
-                            </div>
+                        <div className={`flex items-center justify-center size-10 rounded-xl ${selectedItem!.bgColor} shadow-sm`}>
+                            <SelectedIcon className={`size-5 ${selectedItem!.iconColor}`} />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                                Create {selectedItem!.label} Lesson
+                            </h1>
+                            <p className="text-muted-foreground text-sm">
+                                {selectedItem!.type === "THEORY" && "Write and format your lesson content"}
+                                {selectedItem!.type === "QUIZ" && "Set up quiz settings, then add questions"}
+                                {selectedItem!.type === "CODING" && "Build your coding challenge step by step"}
+                            </p>
                         </div>
                     </div>
-                    <Button
-                        variant="outline"
-                        render={<Link href={`/dashboard/learning-paths/${learningPathId}`} />}
-                    >
-                        Cancel
+                    <Button variant="outline" size="sm" onClick={handleBackToSelection}>
+                        Change Type
                     </Button>
                 </div>
             </div>
 
-            {/* Step Indicator */}
-            <StepIndicator
-                steps={steps}
-                currentStep={currentStep}
-                onStepClick={(index) => {
-                    if (index <= currentStep) {
-                        setCurrentStep(index);
-                    }
-                }}
-            />
-
-            {/* Main Content: Form + Sidebar */}
-            <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">
-                {/* Form */}
-                <div className="lg:col-span-3">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>{steps[currentStep]?.label}</CardTitle>
-                                <span className="text-sm text-muted-foreground">
-                                    Step {currentStep + 1} of {totalSteps}
-                                </span>
-                            </div>
-                            {steps[currentStep]?.description && (
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    {steps[currentStep].description}
-                                </p>
-                            )}
-                        </CardHeader>
-                        <CardContent>
-                            <LessonForm
-                                onSubmit={async (data) => {
-                                    const result = await createLessonMutation.mutateAsync(
-                                        data as unknown as CreateLessonRequest
-                                    );
-                                    router.push(
-                                        `/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`
-                                    );
-                                }}
-                                isPending={createLessonMutation.isPending}
-                                submitLabel="Create Lesson"
-                                currentStep={currentStep}
-                                onStepChange={setCurrentStep}
-                                externalStepControl
-                                formRef={formRef}
-                                defaultValues={{type: lessonType}}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    {/* Navigation Buttons */}
-                    <div className="flex justify-between gap-3 mt-4">
-                        <div>
-                            {currentStep > 0 ? (
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setCurrentStep((p) => p - 1)}
-                                >
-                                    <ChevronLeftIcon data-icon="inline-start" />
-                                    Previous
-                                </Button>
-                            ) : (
-                                <div />
-                            )}
-                        </div>
-                        <div className="flex gap-3">
-                            {currentStep < totalSteps - 1 ? (
-                                <Button onClick={() => setCurrentStep((p) => p + 1)}>
-                                    Next
-                                    <ChevronRightIcon data-icon="inline-end" />
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={handleSubmit}
-                                    disabled={createLessonMutation.isPending}
-                                >
-                                    {createLessonMutation.isPending
-                                        ? "Creating..."
-                                        : "Create Lesson"}
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Sidebar: Lesson Type Selector + Tips */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Lesson Type Selector */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">Lesson Type</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            {(["THEORY", "QUIZ", "CODING"] as LessonType[]).map((type) => {
-                                const Icon = LESSON_TYPE_ICONS[type];
-                                const isSelected = lessonType === type;
-                                return (
-                                    <button
-                                        key={type}
-                                        type="button"
-                                        onClick={() => handleLessonTypeChange(type)}
-                                        className={`
-                                            w-full flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all
-                                            ${
-                                                isSelected
-                                                    ? `border-primary ${LESSON_TYPE_COLORS[type]} bg-muted/50`
-                                                    : "border-border hover:border-muted-foreground/30 hover:bg-muted/30"
-                                            }
-                                        `}
-                                    >
-                                        <div
-                                            className={`
-                                                flex items-center justify-center size-9 rounded-lg shrink-0
-                                                ${
-                                                    isSelected
-                                                        ? LESSON_TYPE_COLORS[type]
-                                                        : "bg-muted text-muted-foreground"
-                                                }
-                                            `}
-                                        >
-                                            {Icon}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="font-semibold text-sm">
-                                                {LESSON_TYPE_LABELS[type]}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                {type === "THEORY" && "Text-based lessons"}
-                                                {type === "QUIZ" && "Knowledge checks"}
-                                                {type === "CODING" && "Programming challenges"}
-                                            </div>
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </CardContent>
-                    </Card>
-
-                    {/* Tips Card */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">
-                                {lessonType === "THEORY" && "Theory Lesson Tips"}
-                                {lessonType === "QUIZ" && "Quiz Lesson Tips"}
-                                {lessonType === "CODING" && "Coding Lesson Tips"}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2 text-sm text-muted-foreground">
-                            {lessonType === "THEORY" && (
-                                <>
-                                    <p>
-                                        Use Markdown to format your content with headings, lists, and code
-                                        blocks.
-                                    </p>
-                                    <p>
-                                        Keep lessons focused on a single concept for better retention.
-                                    </p>
-                                </>
-                            )}
-                            {lessonType === "QUIZ" && (
-                                <>
-                                    <p>Set a reasonable passing score (70% is recommended).</p>
-                                    <p>
-                                        Include explanations for correct answers to aid learning.
-                                    </p>
-                                    <p>You can add questions after creating the lesson.</p>
-                                </>
-                            )}
-                            {lessonType === "CODING" && (
-                                <>
-                                    <p>
-                                        After creating, you will be redirected to add test cases and
-                                        editorials.
-                                    </p>
-                                    <p>
-                                        Starter code is optional — learners can start from scratch.
-                                    </p>
-                                    <p>
-                                        Hidden test cases are used for grading without revealing the
-                                        inputs.
-                                    </p>
-                                </>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
+            {/* Form */}
+            <Card>
+                <CardContent className="p-6">
+                    {selectedType === "CODING" ? (
+                        <CodingLessonForm
+                            onSubmit={handleSubmit}
+                            isPending={createLessonMutation.isPending}
+                            submitLabel="Create Lesson"
+                        />
+                    ) : selectedType === "THEORY" ? (
+                        <TheoryForm
+                            onSubmit={handleSubmit}
+                            isPending={createLessonMutation.isPending}
+                            submitLabel="Create Lesson"
+                        />
+                    ) : (
+                        <LessonForm
+                            onSubmit={handleSubmit}
+                            isPending={createLessonMutation.isPending}
+                            submitLabel="Create Lesson"
+                        />
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }
