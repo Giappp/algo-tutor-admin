@@ -66,6 +66,21 @@ export const CreateTestCaseSchema = z.object({
 export const UpdateTestCaseSchema = CreateTestCaseSchema;
 
 // ---------------------------------------------------------------------------
+// Question schema (used by Quiz lessons)
+// ---------------------------------------------------------------------------
+export const CreateQuestionSchema = z.object({
+    question: z.string().min(1, "Question text is required"),
+    type: QuestionTypeSchema.optional(),
+    points: z.number().int().min(1).optional(),
+    explanation: z.string().optional(),
+    choices: z
+        .array(LessonChoiceSchema)
+        .min(2, "At least 2 choices are required"),
+});
+
+export const UpdateQuestionSchema = CreateQuestionSchema;
+
+// ---------------------------------------------------------------------------
 // Base lesson fields (shared across all types)
 // ---------------------------------------------------------------------------
 const BaseLessonFields = {
@@ -81,9 +96,9 @@ const TheoryLessonFields = {
 
 // Quiz-specific fields
 const QuizLessonFields = {
-    content: z.string().optional(),
     passingScore: z.number().int().min(0).max(100).optional(),
     timeLimitMinutes: z.number().int().optional(),
+    questions: z.array(CreateQuestionSchema).optional(),
 };
 
 // Coding-specific fields
@@ -97,19 +112,6 @@ const CodingLessonFields = {
     examples: z.array(LessonExampleSchema).max(5).optional(),
     testCases: z.array(CreateTestCaseSchema).optional(),
 };
-
-// ---------------------------------------------------------------------------
-// Question schema
-// ---------------------------------------------------------------------------
-export const CreateQuestionSchema = z.object({
-    question: z.string().min(1, "Question text is required"),
-    type: QuestionTypeSchema.optional(),
-    points: z.number().int().min(1).optional(),
-    explanation: z.string().optional(),
-    choices: z
-        .array(LessonChoiceSchema)
-        .min(2, "At least 2 choices are required"),
-});
 
 // ---------------------------------------------------------------------------
 // Polymorphic lesson schema — discriminated union via `type`
@@ -160,6 +162,7 @@ export type UpdateTopic = z.infer<typeof UpdateTopicSchema>;
 export type CreateLesson = z.infer<typeof CreateLessonSchema>;
 export type UpdateLesson = z.infer<typeof UpdateLessonSchema>;
 export type CreateQuestion = z.infer<typeof CreateQuestionSchema>;
+export type UpdateQuestion = z.infer<typeof UpdateQuestionSchema>;
 export type CreateTestCase = z.infer<typeof CreateTestCaseSchema>;
 export type UpdateTestCase = z.infer<typeof UpdateTestCaseSchema>;
 export type CreateEditorial = z.infer<typeof CreateEditorialSchema>;

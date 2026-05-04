@@ -1,6 +1,7 @@
 # Learning Module Admin API Documentation
 
-This document describes the REST API endpoints for managing the Learning Module (admin only). All admin endpoints require authentication with the `ADMIN` role.
+This document describes the REST API endpoints for managing the Learning Module (admin only). All admin endpoints
+require authentication with the `ADMIN` role.
 
 **Base URL:** `/api/v1`
 
@@ -34,12 +35,12 @@ GET /learning-paths
 
 **Query Parameters:**
 
-| Parameter | Type   | Required | Default | Description                        |
-|-----------|--------|----------|---------|------------------------------------|
-| `page`    | int    | No       | 0       | Page number (0-indexed)            |
-| `size`    | int    | No       | 10      | Number of items per page           |
+| Parameter | Type   | Required | Default | Description                                             |
+|-----------|--------|----------|---------|---------------------------------------------------------|
+| `page`    | int    | No       | 0       | Page number (0-indexed)                                 |
+| `size`    | int    | No       | 10      | Number of items per page                                |
 | `level`   | string | No       | -       | Filter by level: `BEGINNER`, `INTERMEDIATE`, `ADVANCED` |
-| `search`  | string | No       | -       | Search by name (partial match)     |
+| `search`  | string | No       | -       | Search by name (partial match)                          |
 
 **Response:** `200 OK`
 
@@ -96,13 +97,13 @@ POST /learning-paths
 }
 ```
 
-| Field         | Type   | Required | Description                                          |
-|---------------|--------|----------|------------------------------------------------------|
-| `name`        | string | Yes      | Name of the learning path                            |
-| `description` | string | Yes      | Detailed description                                 |
-| `goal`        | string | Yes      | Learning objective                                   |
-| `level`       | enum   | Yes      | One of: `BEGINNER`, `INTERMEDIATE`, `ADVANCED`      |
-| `thumbnailUrl`| string | No       | URL to thumbnail image                               |
+| Field          | Type   | Required | Description                                    |
+|----------------|--------|----------|------------------------------------------------|
+| `name`         | string | Yes      | Name of the learning path                      |
+| `description`  | string | Yes      | Detailed description                           |
+| `goal`         | string | Yes      | Learning objective                             |
+| `level`        | enum   | Yes      | One of: `BEGINNER`, `INTERMEDIATE`, `ADVANCED` |
+| `thumbnailUrl` | string | No       | URL to thumbnail image                         |
 
 **Response:** `200 OK`
 
@@ -144,9 +145,9 @@ GET /learning-paths/{id}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description     |
-|-----------|------|----------|-----------------|
-| `id`      | long | Yes      | Learning path ID|
+| Parameter | Type | Required | Description      |
+|-----------|------|----------|------------------|
+| `id`      | long | Yes      | Learning path ID |
 
 **Response:** `200 OK`
 
@@ -206,9 +207,9 @@ PUT /learning-paths/{id}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description     |
-|-----------|------|----------|-----------------|
-| `id`      | long | Yes      | Learning path ID|
+| Parameter | Type | Required | Description      |
+|-----------|------|----------|------------------|
+| `id`      | long | Yes      | Learning path ID |
 
 **Request Body:**
 
@@ -228,7 +229,9 @@ PUT /learning-paths/{id}
 
 ```json
 {
-  "data": { /* Updated LearningPathResponseDTO */ },
+  "data": {
+    /* Updated LearningPathResponseDTO */
+  },
   "success": true
 }
 ```
@@ -251,9 +254,9 @@ DELETE /learning-paths/{id}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description     |
-|-----------|------|----------|-----------------|
-| `id`      | long | Yes      | Learning path ID|
+| Parameter | Type | Required | Description      |
+|-----------|------|----------|------------------|
+| `id`      | long | Yes      | Learning path ID |
 
 **Response:** `200 OK`
 
@@ -282,9 +285,9 @@ PATCH /learning-paths/{id}/publish
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description     |
-|-----------|------|----------|-----------------|
-| `id`      | long | Yes      | Learning path ID|
+| Parameter | Type | Required | Description      |
+|-----------|------|----------|------------------|
+| `id`      | long | Yes      | Learning path ID |
 
 **Response:** `200 OK`
 
@@ -293,7 +296,7 @@ PATCH /learning-paths/{id}/publish
   "data": {
     "id": 1,
     "name": "Data Structures Fundamentals",
-    "isPublished": false,
+    "isPublished": false
     /* ... other fields */
   },
   "success": true
@@ -326,7 +329,9 @@ GET /learning-paths/public/{slug}
 
 ```json
 {
-  "data": { /* LearningPathResponseDTO with published topics and lessons */ },
+  "data": {
+    /* LearningPathResponseDTO with published topics and lessons */
+  },
   "success": true
 }
 ```
@@ -366,11 +371,11 @@ POST /topics/learning-paths/{pathId}
 }
 ```
 
-| Field         | Type    | Required | Description                              |
-|---------------|---------|----------|------------------------------------------|
-| `name`        | string  | No       | Name of the topic                        |
-| `description` | string  | No       | Description of the topic                  |
-| `scopeTags`   | string  | No       | Comma-separated tags for AI scope control|
+| Field         | Type    | Required | Description                                  |
+|---------------|---------|----------|----------------------------------------------|
+| `name`        | string  | No       | Name of the topic                            |
+| `description` | string  | No       | Description of the topic                     |
+| `scopeTags`   | string  | No       | Comma-separated tags for AI scope control    |
 | `isLocked`    | boolean | No       | Whether the topic is locked (default: false) |
 
 **Response:** `200 OK`
@@ -509,7 +514,9 @@ PUT /topics/{topicId}
 
 ```json
 {
-  "data": { /* Updated TopicResponseDTO */ },
+  "data": {
+    /* Updated TopicResponseDTO */
+  },
   "success": true
 }
 ```
@@ -614,8 +621,9 @@ POST /lessons/topics/{topicId}
       "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
     }
   ],
-  "hints": ["Try using a hash map to store seen values."],
-  "keyInsights": ["Use a hash map for O(n) solution."]
+  "hints": [
+    "Try using a hash map to store seen values."
+  ]
 }
 ```
 
@@ -635,10 +643,23 @@ POST /lessons/topics/{topicId}
       "points": 10,
       "explanation": "Array elements can be accessed directly using their index.",
       "choices": [
-        { "text": "O(1)", "isCorrect": true, "explanation": "Correct! Array access is constant time." },
-        { "text": "O(n)", "isCorrect": false },
-        { "text": "O(log n)", "isCorrect": false },
-        { "text": "O(n^2)", "isCorrect": false }
+        {
+          "text": "O(1)",
+          "isCorrect": true,
+          "explanation": "Correct! Array access is constant time."
+        },
+        {
+          "text": "O(n)",
+          "isCorrect": false
+        },
+        {
+          "text": "O(log n)",
+          "isCorrect": false
+        },
+        {
+          "text": "O(n^2)",
+          "isCorrect": false
+        }
       ]
     }
   ]
@@ -678,9 +699,9 @@ GET /lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK`
 
@@ -715,12 +736,16 @@ The response varies by lesson type:
     "difficulty": "EASY",
     "baseTimeLimitMs": 2000,
     "baseMemoryLimitMb": 256,
-    "constraints": ["2 <= nums.length <= 10^4"],
+    "constraints": [
+      "2 <= nums.length <= 10^4"
+    ],
     "starterCode": {
       "java": "class Solution { public int[] twoSum(int[] nums, int target) { } }",
       "python": "class Solution: def twoSum(self, nums: List[int], target: int) -> List[int]: pass"
     },
-    "hints": ["Try using a hash map."],
+    "hints": [
+      "Try using a hash map."
+    ],
     "examples": [
       {
         "input": "[2,7,11,15]\n9",
@@ -728,7 +753,6 @@ The response varies by lesson type:
         "explanation": "..."
       }
     ],
-    "keyInsights": ["Use a hash map for O(n) solution."],
     "testCases": [
       {
         "id": 1,
@@ -766,10 +790,26 @@ The response varies by lesson type:
         "explanation": "Array elements can be accessed directly using their index.",
         "orderIndex": 1,
         "choices": [
-          { "id": 1, "text": "O(1)", "explanation": "Correct!" },
-          { "id": 2, "text": "O(n)", "explanation": null },
-          { "id": 3, "text": "O(log n)", "explanation": null },
-          { "id": 4, "text": "O(n^2)", "explanation": null }
+          {
+            "id": 1,
+            "text": "O(1)",
+            "explanation": "Correct!"
+          },
+          {
+            "id": 2,
+            "text": "O(n)",
+            "explanation": null
+          },
+          {
+            "id": 3,
+            "text": "O(log n)",
+            "explanation": null
+          },
+          {
+            "id": 4,
+            "text": "O(n^2)",
+            "explanation": null
+          }
         ]
       }
     ]
@@ -796,8 +836,8 @@ GET /lessons/slug/{slug}
 
 **Path Parameters:**
 
-| Parameter | Type   | Required | Description   |
-|-----------|--------|----------|---------------|
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
 | `slug`    | string | Yes      | URL-friendly slug |
 
 **Response:** Same as [Get Lesson by ID](#32-get-lesson-by-id)
@@ -826,11 +866,11 @@ GET /lessons/topics/{topicId}
 
 **Query Parameters:**
 
-| Parameter      | Type | Required | Default | Description                        |
-|----------------|------|----------|---------|------------------------------------|
-| `page`         | int  | No       | 0       | Page number (0-indexed)            |
-| `size`         | int  | No       | 20      | Number of items per page           |
-| `publishedOnly`| bool | No       | false   | Only return published lessons      |
+| Parameter       | Type | Required | Default | Description                   |
+|-----------------|------|----------|---------|-------------------------------|
+| `page`          | int  | No       | 0       | Page number (0-indexed)       |
+| `size`          | int  | No       | 20      | Number of items per page      |
+| `publishedOnly` | bool | No       | false   | Only return published lessons |
 
 **Response:** `200 OK`
 
@@ -870,9 +910,9 @@ PUT /lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Request Body:** Same as [Create Lesson](#31-create-lesson), include all fields.
 
@@ -880,7 +920,9 @@ PUT /lessons/{lessonId}
 
 ```json
 {
-  "data": { /* Updated lesson response based on type */ },
+  "data": {
+    /* Updated lesson response based on type */
+  },
   "success": true
 }
 ```
@@ -903,9 +945,9 @@ DELETE /lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK`
 
@@ -934,9 +976,9 @@ PATCH /lessons/{lessonId}/publish
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK`
 
@@ -945,7 +987,7 @@ PATCH /lessons/{lessonId}/publish
   "data": {
     "id": 1,
     "title": "Two Sum",
-    "isPublished": true,
+    "isPublished": true
     /* ... other fields */
   },
   "success": true
@@ -970,9 +1012,9 @@ GET /lessons/public/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK` - Returns lesson data without hidden test cases.
 
@@ -994,9 +1036,9 @@ GET /lessons/public/slug/{slug}
 
 **Path Parameters:**
 
-| Parameter | Type   | Required | Description   |
-|-----------|--------|----------|---------------|
-| `slug`    | string | Yes      | Lesson slug   |
+| Parameter | Type   | Required | Description |
+|-----------|--------|----------|-------------|
+| `slug`    | string | Yes      | Lesson slug |
 
 **Response:** `200 OK` - Returns lesson data without hidden test cases.
 
@@ -1022,9 +1064,9 @@ POST /editorials/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Request Body:**
 
@@ -1035,10 +1077,10 @@ POST /editorials/lessons/{lessonId}
 }
 ```
 
-| Field       | Type   | Required | Description                                      |
-|-------------|--------|----------|--------------------------------------------------|
-| `language`  | enum   | Yes      | One of: `JAVA`, `PYTHON`                         |
-| `sourceCode`| string | Yes      | The solution code                                |
+| Field        | Type   | Required | Description              |
+|--------------|--------|----------|--------------------------|
+| `language`   | enum   | Yes      | One of: `JAVA`, `PYTHON` |
+| `sourceCode` | string | Yes      | The solution code        |
 
 **Response:** `200 OK`
 
@@ -1067,9 +1109,9 @@ GET /editorials/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK`
 
@@ -1105,9 +1147,9 @@ PUT /editorials/{editorialId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `editorialId`| long | Yes      | Editorial ID|
+| Parameter     | Type | Required | Description  |
+|---------------|------|----------|--------------|
+| `editorialId` | long | Yes      | Editorial ID |
 
 **Request Body:**
 
@@ -1122,7 +1164,9 @@ PUT /editorials/{editorialId}
 
 ```json
 {
-  "data": { /* Updated EditorialResponseDTO */ },
+  "data": {
+    /* Updated EditorialResponseDTO */
+  },
   "success": true
 }
 ```
@@ -1145,9 +1189,9 @@ DELETE /editorials/{editorialId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `editorialId`| long | Yes      | Editorial ID|
+| Parameter     | Type | Required | Description  |
+|---------------|------|----------|--------------|
+| `editorialId` | long | Yes      | Editorial ID |
 
 **Response:** `200 OK`
 
@@ -1180,9 +1224,9 @@ POST /testcases/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Request Body:**
 
@@ -1196,13 +1240,13 @@ POST /testcases/lessons/{lessonId}
 }
 ```
 
-| Field            | Type    | Required | Description                              |
-|------------------|---------|----------|------------------------------------------|
-| `stdin`          | string  | Yes      | Standard input for the test case         |
-| `expectedStdout` | string  | Yes      | Expected standard output                 |
-| `isHidden`       | boolean | No       | Hidden from users (default: false)       |
-| `orderIndex`     | integer | No       | Display order                            |
-| `explanation`    | string  | No       | Explanation of the test case             |
+| Field            | Type    | Required | Description                        |
+|------------------|---------|----------|------------------------------------|
+| `stdin`          | string  | Yes      | Standard input for the test case   |
+| `expectedStdout` | string  | Yes      | Expected standard output           |
+| `isHidden`       | boolean | No       | Hidden from users (default: false) |
+| `orderIndex`     | integer | No       | Display order                      |
+| `explanation`    | string  | No       | Explanation of the test case       |
 
 **Response:** `200 OK`
 
@@ -1234,9 +1278,9 @@ GET /testcases/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Lesson ID   |
+| Parameter  | Type | Required | Description |
+|------------|------|----------|-------------|
+| `lessonId` | long | Yes      | Lesson ID   |
 
 **Response:** `200 OK`
 
@@ -1278,9 +1322,9 @@ PUT /testcases/{testCaseId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `testCaseId`| long | Yes      | Test case ID|
+| Parameter    | Type | Required | Description  |
+|--------------|------|----------|--------------|
+| `testCaseId` | long | Yes      | Test case ID |
 
 **Request Body:**
 
@@ -1298,7 +1342,9 @@ PUT /testcases/{testCaseId}
 
 ```json
 {
-  "data": { /* Updated TestCaseResponseDTO */ },
+  "data": {
+    /* Updated TestCaseResponseDTO */
+  },
   "success": true
 }
 ```
@@ -1321,9 +1367,9 @@ DELETE /testcases/{testCaseId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `testCaseId`| long | Yes      | Test case ID|
+| Parameter    | Type | Required | Description  |
+|--------------|------|----------|--------------|
+| `testCaseId` | long | Yes      | Test case ID |
 
 **Response:** `200 OK`
 
@@ -1356,9 +1402,9 @@ POST /questions/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Quiz lesson ID|
+| Parameter  | Type | Required | Description    |
+|------------|------|----------|----------------|
+| `lessonId` | long | Yes      | Quiz lesson ID |
 
 **Request Body:**
 
@@ -1369,29 +1415,43 @@ POST /questions/lessons/{lessonId}
   "points": 10,
   "explanation": "Array elements can be accessed directly using their index in O(1) time.",
   "choices": [
-    { "text": "O(1)", "isCorrect": true, "explanation": "Correct! Array access is constant time." },
-    { "text": "O(n)", "isCorrect": false, "explanation": "Incorrect. Array access doesn't require traversal." },
-    { "text": "O(log n)", "isCorrect": false },
-    { "text": "O(n^2)", "isCorrect": false }
+    {
+      "text": "O(1)",
+      "isCorrect": true,
+      "explanation": "Correct! Array access is constant time."
+    },
+    {
+      "text": "O(n)",
+      "isCorrect": false,
+      "explanation": "Incorrect. Array access doesn't require traversal."
+    },
+    {
+      "text": "O(log n)",
+      "isCorrect": false
+    },
+    {
+      "text": "O(n^2)",
+      "isCorrect": false
+    }
   ]
 }
 ```
 
-| Field         | Type   | Required | Description                                              |
-|---------------|--------|----------|----------------------------------------------------------|
-| `question`    | string | Yes      | The question text                                        |
-| `type`        | enum   | Yes      | One of: `MULTIPLE_CHOICE`, `SINGLE_CHOICE`, `TRUE_FALSE` |
-| `points`      | integer| No       | Points for correct answer (default: 1)                  |
-| `explanation` | string | No       | Explanation shown after answering                        |
-| `choices`     | array  | Yes      | List of answer choices                                   |
+| Field         | Type    | Required | Description                                              |
+|---------------|---------|----------|----------------------------------------------------------|
+| `question`    | string  | Yes      | The question text                                        |
+| `type`        | enum    | Yes      | One of: `MULTIPLE_CHOICE`, `SINGLE_CHOICE`, `TRUE_FALSE` |
+| `points`      | integer | No       | Points for correct answer (default: 1)                   |
+| `explanation` | string  | No       | Explanation shown after answering                        |
+| `choices`     | array   | Yes      | List of answer choices                                   |
 
 **Choice Object:**
 
-| Field         | Type    | Required | Description                     |
-|---------------|---------|----------|---------------------------------|
-| `text`        | string  | Yes      | Choice text                     |
+| Field         | Type    | Required | Description                        |
+|---------------|---------|----------|------------------------------------|
+| `text`        | string  | Yes      | Choice text                        |
 | `isCorrect`   | boolean | Yes      | Whether this is the correct answer |
-| `explanation` | string  | No       | Explanation for this choice    |
+| `explanation` | string  | No       | Explanation for this choice        |
 
 **Response:** `200 OK`
 
@@ -1405,10 +1465,26 @@ POST /questions/lessons/{lessonId}
     "explanation": "Array elements can be accessed directly using their index in O(1) time.",
     "orderIndex": 1,
     "choices": [
-      { "id": 1, "text": "O(1)", "explanation": "Correct! Array access is constant time." },
-      { "id": 2, "text": "O(n)", "explanation": "Incorrect. Array access doesn't require traversal." },
-      { "id": 3, "text": "O(log n)", "explanation": null },
-      { "id": 4, "text": "O(n^2)", "explanation": null }
+      {
+        "id": 1,
+        "text": "O(1)",
+        "explanation": "Correct! Array access is constant time."
+      },
+      {
+        "id": 2,
+        "text": "O(n)",
+        "explanation": "Incorrect. Array access doesn't require traversal."
+      },
+      {
+        "id": 3,
+        "text": "O(log n)",
+        "explanation": null
+      },
+      {
+        "id": 4,
+        "text": "O(n^2)",
+        "explanation": null
+      }
     ]
   },
   "success": true
@@ -1429,9 +1505,9 @@ GET /questions/lessons/{lessonId}
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `lessonId`| long | Yes      | Quiz lesson ID|
+| Parameter  | Type | Required | Description    |
+|------------|------|----------|----------------|
+| `lessonId` | long | Yes      | Quiz lesson ID |
 
 **Response:** `200 OK`
 
@@ -1446,10 +1522,26 @@ GET /questions/lessons/{lessonId}
       "explanation": "Array elements can be accessed directly using their index in O(1) time.",
       "orderIndex": 1,
       "choices": [
-        { "id": 1, "text": "O(1)", "explanation": "Correct! Array access is constant time." },
-        { "id": 2, "text": "O(n)", "explanation": "Incorrect. Array access doesn't require traversal." },
-        { "id": 3, "text": "O(log n)", "explanation": null },
-        { "id": 4, "text": "O(n^2)", "explanation": null }
+        {
+          "id": 1,
+          "text": "O(1)",
+          "explanation": "Correct! Array access is constant time."
+        },
+        {
+          "id": 2,
+          "text": "O(n)",
+          "explanation": "Incorrect. Array access doesn't require traversal."
+        },
+        {
+          "id": 3,
+          "text": "O(log n)",
+          "explanation": null
+        },
+        {
+          "id": 4,
+          "text": "O(n^2)",
+          "explanation": null
+        }
       ]
     }
   ],
@@ -1471,9 +1563,9 @@ PUT /questions/{questionId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `questionId`| long | Yes      | Question ID |
+| Parameter    | Type | Required | Description |
+|--------------|------|----------|-------------|
+| `questionId` | long | Yes      | Question ID |
 
 **Request Body:** Same as [Add Question to Quiz](#61-add-question-to-quiz)
 
@@ -1481,7 +1573,9 @@ PUT /questions/{questionId}
 
 ```json
 {
-  "data": { /* Updated QuizQuestionResponseDTO */ },
+  "data": {
+    /* Updated QuizQuestionResponseDTO */
+  },
   "success": true
 }
 ```
@@ -1504,9 +1598,9 @@ DELETE /questions/{questionId}
 
 **Path Parameters:**
 
-| Parameter   | Type | Required | Description |
-|-------------|------|----------|-------------|
-| `questionId`| long | Yes      | Question ID |
+| Parameter    | Type | Required | Description |
+|--------------|------|----------|-------------|
+| `questionId` | long | Yes      | Question ID |
 
 **Response:** `200 OK`
 
@@ -1531,17 +1625,19 @@ The standard wrapper for all API responses.
 
 ```json
 {
-  "data": { ... },
+  "data": {
+    ...
+  },
   "message": "Optional message",
   "success": true
 }
 ```
 
-| Field    | Type    | Description                           |
-|----------|---------|---------------------------------------|
-| `data`   | any     | Response payload (null if message only)|
-| `message`| string  | Optional success/info message         |
-| `success`| boolean | Whether the request was successful     |
+| Field     | Type    | Description                             |
+|-----------|---------|-----------------------------------------|
+| `data`    | any     | Response payload (null if message only) |
+| `message` | string  | Optional success/info message           |
+| `success` | boolean | Whether the request was successful      |
 
 ### 7.2 PageResponse
 
@@ -1549,7 +1645,9 @@ Paginated list response.
 
 ```json
 {
-  "data": [ ... ],
+  "data": [
+    ...
+  ],
   "pageSize": 10,
   "totalPages": 5,
   "totalElements": 50,
@@ -1557,54 +1655,54 @@ Paginated list response.
 }
 ```
 
-| Field          | Type  | Description                      |
-|----------------|-------|----------------------------------|
-| `data`         | array | List of items for current page  |
-| `pageSize`     | int   | Number of items per page         |
-| `totalPages`   | int   | Total number of pages            |
-| `totalElements`| long  | Total number of items           |
-| `currentPage`  | int   | Current page number (0-indexed)  |
+| Field           | Type  | Description                     |
+|-----------------|-------|---------------------------------|
+| `data`          | array | List of items for current page  |
+| `pageSize`      | int   | Number of items per page        |
+| `totalPages`    | int   | Total number of pages           |
+| `totalElements` | long  | Total number of items           |
+| `currentPage`   | int   | Current page number (0-indexed) |
 
 ### 7.3 Enums
 
 **Level:**
 
-| Value        | Description            |
-|--------------|------------------------|
-| `BEGINNER`   | Beginner level         |
-| `INTERMEDIATE`| Intermediate level     |
-| `ADVANCED`   | Advanced level         |
+| Value          | Description        |
+|----------------|--------------------|
+| `BEGINNER`     | Beginner level     |
+| `INTERMEDIATE` | Intermediate level |
+| `ADVANCED`     | Advanced level     |
 
 **LessonType:**
 
-| Value    | Description          |
-|----------|----------------------|
-| `THEORY` | Theory lesson        |
-| `CODING` | Coding challenge     |
-| `QUIZ`   | Quiz assessment      |
+| Value    | Description      |
+|----------|------------------|
+| `THEORY` | Theory lesson    |
+| `CODING` | Coding challenge |
+| `QUIZ`   | Quiz assessment  |
 
 **Difficulty:**
 
-| Value     | Description      |
-|-----------|------------------|
-| `EASY`    | Easy difficulty  |
-| `MEDIUM`  | Medium difficulty|
-| `HARD`    | Hard difficulty  |
+| Value    | Description       |
+|----------|-------------------|
+| `EASY`   | Easy difficulty   |
+| `MEDIUM` | Medium difficulty |
+| `HARD`   | Hard difficulty   |
 
 **ProgrammingLanguage:**
 
-| Value   | Description         |
-|---------|---------------------|
-| `JAVA`  | Java                |
-| `PYTHON`| Python              |
+| Value    | Description |
+|----------|-------------|
+| `JAVA`   | Java        |
+| `PYTHON` | Python      |
 
 **QuestionType:**
 
-| Value             | Description                    |
-|-------------------|--------------------------------|
-| `MULTIPLE_CHOICE` | Multiple correct answers       |
-| `SINGLE_CHOICE`   | Single correct answer          |
-| `TRUE_FALSE`      | True or false question         |
+| Value             | Description              |
+|-------------------|--------------------------|
+| `MULTIPLE_CHOICE` | Multiple correct answers |
+| `SINGLE_CHOICE`   | Single correct answer    |
+| `TRUE_FALSE`      | True or false question   |
 
 ---
 
@@ -1620,9 +1718,9 @@ All endpoints may return the following error responses:
 
 | Status Code | Description                          |
 |-------------|--------------------------------------|
-| `400`       | Bad Request - Invalid input           |
-| `401`       | Unauthorized - Missing/invalid token  |
-| `403`       | Forbidden - Insufficient permissions  |
+| `400`       | Bad Request - Invalid input          |
+| `401`       | Unauthorized - Missing/invalid token |
+| `403`       | Forbidden - Insufficient permissions |
 | `404`       | Not Found - Resource doesn't exist   |
 | `500`       | Internal Server Error                |
 
@@ -1642,10 +1740,10 @@ All endpoints may return the following error responses:
 
 All list endpoints that return `PageResponse` support Spring Data pagination:
 
-| Parameter | Type | Description                    |
-|-----------|------|--------------------------------|
-| `page`    | int  | Page number (0-indexed)        |
-| `size`    | int  | Items per page (default varies)|
-| `sort`    | string| Sort field and direction      |
+| Parameter | Type   | Description                     |
+|-----------|--------|---------------------------------|
+| `page`    | int    | Page number (0-indexed)         |
+| `size`    | int    | Items per page (default varies) |
+| `sort`    | string | Sort field and direction        |
 
 **Example:** `GET /learning-paths?page=0&size=20&sort=createdAt,desc`

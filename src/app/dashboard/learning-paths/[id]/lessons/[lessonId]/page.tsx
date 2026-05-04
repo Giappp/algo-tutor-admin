@@ -22,10 +22,10 @@ import {TestCasesTab} from "@/components/learning-path/test-cases-tab";
 import {QuestionsTab} from "@/components/learning-path/questions-tab";
 import {EditorialsTab} from "@/components/learning-path/editorials-tab";
 import {RichTextDisplay} from "@/components/ui/rich-text-editor";
-import {LessonForm} from "@/components/learning-path/lesson-form";
 import {TheoryForm} from "@/components/learning-path/theory-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useDeleteLesson, useLesson, useTogglePublishLesson, useUpdateLesson,} from "@/hooks/use-lessons";
+import {QuizForm} from "@/components/learning-path/quiz-form";
 
 export default function LessonDetailPage() {
     const params = useParams();
@@ -169,12 +169,11 @@ export default function LessonDetailPage() {
                             submitLabel="Save Changes"
                         />
                     ) : (
-                        <LessonForm
+                        <QuizForm
                             editMode
                             defaultValues={{
                                 type: "QUIZ",
                                 title: lesson.title,
-                                content: lesson.content,
                                 difficulty: lesson.difficulty,
                                 passingScore: lesson.passingScore,
                                 timeLimitMinutes: lesson.timeLimitMinutes,

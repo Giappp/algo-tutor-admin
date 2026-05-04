@@ -8,20 +8,20 @@ import TaskItem from "@tiptap/extension-task-item";
 import {useEffect, useMemo} from "react";
 import {
     Bold,
+    BookOpen,
     CheckSquare,
     Code,
+    FileText,
     Heading2,
     Heading3,
     Italic,
     List,
+    ListChecks,
     ListOrdered,
+    Pilcrow,
     Quote,
     Redo,
     Undo,
-    Pilcrow,
-    BookOpen,
-    FileText,
-    ListChecks,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
@@ -319,11 +319,11 @@ interface RichTextEditorWithTemplatesProps {
 }
 
 export function RichTextEditorWithTemplates({
-                                               value,
-                                               onChange,
-                                               placeholder = "Write your lesson content here...",
-                                               disabled,
-                                           }: RichTextEditorWithTemplatesProps) {
+                                                value,
+                                                onChange,
+                                                placeholder = "Write your lesson content here...",
+                                                disabled,
+                                            }: RichTextEditorWithTemplatesProps) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -403,19 +403,6 @@ export function RichTextEditorWithTemplates({
                 placeholder={placeholder}
                 disabled={disabled}
             />
-
-            {/* Live Preview */}
-            {value && value !== "" && (
-                <div className="rounded-xl border border-input overflow-hidden">
-                    <div className="px-3 py-2 border-b border-border bg-muted/30 flex items-center gap-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Preview</span>
-                    </div>
-                    <div
-                        className="tiptap-content p-4 min-h-32"
-                        dangerouslySetInnerHTML={{__html: value}}
-                    />
-                </div>
-            )}
         </div>
     );
 }
@@ -428,11 +415,11 @@ interface RichTextEditorWithPreviewProps {
 }
 
 export function RichTextEditorWithPreview({
-                                             value,
-                                             onChange,
-                                             placeholder,
-                                             disabled,
-                                         }: RichTextEditorWithPreviewProps) {
+                                              value,
+                                              onChange,
+                                              placeholder,
+                                              disabled,
+                                          }: RichTextEditorWithPreviewProps) {
     return (
         <RichTextEditorWithTemplates
             value={value}

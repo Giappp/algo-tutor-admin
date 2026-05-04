@@ -6,21 +6,21 @@ import Link from "next/link";
 import {
     ArrowLeftIcon,
     BookOpenIcon,
-    CodeIcon,
-    GraduationCapIcon,
-    ChevronRightIcon,
     CheckCircle2,
-    PenLineIcon,
+    ChevronRightIcon,
+    CodeIcon,
     FileQuestionIcon,
+    GraduationCapIcon,
+    PenLineIcon,
     TerminalIcon,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
-import {LessonForm} from "@/components/learning-path/lesson-form";
 import {TheoryForm} from "@/components/learning-path/theory-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useCreateLesson} from "@/hooks/use-lessons";
 import {CreateLessonRequest, LessonType} from "@/types/learning-path";
+import {QuizForm} from "@/components/learning-path/quiz-form";
 
 type CreationPhase = "type-selection" | "form-creation";
 
@@ -110,17 +110,19 @@ export default function CreateLessonPage() {
         return (
             <div className="flex flex-col gap-6">
                 {/* Header */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]" />
+                <div
+                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
+                    <div
+                        className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]"/>
                     <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             <Button
                                 variant="ghost"
                                 size="icon-sm"
                                 className="shrink-0"
-                                render={<Link href={`/dashboard/learning-paths/${learningPathId}`} />}
+                                render={<Link href={`/dashboard/learning-paths/${learningPathId}`}/>}
                             >
-                                <ArrowLeftIcon data-icon="inline-start" />
+                                <ArrowLeftIcon data-icon="inline-start"/>
                             </Button>
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -157,13 +159,13 @@ export default function CreateLessonPage() {
                                         bg-background/80 shadow-sm
                                         transition-transform duration-200 group-hover:scale-110
                                     `}>
-                                        <Icon className={`size-6 ${item.iconColor}`} />
+                                        <Icon className={`size-6 ${item.iconColor}`}/>
                                     </div>
                                     <ChevronRightIcon className={`
                                         size-5 text-muted-foreground
                                         opacity-0 transition-opacity duration-200
                                         group-hover:opacity-100
-                                    `} />
+                                    `}/>
                                 </div>
 
                                 <div className="mb-4">
@@ -179,8 +181,9 @@ export default function CreateLessonPage() {
                                     {item.features.map((feature, idx) => {
                                         const FeatureIcon = feature.icon;
                                         return (
-                                            <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <FeatureIcon className={`size-3.5 ${item.iconColor} shrink-0`} />
+                                            <div key={idx}
+                                                 className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <FeatureIcon className={`size-3.5 ${item.iconColor} shrink-0`}/>
                                                 <span>{feature.text}</span>
                                             </div>
                                         );
@@ -201,8 +204,10 @@ export default function CreateLessonPage() {
     return (
         <div className="flex flex-col gap-6">
             {/* Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]" />
+            <div
+                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
+                <div
+                    className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]"/>
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
                         <Button
@@ -211,10 +216,11 @@ export default function CreateLessonPage() {
                             className="shrink-0"
                             onClick={handleBackToSelection}
                         >
-                            <ArrowLeftIcon data-icon="inline-start" />
+                            <ArrowLeftIcon data-icon="inline-start"/>
                         </Button>
-                        <div className={`flex items-center justify-center size-10 rounded-xl ${selectedItem!.bgColor} shadow-sm`}>
-                            <SelectedIcon className={`size-5 ${selectedItem!.iconColor}`} />
+                        <div
+                            className={`flex items-center justify-center size-10 rounded-xl ${selectedItem!.bgColor} shadow-sm`}>
+                            <SelectedIcon className={`size-5 ${selectedItem!.iconColor}`}/>
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -249,7 +255,7 @@ export default function CreateLessonPage() {
                             submitLabel="Create Lesson"
                         />
                     ) : (
-                        <LessonForm
+                        <QuizForm
                             onSubmit={handleSubmit}
                             isPending={createLessonMutation.isPending}
                             submitLabel="Create Lesson"
