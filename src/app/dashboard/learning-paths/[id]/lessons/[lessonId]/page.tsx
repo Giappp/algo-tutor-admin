@@ -144,7 +144,6 @@ export default function LessonDetailPage() {
                                 starterCode: lesson.starterCode,
                                 hints: lesson.hints,
                                 examples: lesson.examples,
-                                keyInsights: lesson.keyInsights,
                             }}
                             onSubmit={async (data) => {
                                 await updateLessonMutation.mutateAsync(data as Parameters<typeof updateLessonMutation.mutateAsync>[0]);

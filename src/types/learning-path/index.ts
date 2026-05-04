@@ -163,7 +163,7 @@ export interface CreateLessonRequest {
     statement?: string;
     baseTimeLimitMs?: number;
     baseMemoryLimitMb?: number;
-    constraints?: string;
+    constraints?: string[];
     starterCode?: Record<string, string>;
     hints?: string[];
     examples?: LessonExample[];

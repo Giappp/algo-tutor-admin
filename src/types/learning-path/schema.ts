@@ -53,6 +53,19 @@ export const LessonExampleSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Test case schema
+// ---------------------------------------------------------------------------
+export const CreateTestCaseSchema = z.object({
+    stdin: z.string().min(1, "Standard input is required"),
+    expectedStdout: z.string().min(1, "Expected output is required"),
+    isHidden: z.boolean().optional(),
+    orderIndex: z.number().int().optional(),
+    explanation: z.string().optional(),
+});
+
+export const UpdateTestCaseSchema = CreateTestCaseSchema;
+
+// ---------------------------------------------------------------------------
 // Base lesson fields (shared across all types)
 // ---------------------------------------------------------------------------
 const BaseLessonFields = {
@@ -82,10 +95,12 @@ const CodingLessonFields = {
     starterCode: z.record(z.string(), z.string()).optional(),
     hints: z.array(z.string()).max(10).optional(),
     examples: z.array(LessonExampleSchema).max(5).optional(),
-    keyInsights: z.array(z.string()).max(20).optional(),
+    testCases: z.array(CreateTestCaseSchema).optional(),
 };
 
+// ---------------------------------------------------------------------------
 // Question schema
+// ---------------------------------------------------------------------------
 export const CreateQuestionSchema = z.object({
     question: z.string().min(1, "Question text is required"),
     type: QuestionTypeSchema.optional(),
@@ -124,19 +139,6 @@ export const CreateLessonSchema = z.discriminatedUnion("type", [
 ]);
 
 export const UpdateLessonSchema = CreateLessonSchema;
-
-// ---------------------------------------------------------------------------
-// Test case schema
-// ---------------------------------------------------------------------------
-export const CreateTestCaseSchema = z.object({
-    stdin: z.string().min(1, "Standard input is required"),
-    expectedStdout: z.string().min(1, "Expected output is required"),
-    isHidden: z.boolean().optional(),
-    orderIndex: z.number().int().optional(),
-    explanation: z.string().optional(),
-});
-
-export const UpdateTestCaseSchema = CreateTestCaseSchema;
 
 // ---------------------------------------------------------------------------
 // Editorial schema
