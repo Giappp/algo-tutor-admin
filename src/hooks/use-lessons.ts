@@ -83,8 +83,9 @@ export function useTogglePublishLesson() {
 
     return useMutation({
         mutationFn: (lessonId: number) => lessonService.togglePublish(lessonId),
-        onSuccess: () => {
+        onSuccess: (_, lessonId) => {
             toast.success("Lesson publish status updated");
+            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lesson(lessonId)});
             queryClient.invalidateQueries({queryKey: ["lessons"]});
         },
     });

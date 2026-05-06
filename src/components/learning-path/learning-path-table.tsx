@@ -130,7 +130,8 @@ export function LearningPathTable({
                 header: "Status",
                 cell: ({row}) =>
                     row.original.isPublished ? (
-                        <Badge variant="default" className="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">Published</Badge>
+                        <Badge variant="default"
+                               className="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">Published</Badge>
                     ) : (
                         <Badge variant="secondary">Draft</Badge>
                     ),
@@ -226,6 +227,7 @@ export function LearningPathTable({
                 </p>
                 <div className="mt-6">
                     <Button
+                        nativeButton={false}
                         render={
                             <Link href="/dashboard/learning-paths/create"/>
                         }

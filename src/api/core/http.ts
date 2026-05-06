@@ -123,3 +123,11 @@ export const getPage = async <T>(url: string, config?: Cfg) => {
         hasPrevious: response.currentPage > 0,
     };
 };
+
+export const postForm = async <T>(url: string, formData: FormData, config?: Cfg) => {
+    const response = await api.post<ApiResponse<T>>(url, formData, {
+        ...config,
+        headers: {...config?.headers, "Content-Type": "multipart/form-data"},
+    });
+    return response.data.data;
+};

@@ -1,100 +1,98 @@
 "use client";
 
-import { GraduationCapIcon } from "lucide-react";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {GraduationCapIcon} from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LearningPathForm } from "@/components/learning-path/learning-path-form";
-import { LearningPathPreviewCard } from "@/components/learning-path/preview-card";
-import { StepIndicator } from "@/components/learning-path/step-indicator";
-import { useCreateLearningPath } from "@/hooks/use-learning-paths";
-import { CreateLearningPath } from "@/types/learning-path/schema";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-const CREATE_STEPS = [
-  { id: "info", label: "Basic Info", description: "Name & description" },
-  { id: "topics", label: "Topics", description: "Add topics & lessons" },
-  { id: "review", label: "Review", description: "Review & publish" },
-];
+import {LearningPathFields} from "@/components/learning-path/learning-path-form";
+import {useCreateLearningPath} from "@/hooks/use-learning-paths";
+import {CreateLearningPath, CreateLearningPathSchema} from "@/types/learning-path/schema";
+import {useRouter} from "next/navigation";
+import {Button} from "@/components/ui/button";
 
 export default function CreateLearningPathPage() {
-  const router = useRouter();
-  const createMutation = useCreateLearningPath();
-  const [currentStep, setCurrentStep] = useState(0);
+    const router = useRouter();
+    const createMutation = useCreateLearningPath();
 
-  const handleSubmit = async (data: CreateLearningPath) => {
-    const result = await createMutation.mutateAsync(data);
-    if (result?.id) {
-      router.push(`/dashboard/learning-paths/${result.id}`);
-    }
-  };
+    const {
+        control,
+        handleSubmit,
+        watch,
+        register,
+        setValue,
+        formState: {errors},
+    } = useForm<CreateLearningPath>({
+        resolver: zodResolver(CreateLearningPathSchema),
+        defaultValues: {
+            name: "",
+            description: "",
+            goal: "",
+            thumbnailUrl: "",
+            level: "BEGINNER",
+        },
+    });
 
-  return (
-    <div className="flex flex-col gap-8">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]" />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center size-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/20">
-              <GraduationCapIcon className="size-6 text-white" />
+    const onSubmit = handleSubmit(async (data) => {
+        const result = await createMutation.mutateAsync(data);
+        if (result?.id) {
+            router.push(`/dashboard/learning-paths/${result.id}`);
+        }
+    });
+
+    return (
+        <div className="flex flex-col gap-6 max-w-2xl">
+            {/* Header */}
+            <div
+                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-transparent p-5 dark:from-emerald-950/40 dark:via-teal-950/20">
+                <div
+                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_0%,oklch(0.6_0.15_145/0.12)_0%,transparent_60%)] animate-gradient-shift pointer-events-none"/>
+                <div
+                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_100%,oklch(0.55_0.1_160/0.08)_0%,transparent_50%)] animate-gradient-shift pointer-events-none"
+                    style={{animationDelay: "2s"}}
+                />
+                <div className="absolute inset-0 dot-pattern opacity-30 pointer-events-none"/>
+
+                <div className="relative flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20">
+                            <GraduationCapIcon className="size-5 text-white"/>
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold tracking-tight text-foreground text-gradient-emerald">
+                                Create Learning Path
+                            </h1>
+                            <p className="text-xs text-muted-foreground hidden sm:block">
+                                Fill in basic information, then add topics and lessons on the next page.
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/dashboard/learning-paths"
+                        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted/50"
+                    >
+                        Cancel
+                    </Link>
+                </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Create Learning Path
-              </h1>
-              <p className="text-muted-foreground">
-                Build a structured curriculum for learners to follow.
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" render={<Link href="/dashboard/learning-paths" />}>
-            Cancel
-          </Button>
+
+            {/* Form */}
+            <form onSubmit={onSubmit} className="rounded-2xl border bg-card p-6">
+                <LearningPathFields
+                    control={control}
+                    errors={errors}
+                    watch={watch}
+                    register={register}
+                    setValue={setValue}
+                    isPending={createMutation.isPending}
+                />
+
+                <div className="flex justify-end gap-3 pt-4 mt-2 border-t">
+                    <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending ? "Creating..." : "Create Learning Path"}
+                    </Button>
+                </div>
+            </form>
         </div>
-      </div>
-
-      {/* Step Indicator */}
-      <StepIndicator
-        steps={CREATE_STEPS}
-        currentStep={currentStep}
-        onStepClick={setCurrentStep}
-      />
-
-      {/* Main Content: Form + Preview */}
-      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-        {/* Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LearningPathForm
-              onSubmit={handleSubmit}
-              isPending={createMutation.isPending}
-              submitLabel="Create Learning Path"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Live Preview */}
-        <div className="hidden lg:block">
-          <div className="sticky top-6">
-            <div className="mb-4 flex items-center gap-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Live Preview</h3>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-            <LearningPathPreviewCard
-              name="Data Structures Fundamentals"
-              description="Master arrays, linked lists, trees, and graphs with hands-on coding exercises."
-              level="BEGINNER"
-              lessonCount={24}
-              topicCount={6}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

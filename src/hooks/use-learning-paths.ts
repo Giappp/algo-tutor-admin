@@ -73,8 +73,9 @@ export function useTogglePublishLearningPath() {
 
     return useMutation({
         mutationFn: (id: number) => learningPathService.togglePublish(id),
-        onSuccess: () => {
+        onSuccess: (_, id) => {
             toast.success("Publish status updated");
+            queryClient.invalidateQueries({queryKey: QUERY_KEYS.learningPath(id)});
             queryClient.invalidateQueries({queryKey: ["learning-paths"]});
         },
     });

@@ -370,6 +370,7 @@ export default function LearningPathsPage() {
                     </div>
                     <div className="flex gap-2">
                         <Button
+                            nativeButton={false}
                             variant="outline"
                             size="sm"
                             onClick={handleBulkPublish}
@@ -577,14 +578,14 @@ export default function LearningPathsPage() {
                                         <Pencil data-icon="inline-start" className="size-4"/>
                                         Edit Learning Path
                                     </Button>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => togglePublishMutation.mutate(previewLp.id)}
-                                            className="w-full"
-                                        >
-                                            <Rocket data-icon="inline-start" className="size-4"/>
-                                            {previewLp.isPublished ? "Unpublish" : "Publish"}
-                                        </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => togglePublishMutation.mutate(previewLp.id)}
+                                        className="w-full"
+                                    >
+                                        <Rocket data-icon="inline-start" className="size-4"/>
+                                        {previewLp.isPublished ? "Unpublish" : "Publish"}
+                                    </Button>
                                 </div>
                             </div>
                         </>

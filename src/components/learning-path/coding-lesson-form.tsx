@@ -1,9 +1,9 @@
 "use client";
 
+import React, {useEffect, useImperativeHandle, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
-import {useEffect, useState} from "react";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
@@ -77,19 +77,20 @@ const LANGUAGE_CONFIG: Record<string, { label: string; monacoLanguage: string; b
     },
 };
 
+type CodingLessonFormHandle = {
+    trigger: () => Promise<boolean>;
+    submit: () => Promise<void>;
+};
+
+export type {CodingLessonFormHandle};
+
 interface CodingLessonFormProps {
     defaultValues?: Partial<CreateCodingLesson>;
     onSubmit: (data: CreateCodingLesson) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     editMode?: boolean;
-}
-
-interface TestCaseInput {
-    stdin: string;
-    expectedStdout: string;
-    isHidden: boolean;
-    explanation: string;
+    formRef?: React.RefObject<CodingLessonFormHandle | null>;
 }
 
 export function CodingLessonForm({
@@ -98,10 +99,20 @@ export function CodingLessonForm({
                                      isPending,
                                      submitLabel = "Create Lesson",
                                      editMode,
+                                     formRef: externalFormRef,
                                  }: CodingLessonFormProps) {
+    const internalFormRef = useRef<CodingLessonFormHandle | null>(null);
+    const formRef = externalFormRef ?? internalFormRef;
+
     const [activeSection, setActiveSection] = useState<string>("basic");
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [statementHtml, setStatementHtml] = useState("");
+
+    interface TestCaseInput {
+        stdin: string;
+        expectedStdout: string;
+        isHidden: boolean;
+        explanation: string;
+    }
 
     const {
         register,
@@ -219,26 +230,30 @@ export function CodingLessonForm({
         setValue("testCases" as const, current);
     };
 
-    const handleFormSubmit = async (data: CreateCodingLesson) => {
-        setIsSubmitting(true);
-        try {
-            const finalData = {
-                ...data,
-                type: "CODING" as const,
-                statement: statementHtml,
-                starterCode: {
-                    java: watchedStarterCode["java"] ?? DEFAULT_STARTER_CODE["java"],
-                    python: watchedStarterCode["python"] ?? DEFAULT_STARTER_CODE["python"],
-                },
-            };
-            await onSubmit(finalData);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+    useImperativeHandle(formRef, () => ({
+        trigger: async () => {
+            let valid = false;
+            await handleSubmit(() => { valid = true; })();
+            return valid;
+        },
+        submit: async () => {
+            await handleSubmit(async (data) => {
+                const finalData = {
+                    ...data,
+                    type: "CODING" as const,
+                    statement: statementHtml,
+                    starterCode: {
+                        java: watchedStarterCode["java"] ?? DEFAULT_STARTER_CODE["java"],
+                        python: watchedStarterCode["python"] ?? DEFAULT_STARTER_CODE["python"],
+                    },
+                };
+                await onSubmit(finalData);
+            })();
+        },
+    }));
 
     const toggleSection = (section: string) => {
-        setActiveSection(activeSection === section ? section : section);
+        setActiveSection(activeSection === section ? "" : section);
     };
 
     const isOpen = (section: string) => activeSection === section;
@@ -247,7 +262,21 @@ export function CodingLessonForm({
 
     return (
         <TooltipProvider>
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-8">
+            <form
+                onSubmit={handleSubmit(async (data) => {
+                    const finalData = {
+                        ...data,
+                        type: "CODING" as const,
+                        statement: statementHtml,
+                        starterCode: {
+                            java: watchedStarterCode["java"] ?? DEFAULT_STARTER_CODE["java"],
+                            python: watchedStarterCode["python"] ?? DEFAULT_STARTER_CODE["python"],
+                        },
+                    };
+                    await onSubmit(finalData);
+                })}
+                className="flex flex-col gap-8"
+            >
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <div className="flex items-center justify-center size-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/20">
@@ -743,11 +772,11 @@ export function CodingLessonForm({
                     <div className="flex justify-end pt-6 border-t">
                         <Button
                             type="submit"
-                            disabled={isPending || isSubmitting}
+                            disabled={isPending}
                             size="lg"
                             className="px-8 gap-2"
                         >
-                            {isPending || isSubmitting ? (
+                            {isPending ? (
                                 <>
                                     <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>

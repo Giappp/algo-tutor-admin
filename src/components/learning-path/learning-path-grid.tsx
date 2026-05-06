@@ -201,6 +201,7 @@ function LearningPathCard({
                     <div className="absolute bottom-3 left-3 right-3 flex gap-2">
                         <Button
                             size="sm"
+                            nativeButton={true}
                             variant="secondary"
                             className="h-8 flex-1 bg-white/90 backdrop-blur-sm hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-700"
                             onClick={onPreview}
@@ -210,6 +211,7 @@ function LearningPathCard({
                         </Button>
                         <Button
                             size="sm"
+                            nativeButton={false}
                             variant="secondary"
                             className="h-8 flex-1 bg-white/90 backdrop-blur-sm hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-700"
                             render={<Link href={`/dashboard/learning-paths/${lp.id}`}/>}
@@ -280,14 +282,8 @@ function LearningPathCard({
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger>
-                            <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                className="text-muted-foreground"
-                            >
-                                <MoreHorizontal className="size-4"/>
-                                <span className="sr-only">Open menu</span>
-                            </Button>
+                            <MoreHorizontal className="size-4"/>
+                            <span className="sr-only">Open menu</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={onPreview}>

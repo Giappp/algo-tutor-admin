@@ -5,7 +5,6 @@ import z from "zod";
 // ---------------------------------------------------------------------------
 export const LevelSchema = z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
 export const DifficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
-export const LessonTypeSchema = z.enum(["THEORY", "QUIZ", "CODING"]);
 export const QuestionTypeSchema = z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TRUE_FALSE"]);
 export const ProgrammingLanguageSchema = z.enum(["JAVA", "PYTHON"]);
 
@@ -25,7 +24,7 @@ export const CreateLearningPathSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
     goal: z.string().min(1, "Goal is required"),
-    thumbnailUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+    thumbnailUrl: z.string().optional(),
     level: LevelSchema,
 });
 
@@ -70,7 +69,7 @@ export const UpdateTestCaseSchema = CreateTestCaseSchema;
 // ---------------------------------------------------------------------------
 export const CreateQuestionSchema = z.object({
     question: z.string().min(1, "Question text is required"),
-    type: QuestionTypeSchema.optional(),
+    type: QuestionTypeSchema,
     points: z.number().int().min(1).optional(),
     explanation: z.string().optional(),
     choices: z

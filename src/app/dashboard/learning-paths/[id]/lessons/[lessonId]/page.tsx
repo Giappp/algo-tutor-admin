@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import Link from "next/link";
 import {ArrowLeftIcon, BookOpenIcon, CheckIcon, CodeIcon, SettingsIcon, Trash2Icon, XIcon} from "lucide-react";
@@ -22,10 +22,13 @@ import {TestCasesTab} from "@/components/learning-path/test-cases-tab";
 import {QuestionsTab} from "@/components/learning-path/questions-tab";
 import {EditorialsTab} from "@/components/learning-path/editorials-tab";
 import {RichTextDisplay} from "@/components/ui/rich-text-editor";
+import type {TheoryFormHandle} from "@/components/learning-path/theory-form";
 import {TheoryForm} from "@/components/learning-path/theory-form";
+import type {CodingLessonFormHandle} from "@/components/learning-path/coding-lesson-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
-import {useDeleteLesson, useLesson, useTogglePublishLesson, useUpdateLesson,} from "@/hooks/use-lessons";
+import type {QuizFormHandle} from "@/components/learning-path/quiz-form";
 import {QuizForm} from "@/components/learning-path/quiz-form";
+import {useDeleteLesson, useLesson, useTogglePublishLesson, useUpdateLesson,} from "@/hooks/use-lessons";
 
 export default function LessonDetailPage() {
     const params = useParams();
@@ -40,6 +43,10 @@ export default function LessonDetailPage() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+    const codingFormRef = useRef<CodingLessonFormHandle | null>(null);
+    const theoryFormRef = useRef<TheoryFormHandle | null>(null);
+    const quizFormRef = useRef<QuizFormHandle | null>(null);
 
     if (lessonLoading) {
         return <LessonPageSkeleton/>;
@@ -107,8 +114,11 @@ export default function LessonDetailPage() {
                             </Button>
                             <Button
                                 size="sm"
-                                form="lesson-edit-form"
-                                type="submit"
+                                onClick={() => {
+                                    if (lesson.type === "CODING") codingFormRef.current?.submit();
+                                    else if (lesson.type === "THEORY") theoryFormRef.current?.submit();
+                                    else quizFormRef.current?.submit();
+                                }}
                                 disabled={updateLessonMutation.isPending}
                             >
                                 {updateLessonMutation.isPending ? (
@@ -132,6 +142,7 @@ export default function LessonDetailPage() {
                 <div className="flex flex-col gap-4">
                     {lesson.type === "CODING" ? (
                         <CodingLessonForm
+                            formRef={codingFormRef}
                             editMode
                             defaultValues={{
                                 type: "CODING",
@@ -154,6 +165,7 @@ export default function LessonDetailPage() {
                         />
                     ) : lesson.type === "THEORY" ? (
                         <TheoryForm
+                            formRef={theoryFormRef}
                             editMode
                             defaultValues={{
                                 type: "THEORY",
@@ -170,6 +182,7 @@ export default function LessonDetailPage() {
                         />
                     ) : (
                         <QuizForm
+                            formRef={quizFormRef}
                             editMode
                             defaultValues={{
                                 type: "QUIZ",
@@ -177,6 +190,7 @@ export default function LessonDetailPage() {
                                 difficulty: lesson.difficulty,
                                 passingScore: lesson.passingScore,
                                 timeLimitMinutes: lesson.timeLimitMinutes,
+                                questions: lesson.questions
                             }}
                             onSubmit={async (data) => {
                                 await updateLessonMutation.mutateAsync(data as Parameters<typeof updateLessonMutation.mutateAsync>[0]);

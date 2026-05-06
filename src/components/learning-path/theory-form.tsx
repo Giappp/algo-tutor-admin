@@ -2,7 +2,7 @@
 
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import React from "react";
+import React, {useImperativeHandle, useRef} from "react";
 import {BookOpenIcon} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -33,8 +33,11 @@ const DIFFICULTY_OPTIONS = [
 ];
 
 type TheoryFormHandle = {
+    trigger: () => Promise<boolean>;
     submit: () => Promise<void>;
 };
+
+export type {TheoryFormHandle};
 
 interface TheoryFormProps {
     defaultValues?: Partial<CreateTheoryLesson>;
@@ -51,8 +54,11 @@ export function TheoryForm({
                                isPending,
                                submitLabel = "Create Lesson",
                                editMode,
-                               formRef,
+                               formRef: externalFormRef,
                            }: TheoryFormProps) {
+    const internalFormRef = useRef<TheoryFormHandle | null>(null);
+    const formRef = externalFormRef ?? internalFormRef;
+
     const {
         register,
         handleSubmit: RHhandleSubmit,
@@ -74,14 +80,19 @@ export function TheoryForm({
     const watchedContent = watch("content") ?? "";
     const watchedDifficulty = watch("difficulty");
 
-    const handleSubmit = RHhandleSubmit(onSubmit);
-
-    if (formRef) {
-        formRef.current = {submit: handleSubmit};
-    }
+    useImperativeHandle(formRef, () => ({
+        trigger: async () => {
+            let valid = false;
+            await RHhandleSubmit(() => { valid = true; })();
+            return valid;
+        },
+        submit: async () => {
+            await RHhandleSubmit(onSubmit)();
+        },
+    }));
 
     return (
-        <form id="theory-form" onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form id="theory-form" onSubmit={RHhandleSubmit(onSubmit)} className="flex flex-col gap-6">
             {/* Header */}
             <div className="flex items-center gap-2">
                 <div className="flex items-center justify-center size-7 rounded-md bg-blue-500/10">

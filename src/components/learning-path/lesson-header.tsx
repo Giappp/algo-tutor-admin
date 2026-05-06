@@ -1,11 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import {ArrowLeft, BookOpen, Code2, FileQuestion, Pencil, Rocket, MoreHorizontal, Eye} from "lucide-react";
+import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Pencil, Rocket} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
-import {LessonType, Difficulty} from "@/types/learning-path";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {Difficulty, LessonType} from "@/types/learning-path";
 
 const LESSON_TYPE_CONFIG: Record<LessonType, {
     icon: React.ElementType;
@@ -55,12 +61,12 @@ interface LessonHeaderProps {
 }
 
 export function LessonHeader({
-                                  lesson,
-                                  learningPathId,
-                                  onEdit,
-                                  onTogglePublish,
-                                  isEditPending = false,
-                              }: LessonHeaderProps) {
+                                 lesson,
+                                 learningPathId,
+                                 onEdit,
+                                 onTogglePublish,
+                                 isEditPending = false,
+                             }: LessonHeaderProps) {
     const config = LESSON_TYPE_CONFIG[lesson.type];
     const TypeIcon = config.icon;
 
@@ -69,10 +75,12 @@ export function LessonHeader({
             className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${config.bgGradient} p-6`}
         >
             {/* Decorative accent */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.borderColor} bg-gradient-to-b from-transparent via-current to-transparent opacity-60`}/>
+            <div
+                className={`absolute left-0 top-0 bottom-0 w-1 ${config.borderColor} bg-gradient-to-b from-transparent via-current to-transparent opacity-60`}/>
 
             {/* Decorative glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"/>
+            <div
+                className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"/>
 
             <div className="relative flex items-start justify-between gap-4">
                 {/* Left section: Back + Lesson info */}
@@ -89,7 +97,8 @@ export function LessonHeader({
 
                     <div className="flex items-start gap-4">
                         {/* Icon */}
-                        <div className={`shrink-0 flex items-center justify-center size-12 rounded-xl bg-background/80 backdrop-blur-sm shadow-sm border border-border/50`}>
+                        <div
+                            className={`shrink-0 flex items-center justify-center size-12 rounded-xl bg-background/80 backdrop-blur-sm shadow-sm border border-border/50`}>
                             <TypeIcon className={`size-6 ${config.badgeClass.split(" ")[1]}`}/>
                         </div>
 
@@ -160,10 +169,10 @@ export function LessonHeader({
                     {/* More actions dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger>
-                            <Button variant="ghost" size="icon-sm">
+                            {/* <Button variant="ghost" size="icon-sm">
                                 <MoreHorizontal className="size-4"/>
                                 <span className="sr-only">More options</span>
-                            </Button>
+                            </Button>*/}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={onEdit}>
