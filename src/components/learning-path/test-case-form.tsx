@@ -6,11 +6,11 @@ import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 import {Switch} from "@/components/ui/switch";
 import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateTestCaseDTO, CreateTestCaseSchema,} from "@/types/learning-path/schema";
+import {CreateTestCaseSchema, TestCaseRequestDTO,} from "@/types/learning-path/schema";
 
 interface TestCaseFormProps {
-    defaultValues?: Partial<CreateTestCaseDTO>;
-    onSubmit: (data: CreateTestCaseDTO) => Promise<void>;
+    defaultValues?: Partial<TestCaseRequestDTO>;
+    onSubmit: (data: TestCaseRequestDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -29,7 +29,7 @@ export function TestCaseForm({
         setValue,
         control,
         formState: {errors},
-    } = useForm<CreateTestCaseDTO>({
+    } = useForm<TestCaseRequestDTO>({
         resolver: zodResolver(CreateTestCaseSchema),
         defaultValues: {
             stdin: "",

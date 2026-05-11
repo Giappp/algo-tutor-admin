@@ -17,7 +17,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import {TestCase} from "@/types/learning-path";
-import {CreateTestCaseDTO} from "@/types/learning-path/schema";
+import {TestCaseRequestDTO} from "@/types/learning-path/schema";
 import {useCreateTestCase, useDeleteTestCase, useTestCasesByLesson, useUpdateTestCase} from "@/hooks/use-testcases";
 
 interface TestCasesTabProps {
@@ -33,7 +33,7 @@ export function TestCasesTab({lessonId}: TestCasesTabProps) {
     const updateMutation = useUpdateTestCase(editing?.id ?? 0);
     const deleteMutation = useDeleteTestCase();
 
-    const handleSubmit = async (formData: CreateTestCaseDTO) => {
+    const handleSubmit = async (formData: TestCaseRequestDTO) => {
         if (editing) {
             await updateMutation.mutateAsync(formData);
         } else {
@@ -234,7 +234,7 @@ interface TestCaseDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     testCase: TestCase | null;
-    onSubmit: (data: CreateTestCaseDTO) => Promise<void>;
+    onSubmit: (data: TestCaseRequestDTO) => Promise<void>;
     isPending: boolean;
 }
 

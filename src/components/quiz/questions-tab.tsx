@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent} from "@/components/ui/card";
 import {QuizQuestion} from "@/types/learning-path";
-import {CreateQuestionDTO} from "@/types/learning-path/schema";
+import {QuestionRequestDTO} from "@/types/learning-path/schema";
 import {useCreateQuestion, useDeleteQuestion, useQuestionsByLesson, useUpdateQuestion} from "@/hooks/use-quiz";
 import QuestionDialog from "@/components/quiz/question-dialog";
 
@@ -23,7 +23,7 @@ export function QuestionsTab({lessonId}: QuestionsTabProps) {
     const updateMutation = useUpdateQuestion(editing?.id ?? 0);
     const deleteMutation = useDeleteQuestion();
 
-    const handleSubmit = async (formData: CreateQuestionDTO) => {
+    const handleSubmit = async (formData: QuestionRequestDTO) => {
         if (editing) {
             await updateMutation.mutateAsync(formData);
         } else {

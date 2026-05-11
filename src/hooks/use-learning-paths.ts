@@ -5,7 +5,7 @@ import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import {CreateLearningPathRequest,} from "@/types/learning-path";
 import {LearningPathListParams, learningPathService,} from "@/api/services/learning-path-services";
-import {UpdateLearningPathDTO} from "@/types/learning-path/schema";
+import {LearningPathRequestDTO} from "@/types/learning-path/schema";
 
 export const QUERY_KEYS = {
     learningPaths: (params?: LearningPathListParams) =>
@@ -47,7 +47,7 @@ export function useUpdateLearningPath(id: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: UpdateLearningPathDTO) =>
+        mutationFn: (data: LearningPathRequestDTO) =>
             learningPathService.update(id, data),
         onSuccess: () => {
             toast.success("Learning path updated successfully");

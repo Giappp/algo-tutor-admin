@@ -26,12 +26,6 @@ export const CreateLearningPathSchema = z.object({
     level: LevelSchema,
 });
 
-export const UpdateLearningPathSchema = CreateLearningPathSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-)
-
 // ---------------------------------------------------------------------------
 // Topic schemas
 // ---------------------------------------------------------------------------
@@ -41,12 +35,6 @@ export const CreateTopicSchema = z.object({
     scopeTags: z.string().optional(),
     isLocked: z.boolean().optional(),
 });
-
-export const UpdateTopicSchema = CreateTopicSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-);
 
 // ---------------------------------------------------------------------------
 // Example schema (for coding lessons)
@@ -65,11 +53,6 @@ export const CreateTestCaseSchema = z.object({
     explanation: z.string().optional(),
 });
 
-export const UpdateTestCaseSchema = CreateTestCaseSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-);
 
 // ---------------------------------------------------------------------------
 // Question schema (used by Quiz lessons)
@@ -84,11 +67,6 @@ export const CreateQuestionSchema = z.object({
         .min(2, "At least 2 choices are required"),
 });
 
-export const UpdateQuestionSchema = CreateQuestionSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-);
 
 // ---------------------------------------------------------------------------
 // Plain (non-Zod) input type used for local card/form state that mirrors
@@ -170,38 +148,21 @@ export const CreateLessonSchema = z.discriminatedUnion("type", [
     CreateCodingLessonSchema,
 ]);
 
-export const UpdateLessonSchema = CreateLessonSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-);
 
 export const CreateEditorialSchema = z.object({
     language: ProgrammingLanguageSchema,
     sourceCode: z.string().min(1, "Source code is required"),
 });
 
-export const UpdateEditorialSchema = CreateEditorialSchema.and(
-    z.object({
-        id: z.number().int(),
-    })
-);
-
 // ---------------------------------------------------------------------------
 // Type inference
 // ---------------------------------------------------------------------------
-export type CreateLearningPathDTO = z.infer<typeof CreateLearningPathSchema>;
-export type UpdateLearningPathDTO = z.infer<typeof UpdateLearningPathSchema>;
-export type CreateTopicDTO = z.infer<typeof CreateTopicSchema>;
-export type UpdateTopicDTO = z.infer<typeof UpdateTopicSchema>;
-export type CreateLessonDTO = z.infer<typeof CreateLessonSchema>;
-export type UpdateLessonDTO = z.infer<typeof UpdateLessonSchema>;
-export type CreateQuestionDTO = z.infer<typeof CreateQuestionSchema>;
-export type UpdateQuestionDTO = z.infer<typeof UpdateQuestionSchema>;
-export type CreateTestCaseDTO = z.infer<typeof CreateTestCaseSchema>;
-export type UpdateTestCaseDTO = z.infer<typeof UpdateTestCaseSchema>;
-export type CreateEditorialDTO = z.infer<typeof CreateEditorialSchema>;
-export type UpdateEditorialDTO = z.infer<typeof UpdateEditorialSchema>;
-export type CreateCodingLessonDTO = z.infer<typeof CreateCodingLessonSchema>;
-export type CreateQuizLessonDTO = z.infer<typeof CreateQuizLessonSchema>;
-export type CreateTheoryLessonDTO = z.infer<typeof CreateTheoryLessonSchema>;
+export type LearningPathRequestDTO = z.infer<typeof CreateLearningPathSchema>;
+export type TopicRequestDTO = z.infer<typeof CreateTopicSchema>;
+export type LessonRequestDTO = z.infer<typeof CreateLessonSchema>;
+export type QuestionRequestDTO = z.infer<typeof CreateQuestionSchema>;
+export type TestCaseRequestDTO = z.infer<typeof CreateTestCaseSchema>;
+export type EditorialRequestDTO = z.infer<typeof CreateEditorialSchema>;
+export type CodingLessonDTO = z.infer<typeof CreateCodingLessonSchema>;
+export type QuizLessonDTO = z.infer<typeof CreateQuizLessonSchema>;
+export type TheoryLessonDTO = z.infer<typeof CreateTheoryLessonSchema>;

@@ -2,7 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {CreateQuestionDTO} from "@/types/learning-path/schema";
+import {QuestionRequestDTO} from "@/types/learning-path/schema";
 import {quizService} from "@/api/services/quiz-services";
 
 export const QUERY_KEYS = {
@@ -21,7 +21,7 @@ export function useQuestionsByLesson(lessonId: number) {
 export function useCreateQuestion(lessonId: number) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: CreateQuestionDTO) =>
+        mutationFn: (data: QuestionRequestDTO) =>
             quizService.create(lessonId, data as Parameters<typeof quizService.create>[1]),
         onSuccess: () => {
             toast.success("Question added successfully");
@@ -33,7 +33,7 @@ export function useCreateQuestion(lessonId: number) {
 export function useUpdateQuestion(questionId: number) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: CreateQuestionDTO) =>
+        mutationFn: (data: QuestionRequestDTO) =>
             quizService.update(questionId, data as Parameters<typeof quizService.update>[1]),
         onSuccess: () => {
             toast.success("Question updated successfully");

@@ -13,7 +13,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {FormField} from "@/components/learning-path/form-field";
 import {RichTextEditorWithPreview} from "@/components/ui/rich-text-editor";
 import {Difficulty} from "@/types/learning-path";
-import {CreateCodingLessonDTO, CreateCodingLessonSchema} from "@/types/learning-path/schema";
+import {CodingLessonDTO, CreateCodingLessonSchema} from "@/types/learning-path/schema";
 
 const MonacoEditor = dynamic(
     () => import("@monaco-editor/react").then((mod) => mod.default),
@@ -96,8 +96,8 @@ type CodingLessonFormHandle = {
 export type {CodingLessonFormHandle};
 
 interface CodingLessonFormProps {
-    defaultValues?: Partial<CreateCodingLessonDTO>;
-    onSubmit: (data: CreateCodingLessonDTO) => Promise<void>;
+    defaultValues?: Partial<CodingLessonDTO>;
+    onSubmit: (data: CodingLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     formRef?: React.RefObject<CodingLessonFormHandle | null>;
@@ -121,7 +121,7 @@ export function CodingLessonForm({
         setValue,
         control,
         formState: {errors},
-    } = useForm<CreateCodingLessonDTO>({
+    } = useForm<CodingLessonDTO>({
         resolver: zodResolver(CreateCodingLessonSchema),
         defaultValues: {
             type: "CODING",

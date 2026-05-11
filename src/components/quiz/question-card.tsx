@@ -2,7 +2,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {Control, Controller, useFieldArray, UseFormGetValues, UseFormSetValue, useWatch} from "react-hook-form";
 import {cn} from "@/lib/utils";
 import {Badge} from "@/components/ui/badge";
-import {CreateQuizLessonDTO, QuestionInput} from "@/types/learning-path/schema";
+import {QuestionInput, QuizLessonDTO} from "@/types/learning-path/schema";
 import {FormField} from "@/components/learning-path/form-field";
 import {Button} from "@/components/ui/button";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -12,9 +12,9 @@ interface QuestionCardProps {
     index: number;
     isPending?: boolean;
     onRemove: () => void;
-    control: Control<CreateQuizLessonDTO>;
-    setValue: UseFormSetValue<CreateQuizLessonDTO>;
-    getValues: UseFormGetValues<CreateQuizLessonDTO>;
+    control: Control<QuizLessonDTO>;
+    setValue: UseFormSetValue<QuizLessonDTO>;
+    getValues: UseFormGetValues<QuizLessonDTO>;
 }
 
 const QUESTION_TYPE_OPTIONS = [
@@ -226,7 +226,7 @@ function ChoiceItem({
                         totalChoices,
                         defaultText,
                     }: {
-    control: Control<CreateQuizLessonDTO>;
+    control: Control<QuizLessonDTO>;
     ci: number;
     questionIndex: number;
     isTrueFalse: boolean;
@@ -288,7 +288,7 @@ function ChoiceItem({
 }
 
 // Isolates explanation text watch to avoid lag
-function ExplanationBadge({control, index}: { control: Control<CreateQuizLessonDTO>; index: number }) {
+function ExplanationBadge({control, index}: { control: Control<QuizLessonDTO>; index: number }) {
     const explanation = useWatch({control, name: `questions.${index}.explanation`});
     if (!explanation) return null;
     return <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 ml-1">set</Badge>;

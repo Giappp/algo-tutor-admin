@@ -11,7 +11,7 @@ import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Field, FieldContent, FieldDescription, FieldGroup, FieldLabel,} from "@/components/ui/field";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import {ImageUpload} from "@/components/ui/image-upload";
-import {CreateLearningPathDTO, CreateLearningPathSchema,} from "@/types/learning-path/schema";
+import {CreateLearningPathSchema, LearningPathRequestDTO,} from "@/types/learning-path/schema";
 import {Level} from "@/types/learning-path";
 
 const LEVEL_OPTIONS: {
@@ -74,12 +74,12 @@ const LEVEL_OPTIONS: {
 ];
 
 interface LearningPathFieldsProps {
-    control: ReturnType<typeof useForm<CreateLearningPathDTO>>["control"];
+    control: ReturnType<typeof useForm<LearningPathRequestDTO>>["control"];
     isPending?: boolean;
-    errors: ReturnType<typeof useForm<CreateLearningPathDTO>>["formState"]["errors"];
-    watch: ReturnType<typeof useForm<CreateLearningPathDTO>>["watch"];
-    register: ReturnType<typeof useForm<CreateLearningPathDTO>>["register"];
-    setValue: ReturnType<typeof useForm<CreateLearningPathDTO>>["setValue"];
+    errors: ReturnType<typeof useForm<LearningPathRequestDTO>>["formState"]["errors"];
+    watch: ReturnType<typeof useForm<LearningPathRequestDTO>>["watch"];
+    register: ReturnType<typeof useForm<LearningPathRequestDTO>>["register"];
+    setValue: ReturnType<typeof useForm<LearningPathRequestDTO>>["setValue"];
 }
 
 function ErrorMessage({message}: { message?: string | object }) {
@@ -246,8 +246,8 @@ export function LearningPathFields({
 }
 
 interface LearningPathFormProps {
-    defaultValues?: Partial<CreateLearningPathDTO>;
-    onSubmit?: (data: CreateLearningPathDTO) => Promise<void>;
+    defaultValues?: Partial<LearningPathRequestDTO>;
+    onSubmit?: (data: LearningPathRequestDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
 }
@@ -265,7 +265,7 @@ export function LearningPathForm({
         register,
         setValue,
         formState: {errors},
-    } = useForm<CreateLearningPathDTO>({
+    } = useForm<LearningPathRequestDTO>({
         resolver: zodResolver(CreateLearningPathSchema),
         defaultValues: {
             name: "",

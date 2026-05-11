@@ -8,7 +8,7 @@ import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {FormField} from "@/components/learning-path/form-field";
-import {CreateTheoryLessonDTO, CreateTheoryLessonSchema} from "@/types/learning-path/schema";
+import {CreateTheoryLessonSchema, TheoryLessonDTO} from "@/types/learning-path/schema";
 import {RichTextEditorWithTemplates} from "@/components/ui/rich-text-editor";
 
 const DIFFICULTY_OPTIONS = [
@@ -40,8 +40,8 @@ type TheoryFormHandle = {
 export type {TheoryFormHandle};
 
 interface TheoryFormProps {
-    defaultValues?: Partial<CreateTheoryLessonDTO>;
-    onSubmit: (data: CreateTheoryLessonDTO) => Promise<void>;
+    defaultValues?: Partial<TheoryLessonDTO>;
+    onSubmit: (data: TheoryLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     formRef?: React.RefObject<TheoryFormHandle | null>;
@@ -63,7 +63,7 @@ export function TheoryForm({
         setValue,
         control,
         formState: {errors},
-    } = useForm<CreateTheoryLessonDTO>({
+    } = useForm<TheoryLessonDTO>({
         resolver: zodResolver(CreateTheoryLessonSchema),
         defaultValues: {
             type: "THEORY",

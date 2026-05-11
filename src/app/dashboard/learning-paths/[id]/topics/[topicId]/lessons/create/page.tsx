@@ -20,7 +20,7 @@ import {TheoryForm} from "@/components/learning-path/theory-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useCreateLesson} from "@/hooks/use-lessons";
 import {CreateLessonRequest, LessonType} from "@/types/learning-path";
-import {CreateCodingLessonDTO, CreateQuizLessonDTO, CreateTheoryLessonDTO} from "@/types/learning-path/schema";
+import {CodingLessonDTO, QuizLessonDTO, TheoryLessonDTO} from "@/types/learning-path/schema";
 import {QuizForm} from "@/components/quiz/quiz-form";
 
 type CreationPhase = "type-selection" | "form-creation";
@@ -97,7 +97,7 @@ export default function CreateLessonPage() {
         setSelectedType(null);
     };
 
-    const handleSubmit = async (data: CreateCodingLessonDTO | CreateTheoryLessonDTO | CreateQuizLessonDTO) => {
+    const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
         const result = await createLessonMutation.mutateAsync(data as CreateLessonRequest);
         router.push(
             `/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`

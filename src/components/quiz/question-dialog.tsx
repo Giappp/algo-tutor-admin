@@ -1,5 +1,5 @@
 import {QuizQuestion} from "@/types/learning-path";
-import {CreateQuestionDTO} from "@/types/learning-path/schema";
+import {QuestionRequestDTO} from "@/types/learning-path/schema";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Button} from "@/components/ui/button";
 import {QuestionForm} from "@/components/quiz/question-form";
@@ -8,11 +8,11 @@ interface QuestionDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     question: QuizQuestion | null;
-    onSubmit: (data: CreateQuestionDTO) => Promise<void>;
+    onSubmit: (data: QuestionRequestDTO) => Promise<void>;
     isPending: boolean;
 }
 
-function toCreateQuestion(q: QuizQuestion): CreateQuestionDTO {
+function toCreateQuestion(q: QuizQuestion): QuestionRequestDTO {
     return {
         question: q.question,
         type: q.type,

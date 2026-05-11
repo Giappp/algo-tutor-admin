@@ -7,11 +7,11 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateTopicDTO, CreateTopicSchema,} from "@/types/learning-path/schema";
+import {CreateTopicSchema, TopicRequestDTO,} from "@/types/learning-path/schema";
 
 interface TopicFormProps {
-    defaultValues?: Partial<CreateTopicDTO>;
-    onSubmit: (data: CreateTopicDTO) => Promise<void>;
+    defaultValues?: Partial<TopicRequestDTO>;
+    onSubmit: (data: TopicRequestDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
 }
@@ -28,7 +28,7 @@ export function TopicForm({
         setValue,
         watch,
         formState: {errors},
-    } = useForm<CreateTopicDTO>({
+    } = useForm<TopicRequestDTO>({
         resolver: zodResolver(CreateTopicSchema),
         defaultValues: {
             name: "",

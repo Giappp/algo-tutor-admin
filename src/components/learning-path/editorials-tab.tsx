@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Editorial, ProgrammingLanguage} from "@/types/learning-path";
-import {CreateEditorialDTO} from "@/types/learning-path/schema";
+import {EditorialRequestDTO} from "@/types/learning-path/schema";
 import {
     useCreateEditorial,
     useDeleteEditorial,
@@ -47,7 +47,7 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
     const updateMutation = useUpdateEditorial(editing?.id ?? 0);
     const deleteMutation = useDeleteEditorial();
 
-    const handleSubmit = async (formData: CreateEditorialDTO) => {
+    const handleSubmit = async (formData: EditorialRequestDTO) => {
         if (editing) {
             await updateMutation.mutateAsync(formData);
         } else {
@@ -219,7 +219,7 @@ interface EditorialDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     editorial: Editorial | null;
-    onSubmit: (data: CreateEditorialDTO) => Promise<void>;
+    onSubmit: (data: EditorialRequestDTO) => Promise<void>;
     isPending: boolean;
 }
 

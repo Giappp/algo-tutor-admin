@@ -22,8 +22,8 @@ import {
     useUpdateLearningPath,
 } from "@/hooks/use-learning-paths";
 import {useCreateTopic} from "@/hooks/use-topics";
-import {CreateLearningPathDTO} from "@/types/learning-path/schema";
-import {CreateTopicRequest, UpdateLearningPathRequest} from "@/types/learning-path";
+import {LearningPathRequestDTO} from "@/types/learning-path/schema";
+import {CreateTopicRequest} from "@/types/learning-path";
 import {Button} from "@/components/ui/button";
 import {
     LearningPathDetailHeader,
@@ -80,8 +80,8 @@ export default function LearningPathDetailPage() {
         );
     }
 
-    const handleUpdate = async (data: CreateLearningPathDTO) => {
-        await updateMutation.mutateAsync(data as unknown as UpdateLearningPathRequest);
+    const handleUpdate = async (data: LearningPathRequestDTO) => {
+        await updateMutation.mutateAsync(data);
         setIsEditOpen(false);
     };
 

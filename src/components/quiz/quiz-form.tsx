@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {FormField} from "@/components/learning-path/form-field";
-import type {CreateQuestionDTO, CreateQuizLessonDTO, QuestionInput} from "@/types/learning-path/schema";
+import type {QuestionInput, QuestionRequestDTO, QuizLessonDTO} from "@/types/learning-path/schema";
 import {CreateQuizLessonSchema} from "@/types/learning-path/schema";
 import {Difficulty} from "@/types/learning-path";
 import QuestionCard from "@/components/quiz/question-card";
@@ -51,14 +51,14 @@ export type QuizFormHandle = {
 };
 
 interface QuizFormProps {
-    defaultValues?: Partial<CreateQuizLessonDTO>;
-    onSubmit: (data: CreateQuizLessonDTO) => Promise<void>;
+    defaultValues?: Partial<QuizLessonDTO>;
+    onSubmit: (data: QuizLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     formRef?: React.RefObject<QuizFormHandle | null>;
 }
 
-function QuizStats({control}: { control: Control<CreateQuizLessonDTO> }) {
+function QuizStats({control}: { control: Control<QuizLessonDTO> }) {
     const watchedQuestions = useWatch({control, name: "questions"}) as QuestionInput[];
 
     const stats = {
@@ -107,7 +107,7 @@ export function QuizForm({
         trigger,
         getValues,
         formState: {errors},
-    } = useForm<CreateQuizLessonDTO>({
+    } = useForm<QuizLessonDTO>({
         resolver: zodResolver(CreateQuizLessonSchema),
         defaultValues: {
             type: "QUIZ",
@@ -147,7 +147,7 @@ export function QuizForm({
                 {text: "", isCorrect: false, explanation: ""},
             ],
         };
-        append(newQ as CreateQuestionDTO);
+        append(newQ as QuestionRequestDTO);
         setActiveSection("questions");
     };
 

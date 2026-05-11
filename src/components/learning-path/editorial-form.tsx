@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {Field, FieldContent, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateEditorialDTO, CreateEditorialSchema,} from "@/types/learning-path/schema";
+import {CreateEditorialSchema, EditorialRequestDTO,} from "@/types/learning-path/schema";
 import {ProgrammingLanguage} from "@/types/learning-path";
 
 const MonacoEditor = dynamic(
@@ -21,8 +21,8 @@ const MonacoEditor = dynamic(
 );
 
 interface EditorialFormProps {
-    defaultValues?: Partial<CreateEditorialDTO>;
-    onSubmit: (data: CreateEditorialDTO) => Promise<void>;
+    defaultValues?: Partial<EditorialRequestDTO>;
+    onSubmit: (data: EditorialRequestDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -51,7 +51,7 @@ export function EditorialForm({
         setValue,
         control,
         formState: {errors},
-    } = useForm<CreateEditorialDTO>({
+    } = useForm<EditorialRequestDTO>({
         resolver: zodResolver(CreateEditorialSchema),
         defaultValues: {
             language: "JAVA",

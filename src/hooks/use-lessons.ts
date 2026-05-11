@@ -4,7 +4,7 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {CreateLessonRequest,} from "@/types/learning-path";
 import {lessonService} from "@/api/services/lesson-services";
-import {UpdateLessonDTO} from "@/types/learning-path/schema";
+import {LessonRequestDTO} from "@/types/learning-path/schema";
 
 export const QUERY_KEYS = {
     lessons: (topicId: number, publishedOnly?: boolean) =>
@@ -58,7 +58,7 @@ export function useUpdateLesson(lessonId: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: UpdateLessonDTO) =>
+        mutationFn: (data: LessonRequestDTO) =>
             lessonService.update(lessonId, data),
         onSuccess: () => {
             toast.success("Lesson updated successfully");

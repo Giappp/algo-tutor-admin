@@ -8,12 +8,12 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateQuestionDTO, CreateQuestionSchema,} from "@/types/learning-path/schema";
+import {CreateQuestionSchema, QuestionRequestDTO,} from "@/types/learning-path/schema";
 import {QuestionType} from "@/types/learning-path";
 
 interface QuestionFormProps {
-    defaultValues?: CreateQuestionDTO;
-    onSubmit: (data: CreateQuestionDTO) => Promise<void>;
+    defaultValues?: QuestionRequestDTO;
+    onSubmit: (data: QuestionRequestDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -38,7 +38,7 @@ export function QuestionForm({
         setValue,
         control,
         formState: {errors},
-    } = useForm<CreateQuestionDTO>({
+    } = useForm<QuestionRequestDTO>({
         resolver: zodResolver(CreateQuestionSchema),
         defaultValues: {
             question: "",
