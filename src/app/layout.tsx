@@ -25,7 +25,7 @@ export default function RootLayout({
         <QueryProvider>
             {children}
         </QueryProvider>
-        <Toaster richColors closeButton position="top-right"/>
+        <Toaster closeButton position="top-right"/>
         </body>
         </html>
     );

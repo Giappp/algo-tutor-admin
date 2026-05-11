@@ -6,39 +6,29 @@ import {Switch} from "@/components/ui/switch";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
-import {
-    CreateTopicSchema,
-    CreateTopic,
-} from "@/types/learning-path/schema";
+import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
+import {CreateTopicDTO, CreateTopicSchema,} from "@/types/learning-path/schema";
 
 interface TopicFormProps {
-    defaultValues?: Partial<CreateTopic>;
-    onSubmit: (data: CreateTopic) => Promise<void>;
+    defaultValues?: Partial<CreateTopicDTO>;
+    onSubmit: (data: CreateTopicDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
 }
 
 export function TopicForm({
-    defaultValues,
-    onSubmit,
-    isPending,
-    submitLabel = "Save",
-}: TopicFormProps) {
+                              defaultValues,
+                              onSubmit,
+                              isPending,
+                              submitLabel = "Save",
+                          }: TopicFormProps) {
     const {
         register,
         handleSubmit,
         setValue,
         watch,
         formState: {errors},
-    } = useForm<CreateTopic>({
+    } = useForm<CreateTopicDTO>({
         resolver: zodResolver(CreateTopicSchema),
         defaultValues: {
             name: "",

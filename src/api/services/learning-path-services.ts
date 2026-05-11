@@ -1,5 +1,6 @@
 import {del, get, getPage, patch, post, put} from "@/api/core/http";
-import {CreateLearningPathRequest, LearningPath, UpdateLearningPathRequest,} from "@/types/learning-path";
+import {CreateLearningPathRequest, LearningPath,} from "@/types/learning-path";
+import {UpdateLearningPathDTO} from "@/types/learning-path/schema";
 
 export interface LearningPathListParams {
     page?: number;
@@ -18,8 +19,8 @@ export const learningPathService = {
     create: (data: CreateLearningPathRequest) =>
         post<LearningPath>("/api/v1/learning-paths", data),
 
-    update: (id: number, data: UpdateLearningPathRequest) =>
-        put<LearningPath>(`/api/v1/learning-paths/${id}`, data),
+    update: (id: number, data: UpdateLearningPathDTO) =>
+        put<UpdateLearningPathDTO>(`/api/v1/learning-paths/${id}`, data),
 
     delete: (id: number) =>
         del<void>(`/api/v1/learning-paths/${id}`),

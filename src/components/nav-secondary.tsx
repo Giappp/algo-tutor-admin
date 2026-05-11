@@ -1,39 +1,51 @@
 "use client"
 
 import * as React from "react"
+import {usePathname} from "next/navigation"
+import Link from "next/link"
 
 import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
 export function NavSecondary({
-  items,
-  ...props
+    items,
+    ...props
 }: {
-  items: {
-    title: string
-    url: string
-    icon: React.ReactNode
-  }[]
+    items: {
+        title: string
+        url: string
+        icon: React.ReactNode
+    }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-  return (
-    <SidebarGroup {...props}>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton size="sm" render={<a href={item.url} />}>
-                {item.icon}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
+    const pathname = usePathname()
+
+    function isActive(url: string) {
+        return pathname === url || pathname.startsWith(url + "/")
+    }
+
+    return (
+        <SidebarGroup {...props}>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    {items.map((item) => (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                                size="sm"
+                                data-active={isActive(item.url) ? "true" : undefined}
+                                render={<Link href={item.url}/>}
+                            >
+                                {item.icon}
+                                <span>{item.title}</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
+    )
 }

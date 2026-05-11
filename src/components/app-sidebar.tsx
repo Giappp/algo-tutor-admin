@@ -18,6 +18,7 @@ import {
     BotIcon,
     CodeIcon,
     GraduationCapIcon,
+    LayoutDashboardIcon,
     LineChartIcon,
     Settings2Icon,
     TerminalSquareIcon,
@@ -25,51 +26,76 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-const data = {
-    navMain: [
-        {
-            title: "Learning Paths",
-            url: "/dashboard/learning-paths",
-            icon: <GraduationCapIcon className="w-4 h-4"/>,
-            isActive: true,
-            items: [
-                {title: "All Paths", url: "/dashboard/learning-paths"},
-                {title: "Create New", url: "/dashboard/learning-paths/create"},
-            ],
-        },
-        {
-            title: "Analytics",
-            url: "/dashboard/analytics",
-            icon: <LineChartIcon className="w-4 h-4"/>,
-            items: [],
-        },
-        {
-            title: "Users",
-            url: "/dashboard/users",
-            icon: <UsersIcon className="w-4 h-4"/>,
-            items: [],
-        },
-        {
-            title: "AI Models",
-            url: "/dashboard/models",
-            icon: <BotIcon className="w-4 h-4"/>,
-            items: [],
-        },
-        {
-            title: "Playground",
-            url: "/dashboard/playground",
-            icon: <TerminalSquareIcon className="w-4 h-4"/>,
-            items: [],
-        },
-    ],
-    navSecondary: [
-        {
-            title: "Settings",
-            url: "/dashboard/settings",
-            icon: <Settings2Icon className="w-4 h-4"/>,
-        },
-    ],
-}
+const groups = [
+    {
+        label: "Overview",
+        items: [
+            {
+                title: "Dashboard",
+                url: "/dashboard",
+                icon: <LayoutDashboardIcon className="w-4 h-4"/>,
+                isActive: true,
+                items: [],
+            },
+            {
+                title: "Analytics",
+                url: "/dashboard/analytics",
+                icon: <LineChartIcon className="w-4 h-4"/>,
+                items: [],
+            },
+        ],
+    },
+    {
+        label: "Curriculum",
+        items: [
+            {
+                title: "Learning Paths",
+                url: "/dashboard/learning-paths",
+                icon: <GraduationCapIcon className="w-4 h-4"/>,
+                items: [
+                    {title: "All Paths", url: "/dashboard/learning-paths"},
+                    {title: "Create New", url: "/dashboard/learning-paths/create"},
+                ],
+            },
+        ],
+    },
+    {
+        label: "AI Lab",
+        items: [
+            {
+                title: "AI Models",
+                url: "/dashboard/models",
+                icon: <BotIcon className="w-4 h-4"/>,
+                items: [],
+            },
+            {
+                title: "Playground",
+                url: "/dashboard/playground",
+                icon: <TerminalSquareIcon className="w-4 h-4"/>,
+                items: [],
+            },
+        ],
+    },
+    {
+        label: "Administration",
+        items: [
+            {
+                title: "Users",
+                url: "/dashboard/users",
+                icon: <UsersIcon className="w-4 h-4"/>,
+                items: [],
+            },
+        ],
+    },
+]
+
+const navSecondary = [
+    {
+        title: "Settings",
+        url: "/dashboard/settings",
+        icon: <Settings2Icon className="w-4 h-4"/>,
+    },
+]
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     return (
@@ -94,8 +120,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain}/>
-                <NavSecondary items={data.navSecondary} className="mt-auto"/>
+                <NavMain groups={groups}/>
+                <NavSecondary items={navSecondary} className="mt-auto"/>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser/>

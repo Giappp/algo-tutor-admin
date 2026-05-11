@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Pencil, Rocket} from "lucide-react";
+import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {
@@ -55,7 +55,6 @@ interface LessonHeaderProps {
         slug?: string;
     };
     learningPathId: number;
-    onEdit: () => void;
     onTogglePublish: () => void;
     isEditPending?: boolean;
 }
@@ -63,7 +62,6 @@ interface LessonHeaderProps {
 export function LessonHeader({
                                  lesson,
                                  learningPathId,
-                                 onEdit,
                                  onTogglePublish,
                                  isEditPending = false,
                              }: LessonHeaderProps) {
@@ -160,12 +158,6 @@ export function LessonHeader({
                         {lesson.isPublished ? "Unpublish" : "Publish"}
                     </Button>
 
-                    {/* Edit */}
-                    <Button size="sm" onClick={onEdit}>
-                        <Pencil className="size-4 mr-1.5"/>
-                        Edit
-                    </Button>
-
                     {/* More actions dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger>
@@ -175,10 +167,6 @@ export function LessonHeader({
                             </Button>*/}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={onEdit}>
-                                <Pencil className="size-4 mr-2"/>
-                                Edit Lesson
-                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={onTogglePublish}>
                                 <Rocket className="size-4 mr-2"/>
                                 {lesson.isPublished ? "Unpublish" : "Publish"}

@@ -1,6 +1,6 @@
 "use client";
 
-import {useFieldArray, useForm} from "react-hook-form";
+import {useFieldArray, useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Plus, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -8,12 +8,12 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateQuestion, CreateQuestionSchema,} from "@/types/learning-path/schema";
+import {CreateQuestionDTO, CreateQuestionSchema,} from "@/types/learning-path/schema";
 import {QuestionType} from "@/types/learning-path";
 
 interface QuestionFormProps {
-    defaultValues?: Partial<CreateQuestion>;
-    onSubmit: (data: CreateQuestion) => Promise<void>;
+    defaultValues?: CreateQuestionDTO;
+    onSubmit: (data: CreateQuestionDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -36,10 +36,9 @@ export function QuestionForm({
         register,
         handleSubmit,
         setValue,
-        watch,
         control,
         formState: {errors},
-    } = useForm<CreateQuestion>({
+    } = useForm<CreateQuestionDTO>({
         resolver: zodResolver(CreateQuestionSchema),
         defaultValues: {
             question: "",
@@ -59,8 +58,17 @@ export function QuestionForm({
         name: "choices",
     });
 
-    const watchedType = watch("type");
-    const watchedChoices = watch("choices");
+    const watchedType = useWatch({
+        name: "type",
+        control,
+    })
+
+    const watchedChoices = useWatch({
+        name: "choices",
+        control,
+    })
+
+    const isTrueFalse = watchedType === "TRUE_FALSE";
 
     const handleCorrectChange = (index: number) => {
         const updated = watchedChoices.map((c, i) => ({
@@ -68,6 +76,21 @@ export function QuestionForm({
             isCorrect: watchedType === "MULTIPLE_CHOICE" ? c.isCorrect : i === index,
         }));
         setValue("choices", updated, {shouldValidate: true});
+    };
+
+    const handleTypeChange = (newType: QuestionType) => {
+        if (newType === "TRUE_FALSE") {
+            setValue("choices", [
+                {text: "True", isCorrect: true},
+                {text: "False", isCorrect: false},
+            ], {shouldValidate: true});
+        } else {
+            setValue("choices", [
+                {text: "", isCorrect: false},
+                {text: "", isCorrect: false},
+            ], {shouldValidate: true});
+        }
+        setValue("type", newType, {shouldValidate: true});
     };
 
     return (
@@ -96,9 +119,7 @@ export function QuestionForm({
                         <FieldContent>
                             <Select
                                 value={watchedType}
-                                onValueChange={(v) =>
-                                    setValue("type", v as QuestionType, {shouldValidate: true})
-                                }
+                                onValueChange={(v) => handleTypeChange(v as QuestionType)}
                                 disabled={isPending}
                             >
                                 <SelectTrigger aria-label="Select type">
@@ -173,7 +194,7 @@ export function QuestionForm({
                                             disabled={isPending}
                                             {...register(`choices.${index}.text` as const)}
                                         />
-                                        {fields.length > 2 && (
+                                        {!isTrueFalse && fields.length > 2 && (
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -190,12 +211,14 @@ export function QuestionForm({
                                             {errors.choices[index]?.text?.message}
                                         </FieldError>
                                     )}
-                                    <Input
-                                        placeholder="Explanation (optional)"
-                                        disabled={isPending}
-                                        {...register(`choices.${index}.explanation` as const)}
-                                        className="text-xs"
-                                    />
+                                    {!isTrueFalse && (
+                                        <Input
+                                            placeholder="Explanation (optional)"
+                                            disabled={isPending}
+                                            {...register(`choices.${index}.explanation` as const)}
+                                            className="text-xs"
+                                        />
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -204,18 +227,21 @@ export function QuestionForm({
                             <FieldError>{errors.choices.root.message}</FieldError>
                         )}
 
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                                append({text: "", isCorrect: false, explanation: ""})
-                            }
-                            disabled={isPending}
-                        >
-                            <Plus data-icon="inline-start"/>
-                            Add Choice
-                        </Button>
+                        {!isTrueFalse && (
+                            <Button
+                                nativeButton={true}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                    append({text: "", isCorrect: false})
+                                }
+                                disabled={isPending}
+                            >
+                                <Plus data-icon="inline-start"/>
+                                Add Choice
+                            </Button>
+                        )}
                     </FieldContent>
                 </Field>
             </FieldGroup>

@@ -2,8 +2,9 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {CreateLessonRequest, UpdateLessonRequest,} from "@/types/learning-path";
+import {CreateLessonRequest,} from "@/types/learning-path";
 import {lessonService} from "@/api/services/lesson-services";
+import {UpdateLessonDTO} from "@/types/learning-path/schema";
 
 export const QUERY_KEYS = {
     lessons: (topicId: number, publishedOnly?: boolean) =>
@@ -48,7 +49,7 @@ export function useCreateLesson(topicId: number) {
             toast.success("Lesson created successfully");
             queryClient.invalidateQueries({queryKey: QUERY_KEYS.lessons(topicId)});
             // Also invalidate the parent learning path so the topic lesson count updates
-            queryClient.invalidateQueries({queryKey: ["learning-path"]});
+            queryClient.invalidateQueries({queryKey: ["learning-path", "topics"]});
         },
     });
 }
@@ -57,7 +58,7 @@ export function useUpdateLesson(lessonId: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: UpdateLessonRequest) =>
+        mutationFn: (data: UpdateLessonDTO) =>
             lessonService.update(lessonId, data),
         onSuccess: () => {
             toast.success("Lesson updated successfully");

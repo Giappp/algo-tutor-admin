@@ -6,7 +6,7 @@ import {GraduationCapIcon} from "lucide-react";
 import Link from "next/link";
 import {LearningPathFields} from "@/components/learning-path/learning-path-form";
 import {useCreateLearningPath} from "@/hooks/use-learning-paths";
-import {CreateLearningPath, CreateLearningPathSchema} from "@/types/learning-path/schema";
+import {CreateLearningPathDTO, CreateLearningPathSchema} from "@/types/learning-path/schema";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ export default function CreateLearningPathPage() {
         register,
         setValue,
         formState: {errors},
-    } = useForm<CreateLearningPath>({
+    } = useForm<CreateLearningPathDTO>({
         resolver: zodResolver(CreateLearningPathSchema),
         defaultValues: {
             name: "",

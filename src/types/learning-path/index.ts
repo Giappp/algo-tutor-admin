@@ -13,7 +13,6 @@ export type ProgrammingLanguage = "JAVA" | "PYTHON";
 // ---------------------------------------------------------------------------
 
 export interface LessonChoice {
-    id?: number;
     text: string;
     isCorrect: boolean;
     explanation?: string;
@@ -176,14 +175,6 @@ export interface CreateLessonRequest {
 }
 
 export type UpdateLessonRequest = CreateLessonRequest;
-
-export interface CreateQuestionRequest {
-    question: string;
-    type?: QuestionType;
-    points?: number;
-    explanation?: string;
-    choices: Omit<LessonChoice, "id">[];
-}
 
 export interface CreateTestCaseRequest {
     stdin: string;

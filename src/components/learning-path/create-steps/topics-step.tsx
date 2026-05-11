@@ -2,22 +2,21 @@
 
 import {useState} from "react";
 import {
-    PlusIcon,
-    TrashIcon,
     BookOpenIcon,
     BrainCircuitIcon,
-    CodeIcon,
-    GripVerticalIcon,
     ChevronDownIcon,
     ChevronRightIcon,
+    CodeIcon,
+    GripVerticalIcon,
     LayersIcon,
+    PlusIcon,
+    TrashIcon,
 } from "lucide-react";
 import {cn} from "@/lib/utils";
 import {StepLayout} from "./step-layout";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Badge} from "@/components/ui/badge";
-import {Card, CardContent} from "@/components/ui/card";
 
 interface TopicItem {
     id: string;
@@ -63,8 +62,10 @@ function getLessonTypeMeta(type: LessonItem["type"]) {
 
 function EmptyTopicsState() {
     return (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border py-16 text-center">
-            <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-900/40">
+        <div
+            className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border py-16 text-center">
+            <div
+                className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-900/40">
                 <LayersIcon className="size-7 text-emerald-500 dark:text-emerald-400"/>
             </div>
             <h3 className="mb-2 text-sm font-semibold text-foreground">No topics yet</h3>
@@ -80,12 +81,12 @@ function EmptyTopicsState() {
 }
 
 function TopicCard({
-                      topic,
-                      index,
-                      onUpdate,
-                      onDelete,
-                      onToggleExpand,
-                  }: {
+                       topic,
+                       index,
+                       onUpdate,
+                       onDelete,
+                       onToggleExpand,
+                   }: {
     topic: TopicItem;
     index: number;
     onUpdate: (id: string, updates: Partial<TopicItem>) => void;
@@ -106,7 +107,8 @@ function TopicCard({
                         <GripVerticalIcon className="size-4 text-muted-foreground"/>
                     </div>
 
-                    <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400 text-xs font-bold">
+                    <div
+                        className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400 text-xs font-bold">
                         {index + 1}
                     </div>
 
@@ -166,7 +168,8 @@ function TopicCard({
                                         key={lesson.id}
                                         className="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/30 px-3 py-2"
                                     >
-                                        <GripVerticalIcon className="size-3.5 shrink-0 cursor-grab text-muted-foreground/50"/>
+                                        <GripVerticalIcon
+                                            className="size-3.5 shrink-0 cursor-grab text-muted-foreground/50"/>
                                         <div className={cn("shrink-0 rounded-md border p-1", meta.color)}>
                                             <meta.icon className="size-3"/>
                                         </div>

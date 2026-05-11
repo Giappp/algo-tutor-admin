@@ -1,16 +1,16 @@
 "use client";
 
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 import {Switch} from "@/components/ui/switch";
 import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateTestCase, CreateTestCaseSchema,} from "@/types/learning-path/schema";
+import {CreateTestCaseDTO, CreateTestCaseSchema,} from "@/types/learning-path/schema";
 
 interface TestCaseFormProps {
-    defaultValues?: Partial<CreateTestCase>;
-    onSubmit: (data: CreateTestCase) => Promise<void>;
+    defaultValues?: Partial<CreateTestCaseDTO>;
+    onSubmit: (data: CreateTestCaseDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -27,9 +27,9 @@ export function TestCaseForm({
         register,
         handleSubmit,
         setValue,
-        watch,
+        control,
         formState: {errors},
-    } = useForm<CreateTestCase>({
+    } = useForm<CreateTestCaseDTO>({
         resolver: zodResolver(CreateTestCaseSchema),
         defaultValues: {
             stdin: "",
@@ -40,7 +40,7 @@ export function TestCaseForm({
         },
     });
 
-    const isHidden = watch("isHidden");
+    const isHidden = useWatch({control, name: "isHidden"});
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">

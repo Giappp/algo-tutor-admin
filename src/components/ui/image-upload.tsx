@@ -1,7 +1,7 @@
 "use client";
 
 import {useCallback, useRef, useState} from "react";
-import {ImageIcon, Trash2, UploadCloud, X} from "lucide-react";
+import {Trash2, UploadCloud, X} from "lucide-react";
 import Image from "next/image";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -78,7 +78,7 @@ export function ImageUpload({
             const file = e.dataTransfer.files[0];
             if (file) uploadFile(file);
         },
-        [disabled, isUploading]
+        [disabled, isUploading, uploadFile]
     );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -2,10 +2,10 @@
 
 import {createContext, useContext} from "react";
 import {UseFormReturn} from "react-hook-form";
-import {CreateLearningPath} from "@/types/learning-path/schema";
+import {CreateLearningPathDTO} from "@/types/learning-path/schema";
 
 export const CreateLearningPathFormContext = createContext<
-    UseFormReturn<CreateLearningPath> | null
+    UseFormReturn<CreateLearningPathDTO> | null
 >(null);
 
 export function useLearningPathForm() {

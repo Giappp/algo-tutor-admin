@@ -8,19 +8,10 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
+import {Field, FieldContent, FieldDescription, FieldGroup, FieldLabel,} from "@/components/ui/field";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import {ImageUpload} from "@/components/ui/image-upload";
-import {
-    CreateLearningPath,
-    CreateLearningPathSchema,
-} from "@/types/learning-path/schema";
+import {CreateLearningPathDTO, CreateLearningPathSchema,} from "@/types/learning-path/schema";
 import {Level} from "@/types/learning-path";
 
 const LEVEL_OPTIONS: {
@@ -36,7 +27,8 @@ const LEVEL_OPTIONS: {
         label: "Beginner",
         description: "New to the topic",
         icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 16v-4"/>
                 <path d="M12 8h.01"/>
@@ -50,7 +42,8 @@ const LEVEL_OPTIONS: {
         label: "Intermediate",
         description: "Some experience",
         icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2v4"/>
                 <path d="M12 18v4"/>
                 <path d="M4.93 4.93l2.83 2.83"/>
@@ -69,8 +62,10 @@ const LEVEL_OPTIONS: {
         label: "Advanced",
         description: "Expert level",
         icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round">
+                <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
         ),
         iconBg: "bg-rose-100 dark:bg-rose-900/50",
@@ -79,12 +74,12 @@ const LEVEL_OPTIONS: {
 ];
 
 interface LearningPathFieldsProps {
-    control: ReturnType<typeof useForm<CreateLearningPath>>["control"];
+    control: ReturnType<typeof useForm<CreateLearningPathDTO>>["control"];
     isPending?: boolean;
-    errors: ReturnType<typeof useForm<CreateLearningPath>>["formState"]["errors"];
-    watch: ReturnType<typeof useForm<CreateLearningPath>>["watch"];
-    register: ReturnType<typeof useForm<CreateLearningPath>>["register"];
-    setValue: ReturnType<typeof useForm<CreateLearningPath>>["setValue"];
+    errors: ReturnType<typeof useForm<CreateLearningPathDTO>>["formState"]["errors"];
+    watch: ReturnType<typeof useForm<CreateLearningPathDTO>>["watch"];
+    register: ReturnType<typeof useForm<CreateLearningPathDTO>>["register"];
+    setValue: ReturnType<typeof useForm<CreateLearningPathDTO>>["setValue"];
 }
 
 function ErrorMessage({message}: { message?: string | object }) {
@@ -94,13 +89,12 @@ function ErrorMessage({message}: { message?: string | object }) {
 }
 
 export function LearningPathFields({
-                                      control,
-                                      isPending,
-                                      errors,
-                                      watch,
-                                      register,
-                                      setValue,
-                                  }: LearningPathFieldsProps) {
+                                       isPending,
+                                       errors,
+                                       watch,
+                                       register,
+                                       setValue,
+                                   }: LearningPathFieldsProps) {
     const thumbnailUrl = watch("thumbnailUrl");
     const level = watch("level");
 
@@ -252,8 +246,8 @@ export function LearningPathFields({
 }
 
 interface LearningPathFormProps {
-    defaultValues?: Partial<CreateLearningPath>;
-    onSubmit?: (data: CreateLearningPath) => Promise<void>;
+    defaultValues?: Partial<CreateLearningPathDTO>;
+    onSubmit?: (data: CreateLearningPathDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
 }
@@ -271,7 +265,7 @@ export function LearningPathForm({
         register,
         setValue,
         formState: {errors},
-    } = useForm<CreateLearningPath>({
+    } = useForm<CreateLearningPathDTO>({
         resolver: zodResolver(CreateLearningPathSchema),
         defaultValues: {
             name: "",

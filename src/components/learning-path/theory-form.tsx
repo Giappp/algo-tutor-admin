@@ -1,6 +1,6 @@
 "use client";
 
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useImperativeHandle, useRef} from "react";
 import {BookOpenIcon} from "lucide-react";
@@ -8,7 +8,7 @@ import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {FormField} from "@/components/learning-path/form-field";
-import {CreateTheoryLesson, CreateTheoryLessonSchema} from "@/types/learning-path/schema";
+import {CreateTheoryLessonDTO, CreateTheoryLessonSchema} from "@/types/learning-path/schema";
 import {RichTextEditorWithTemplates} from "@/components/ui/rich-text-editor";
 
 const DIFFICULTY_OPTIONS = [
@@ -40,11 +40,10 @@ type TheoryFormHandle = {
 export type {TheoryFormHandle};
 
 interface TheoryFormProps {
-    defaultValues?: Partial<CreateTheoryLesson>;
-    onSubmit: (data: CreateTheoryLesson) => Promise<void>;
+    defaultValues?: Partial<CreateTheoryLessonDTO>;
+    onSubmit: (data: CreateTheoryLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
-    editMode?: boolean;
     formRef?: React.RefObject<TheoryFormHandle | null>;
 }
 
@@ -53,7 +52,6 @@ export function TheoryForm({
                                onSubmit,
                                isPending,
                                submitLabel = "Create Lesson",
-                               editMode,
                                formRef: externalFormRef,
                            }: TheoryFormProps) {
     const internalFormRef = useRef<TheoryFormHandle | null>(null);
@@ -63,9 +61,9 @@ export function TheoryForm({
         register,
         handleSubmit: RHhandleSubmit,
         setValue,
-        watch,
+        control,
         formState: {errors},
-    } = useForm<CreateTheoryLesson>({
+    } = useForm<CreateTheoryLessonDTO>({
         resolver: zodResolver(CreateTheoryLessonSchema),
         defaultValues: {
             type: "THEORY",
@@ -77,13 +75,15 @@ export function TheoryForm({
         },
     });
 
-    const watchedContent = watch("content") ?? "";
-    const watchedDifficulty = watch("difficulty");
+    const watchedContent = useWatch({control, name: "content"}) ?? "";
+    const watchedDifficulty = useWatch({control, name: "difficulty"});
 
     useImperativeHandle(formRef, () => ({
         trigger: async () => {
             let valid = false;
-            await RHhandleSubmit(() => { valid = true; })();
+            await RHhandleSubmit(() => {
+                valid = true;
+            })();
             return valid;
         },
         submit: async () => {
@@ -140,7 +140,8 @@ export function TheoryForm({
                                         : "border-border hover:border-primary/50 hover:bg-muted"
                                 )}
                             >
-                                <span className={cn(isSelected ? "text-primary-foreground" : opt.color, "text-xs font-semibold")}>
+                                <span
+                                    className={cn(isSelected ? "text-primary-foreground" : opt.color, "text-xs font-semibold")}>
                                     {opt.label.charAt(0)}
                                 </span>
                                 <span>{opt.label}</span>
@@ -165,13 +166,11 @@ export function TheoryForm({
             </FormField>
 
             {/* Submit */}
-            {!editMode && (
-                <div className="flex justify-end pt-2">
-                    <Button type="submit" disabled={isPending}>
-                        {isPending ? "Saving..." : submitLabel}
-                    </Button>
-                </div>
-            )}
+            <div className="flex justify-end pt-2">
+                <Button type="submit" disabled={isPending}>
+                    {isPending ? "Saving..." : submitLabel}
+                </Button>
+            </div>
         </form>
     );
 }

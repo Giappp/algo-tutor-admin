@@ -1,20 +1,12 @@
 "use client";
 
-import {
-    CheckCircleIcon,
-    CircleIcon,
-    RocketIcon,
-    SaveIcon,
-    AlertCircleIcon,
-} from "lucide-react";
+import {AlertCircleIcon, CheckCircleIcon, CircleIcon, RocketIcon, SaveIcon,} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {StepLayout} from "./step-layout";
 import {LearningPathPreviewCard} from "@/components/learning-path/preview-card";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {useLearningPathForm} from "@/components/learning-path/create-steps/form-context";
-import {Badge} from "@/components/ui/badge";
-import {CreateLearningPath} from "@/types/learning-path/schema";
 
 interface ChecklistItem {
     label: string;
@@ -114,7 +106,8 @@ export function ReviewStep({
 
                 {/* Info callout */}
                 {!allValid && (
-                    <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
+                    <div
+                        className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
                         <AlertCircleIcon className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"/>
                         <div>
                             <p className="text-sm font-medium text-amber-800 dark:text-amber-200">

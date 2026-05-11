@@ -3,11 +3,7 @@
 import {useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import Link from "next/link";
-import {
-    GraduationCap,
-    Settings,
-    LayoutGrid,
-} from "lucide-react";
+import {GraduationCap, LayoutGrid, Settings,} from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -26,18 +22,14 @@ import {
     useUpdateLearningPath,
 } from "@/hooks/use-learning-paths";
 import {useCreateTopic} from "@/hooks/use-topics";
-import {CreateLearningPath} from "@/types/learning-path/schema";
-import {
-    CreateTopicRequest,
-    Topic,
-    UpdateLearningPathRequest
-} from "@/types/learning-path";
+import {CreateLearningPathDTO} from "@/types/learning-path/schema";
+import {CreateTopicRequest, UpdateLearningPathRequest} from "@/types/learning-path";
 import {Button} from "@/components/ui/button";
 import {
     LearningPathDetailHeader,
+    LearningPathSettingsTab,
     LearningPathStatsGrid,
     LearningPathTopicsTab,
-    LearningPathSettingsTab,
 } from "@/components/learning-path/detail";
 
 export default function LearningPathDetailPage() {
@@ -59,32 +51,36 @@ export default function LearningPathDetailPage() {
     if (isLoading) {
         return (
             <div className="flex flex-col gap-5">
-                <div className="h-24 w-full rounded-2xl bg-gradient-to-r from-chart-1/10 via-chart-2/8 to-chart-1/10 animate-pulse" />
+                <div
+                    className="h-24 w-full rounded-2xl bg-gradient-to-r from-chart-1/10 via-chart-2/8 to-chart-1/10 animate-pulse"/>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-20 rounded-2xl bg-chart-1/8 animate-pulse" />
+                        <div key={i} className="h-20 rounded-2xl bg-chart-1/8 animate-pulse"/>
                     ))}
                 </div>
-                <div className="h-64 w-full rounded-2xl bg-chart-1/5 animate-pulse" />
+                <div className="h-64 w-full rounded-2xl bg-chart-1/5 animate-pulse"/>
             </div>
         );
     }
 
     if (!lp) {
         return (
-            <div className="flex flex-col items-center justify-center gap-4 py-20 rounded-2xl border-2 border-dashed border-chart-1/20 bg-gradient-to-b from-chart-1/5 to-transparent">
-                <div className="flex items-center justify-center size-16 rounded-2xl bg-chart-1/10 border border-chart-1/25">
-                    <GraduationCap className="size-7 text-chart-1" />
+            <div
+                className="flex flex-col items-center justify-center gap-4 py-20 rounded-2xl border-2 border-dashed border-chart-1/20 bg-gradient-to-b from-chart-1/5 to-transparent">
+                <div
+                    className="flex items-center justify-center size-16 rounded-2xl bg-chart-1/10 border border-chart-1/25">
+                    <GraduationCap className="size-7 text-chart-1"/>
                 </div>
                 <p className="text-muted-foreground font-medium">Learning path not found.</p>
-                <Button variant="outline" nativeButton={false} render={<Link href="/dashboard/learning-paths" />} className="border-chart-1/30 text-chart-1 hover:bg-chart-1/10">
+                <Button variant="outline" nativeButton={false} render={<Link href="/dashboard/learning-paths"/>}
+                        className="border-chart-1/30 text-chart-1 hover:bg-chart-1/10">
                     Back to Learning Paths
                 </Button>
             </div>
         );
     }
 
-    const handleUpdate = async (data: CreateLearningPath) => {
+    const handleUpdate = async (data: CreateLearningPathDTO) => {
         await updateMutation.mutateAsync(data as unknown as UpdateLearningPathRequest);
         setIsEditOpen(false);
     };
@@ -126,14 +122,14 @@ export default function LearningPathDetailPage() {
                                 value="topics"
                                 className="flex items-center justify-center gap-2 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-chart-1/15 data-[state=active]:to-chart-2/10 data-[state=active]:text-chart-1 data-[state=active]:shadow-sm rounded-xl py-2.5 font-semibold transition-all"
                             >
-                                <LayoutGrid className="size-4" />
+                                <LayoutGrid className="size-4"/>
                                 <span>Topics</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="settings"
                                 className="flex items-center justify-center gap-2 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-muted data-[state=active]:to-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-xl py-2.5 font-medium transition-all"
                             >
-                                <Settings className="size-4" />
+                                <Settings className="size-4"/>
                                 <span>Settings</span>
                             </TabsTrigger>
                         </TabsList>

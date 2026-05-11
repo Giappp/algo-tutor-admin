@@ -20,7 +20,8 @@ import {TheoryForm} from "@/components/learning-path/theory-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useCreateLesson} from "@/hooks/use-lessons";
 import {CreateLessonRequest, LessonType} from "@/types/learning-path";
-import {QuizForm} from "@/components/learning-path/quiz-form";
+import {CreateCodingLessonDTO, CreateQuizLessonDTO, CreateTheoryLessonDTO} from "@/types/learning-path/schema";
+import {QuizForm} from "@/components/quiz/quiz-form";
 
 type CreationPhase = "type-selection" | "form-creation";
 
@@ -96,10 +97,8 @@ export default function CreateLessonPage() {
         setSelectedType(null);
     };
 
-    const handleSubmit = async (data: unknown) => {
-        const result = await createLessonMutation.mutateAsync(
-            data as unknown as CreateLessonRequest
-        );
+    const handleSubmit = async (data: CreateCodingLessonDTO | CreateTheoryLessonDTO | CreateQuizLessonDTO) => {
+        const result = await createLessonMutation.mutateAsync(data as CreateLessonRequest);
         router.push(
             `/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`
         );
@@ -117,6 +116,7 @@ export default function CreateLessonPage() {
                     <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             <Button
+                                nativeButton={true}
                                 variant="ghost"
                                 size="icon-sm"
                                 className="shrink-0"
@@ -169,9 +169,9 @@ export default function CreateLessonPage() {
                                 </div>
 
                                 <div className="mb-4">
-                                    <h3 className="text-lg font-bold text-foreground mb-1">
+                                    <span className="text-lg font-bold text-foreground mb-1">
                                         {item.label}
-                                    </h3>
+                                    </span>
                                     <p className="text-sm text-muted-foreground">
                                         {item.description}
                                     </p>
@@ -199,6 +199,10 @@ export default function CreateLessonPage() {
 
     // Phase 2: Form Creation
     const selectedItem = LESSON_TYPES.find((t) => t.type === selectedType);
+    if (!selectedItem) {
+        setPhase("type-selection");
+        return null;
+    }
     const SelectedIcon = selectedItem!.icon;
 
     return (

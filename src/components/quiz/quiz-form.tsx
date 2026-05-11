@@ -1,18 +1,19 @@
 "use client";
 
-import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
-import {useForm} from "react-hook-form";
+import React, {useCallback, useImperativeHandle, useState} from "react";
+import {Control, useFieldArray, useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {FormField} from "@/components/learning-path/form-field";
-import type {CreateQuizLesson} from "@/types/learning-path/schema";
+import type {CreateQuestionDTO, CreateQuizLessonDTO, QuestionInput} from "@/types/learning-path/schema";
 import {CreateQuizLessonSchema} from "@/types/learning-path/schema";
-import {Difficulty, QuestionType} from "@/types/learning-path";
+import {Difficulty} from "@/types/learning-path";
 import QuestionCard from "@/components/quiz/question-card";
 import SectionCard from "@/components/quiz/section-card";
+import {Loader2} from "lucide-react";
 
 const DIFFICULTY_OPTIONS: {
     value: Difficulty;
@@ -44,34 +45,49 @@ const DIFFICULTY_OPTIONS: {
     },
 ];
 
-interface ChoiceInput {
-    text: string;
-    isCorrect: boolean;
-    explanation: string;
-}
-
-interface QuestionInput {
-    question: string;
-    type: QuestionType;
-    points: number;
-    explanation: string;
-    choices: ChoiceInput[];
-}
-
-type QuizFormHandle = {
-    trigger: () => Promise<boolean>;
-    submit: () => Promise<void>;
+export type QuizFormHandle = {
+    triggerValidation: () => Promise<boolean>;
+    submit: () => void;
 };
 
-export type {QuizFormHandle};
-
 interface QuizFormProps {
-    defaultValues?: Partial<CreateQuizLesson>;
-    onSubmit: (data: CreateQuizLesson) => Promise<void>;
+    defaultValues?: Partial<CreateQuizLessonDTO>;
+    onSubmit: (data: CreateQuizLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
-    editMode?: boolean;
     formRef?: React.RefObject<QuizFormHandle | null>;
+}
+
+function QuizStats({control}: { control: Control<CreateQuizLessonDTO> }) {
+    const watchedQuestions = useWatch({control, name: "questions"}) as QuestionInput[];
+
+    const stats = {
+        questionCount: watchedQuestions.length,
+        totalPoints: watchedQuestions.reduce((sum, q) => sum + (q.points ?? 0), 0),
+        answeredCount: watchedQuestions.filter((q) => q.choices?.some((c) => c.isCorrect)).length,
+    };
+
+    return (
+        <div className="grid grid-cols-3 gap-3">
+            <div
+                className="flex flex-col items-center justify-center rounded-xl border bg-muted/30 py-3 gap-1">
+                <span className="text-xl font-bold text-foreground">{stats.questionCount}</span>
+                <span className="text-xs text-muted-foreground">Questions</span>
+            </div>
+            <div
+                className="flex flex-col items-center justify-center rounded-xl border bg-muted/30 py-3 gap-1">
+                <span className="text-xl font-bold text-foreground">{stats.totalPoints}</span>
+                <span className="text-xs text-muted-foreground">Total Points</span>
+            </div>
+            <div
+                className="flex flex-col items-center justify-center rounded-xl border bg-muted/30 py-3 gap-1">
+                                    <span className="text-xl font-bold text-foreground">
+                                        {stats.answeredCount}/{stats.questionCount}
+                                    </span>
+                <span className="text-xs text-muted-foreground">Answered</span>
+            </div>
+        </div>
+    )
 }
 
 export function QuizForm({
@@ -79,24 +95,19 @@ export function QuizForm({
                              onSubmit,
                              isPending,
                              submitLabel = "Create Lesson",
-                             editMode,
                              formRef: externalFormRef,
                          }: QuizFormProps) {
-    const internalFormRef = useRef<QuizFormHandle | null>(null);
-    const formRef = externalFormRef ?? internalFormRef;
-
     const [activeSection, setActiveSection] = useState<string>("basic");
-    // Flat local state for questions — avoids watch() re-rendering the whole form
-    const [questions, setQuestions] = useState<QuestionInput[]>([]);
 
     const {
         register,
         handleSubmit,
         setValue,
-        watch,
-        reset,
+        control,
+        trigger,
+        getValues,
         formState: {errors},
-    } = useForm<CreateQuizLesson>({
+    } = useForm<CreateQuizLessonDTO>({
         resolver: zodResolver(CreateQuizLessonSchema),
         defaultValues: {
             type: "QUIZ",
@@ -104,91 +115,62 @@ export function QuizForm({
             difficulty: undefined,
             passingScore: 70,
             timeLimitMinutes: undefined,
-            questions: [],
+            questions: [] as QuestionInput[],
             ...defaultValues,
         },
     });
 
-    useEffect(() => {
-        if (!defaultValues) return;
-        const qs: QuestionInput[] = (defaultValues.questions ?? []).map((q) => ({
-            question: q.question,
-            type: q.type ?? "MULTIPLE_CHOICE",
-            points: q.points ?? 10,
-            explanation: q.explanation ?? "",
-            choices: q.choices.map((c) => ({
-                text: c.text,
-                isCorrect: c.isCorrect,
-                explanation: c.explanation ?? "",
-            })),
-        }));
-        setQuestions(qs);
-        reset({
-            type: "QUIZ",
-            title: defaultValues.title ?? "",
-            difficulty: defaultValues.difficulty,
-            passingScore: defaultValues.passingScore ?? 70,
-            timeLimitMinutes: defaultValues.timeLimitMinutes,
-        });
-    }, [defaultValues]);
+    const {fields, append, remove} = useFieldArray({
+        control,
+        name: "questions",
+    });
 
-    const watchedDifficulty = watch("difficulty");
-    const watchedPassingScore = watch("passingScore");
-
-    // Stats — memoized so they only recompute when questions change
-    const stats = useMemo(() => ({
-        questionCount: questions.length,
-        totalPoints: questions.reduce((s, q) => s + q.points, 0),
-        answeredCount: questions.filter((q) => q.choices.some((c) => c.isCorrect)).length,
-    }), [questions]);
-
-    const toggleSection = useCallback((section: string) => {
+    const watchedDifficulty = useWatch({
+        name: "difficulty",
+        control
+    });
+    const watchedPassingScore = useWatch({
+        name: "passingScore",
+        control
+    });
+    const toggleSection = (section: string) => {
         setActiveSection((prev) => prev === section ? "" : section);
-    }, []);
+    };
 
-    const addQuestion = useCallback(() => {
+    const addQuestion = () => {
         const newQ: QuestionInput = {
             question: "",
             type: "MULTIPLE_CHOICE",
             points: 10,
-            explanation: "",
             choices: [
                 {text: "", isCorrect: false, explanation: ""},
                 {text: "", isCorrect: false, explanation: ""},
             ],
         };
-        setQuestions((prev) => [...prev, newQ]);
+        append(newQ as CreateQuestionDTO);
         setActiveSection("questions");
-    }, []);
+    };
 
-    const removeQuestion = useCallback((index: number) => {
-        setQuestions((prev) => prev.filter((_, i) => i !== index));
-    }, []);
-
-    const updateQuestion = useCallback((index: number, updated: QuestionInput) => {
-        setQuestions((prev) => prev.map((q, i) => i === index ? updated : q));
-    }, []);
-
-    const handleFormSubmit = handleSubmit(async (data) => {
-        await onSubmit({...data, questions: questions as unknown as CreateQuizLesson["questions"]});
+    const onFormSubmit = handleSubmit(async (data) => {
+        await onSubmit(data);
     });
 
-    useImperativeHandle(formRef, () => ({
-        trigger: async () => {
-            let valid = false;
-            await handleSubmit(() => {
-                valid = true;
-            })();
-            return valid;
-        },
-        submit: async () => {
-            await handleFormSubmit();
-        },
-    }));
+    const triggerValidation = useCallback(async (): Promise<boolean> => {
+        return await trigger();
+    }, [trigger]);
+
+    const submit = useCallback(() => {
+        onFormSubmit();
+    }, [onFormSubmit]);
+
+    useImperativeHandle(externalFormRef, () => ({
+        triggerValidation,
+        submit,
+    }), [triggerValidation, submit]);
 
     return (
         <TooltipProvider>
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-8">
+            <form onSubmit={onFormSubmit} className="flex flex-col gap-8">
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <div
@@ -210,7 +192,6 @@ export function QuizForm({
                 </div>
 
                 <div className="flex flex-col gap-3">
-
                     <SectionCard
                         number="01"
                         title="Basic Information"
@@ -254,6 +235,7 @@ export function QuizForm({
                                 </div>
                             </FormField>
                         </div>
+                        <QuizStats control={control}/>
                     </SectionCard>
 
                     {/* ── 02 Quiz Settings ── */}
@@ -311,13 +293,6 @@ export function QuizForm({
                                     </div>
                                 </FormField>
                             </div>
-
-                            {/* Quick stats */}
-                            <div className="grid grid-cols-3 gap-3">
-                                <StatCard label="Questions" value={stats.questionCount}/>
-                                <StatCard label="Total Points" value={stats.totalPoints}/>
-                                <StatCard label="Answered" value={`${stats.answeredCount}/${stats.questionCount}`}/>
-                            </div>
                         </div>
                     </SectionCard>
 
@@ -326,7 +301,7 @@ export function QuizForm({
                         number="03"
                         title="Questions"
                         color="amber"
-                        badge={questions.length > 0 ? questions.length : undefined}
+                        badge={fields.length > 0 ? fields.length : undefined}
                         isOpen={activeSection === "questions"}
                         onToggle={() => toggleSection("questions")}
                     >
@@ -340,7 +315,11 @@ export function QuizForm({
                                 <span>Questions are embedded directly in the lesson payload. Set the correct answer by clicking the radio/checkbox next to each choice.</span>
                             </div>
 
-                            {questions.length === 0 && (
+                            {errors.questions?.root && (
+                                <p className="text-sm text-destructive">{errors.questions.root.message}</p>
+                            )}
+
+                            {fields.length === 0 && (
                                 <div
                                     className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/20 py-10 gap-3">
                                     <div className="size-10 rounded-full bg-muted flex items-center justify-center">
@@ -356,19 +335,20 @@ export function QuizForm({
                                 </div>
                             )}
 
-                            {questions.map((q, qi) => (
+                            {fields.map((field, qi) => (
                                 <QuestionCard
-                                    key={qi}
-                                    question={q}
+                                    key={field.id}
                                     index={qi}
                                     isPending={isPending}
-                                    onChange={(updated) => updateQuestion(qi, updated)}
-                                    onRemove={() => removeQuestion(qi)}
+                                    onRemove={() => remove(qi)}
+                                    control={control}
+                                    setValue={setValue}   // Pass this
+                                    getValues={getValues} // Pass this
                                 />
                             ))}
 
-                            <Button type="button" variant="outline" size="sm" onClick={addQuestion}
-                                    className="self-start">
+                            <Button type="button" size="sm" onClick={addQuestion}
+                                    className="self-start bg-amber-500 hover:bg-amber-600 text-white border-amber-500 hover:border-amber-600 shadow-sm">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                      strokeWidth="2" className="mr-1.5">
                                     <path d="M12 5v14M5 12h14"/>
@@ -380,41 +360,27 @@ export function QuizForm({
                 </div>
 
                 {/* Submit Button */}
-                {!editMode && (
-                    <div className="flex justify-end pt-6 border-t">
-                        <Button type="submit" disabled={isPending} size="lg" className="px-8 gap-2">
-                            {isPending ? (
-                                <>
-                                    <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                         stroke="currentColor" strokeWidth="2">
-                                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                                    </svg>
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         strokeWidth="2">
-                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                                        <polyline points="17 21 17 13 7 13 7 21"/>
-                                        <polyline points="7 3 7 8 15 8"/>
-                                    </svg>
-                                    {submitLabel}
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                )}
+                <div className="flex justify-end pt-6 border-t">
+                    <Button type="submit" disabled={isPending} size="lg" className="px-8 gap-2">
+                        {isPending ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin"/>
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     strokeWidth="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                    <polyline points="7 3 7 8 15 8"/>
+                                </svg>
+                                {submitLabel}
+                            </>
+                        )}
+                    </Button>
+                </div>
             </form>
         </TooltipProvider>
     );
 }
-
-const StatCard = React.memo(function StatCard({label, value}: { label: string; value: number | string }) {
-    return (
-        <div className="flex flex-col items-center justify-center rounded-xl border bg-muted/30 py-3 gap-1">
-            <span className="text-xl font-bold text-foreground">{value}</span>
-            <span className="text-xs text-muted-foreground">{label}</span>
-        </div>
-    );
-});

@@ -1,13 +1,13 @@
 "use client";
 
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import {Button} from "@/components/ui/button";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {Field, FieldContent, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateEditorial, CreateEditorialSchema,} from "@/types/learning-path/schema";
+import {CreateEditorialDTO, CreateEditorialSchema,} from "@/types/learning-path/schema";
 import {ProgrammingLanguage} from "@/types/learning-path";
 
 const MonacoEditor = dynamic(
@@ -21,8 +21,8 @@ const MonacoEditor = dynamic(
 );
 
 interface EditorialFormProps {
-    defaultValues?: Partial<CreateEditorial>;
-    onSubmit: (data: CreateEditorial) => Promise<void>;
+    defaultValues?: Partial<CreateEditorialDTO>;
+    onSubmit: (data: CreateEditorialDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
@@ -49,9 +49,9 @@ export function EditorialForm({
         register,
         handleSubmit,
         setValue,
-        watch,
+        control,
         formState: {errors},
-    } = useForm<CreateEditorial>({
+    } = useForm<CreateEditorialDTO>({
         resolver: zodResolver(CreateEditorialSchema),
         defaultValues: {
             language: "JAVA",
@@ -60,8 +60,8 @@ export function EditorialForm({
         },
     });
 
-    const language = watch("language");
-    const sourceCode = watch("sourceCode");
+    const language = useWatch({control, name: "language"});
+    const sourceCode = useWatch({control, name: "sourceCode"});
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">

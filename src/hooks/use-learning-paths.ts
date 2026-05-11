@@ -3,8 +3,9 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
-import {CreateLearningPathRequest, UpdateLearningPathRequest,} from "@/types/learning-path";
+import {CreateLearningPathRequest,} from "@/types/learning-path";
 import {LearningPathListParams, learningPathService,} from "@/api/services/learning-path-services";
+import {UpdateLearningPathDTO} from "@/types/learning-path/schema";
 
 export const QUERY_KEYS = {
     learningPaths: (params?: LearningPathListParams) =>
@@ -46,7 +47,7 @@ export function useUpdateLearningPath(id: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: UpdateLearningPathRequest) =>
+        mutationFn: (data: UpdateLearningPathDTO) =>
             learningPathService.update(id, data),
         onSuccess: () => {
             toast.success("Learning path updated successfully");
