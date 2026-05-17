@@ -2,7 +2,6 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {CreateLessonRequest,} from "@/types/learning-path";
 import {lessonService} from "@/api/services/lesson-services";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 
@@ -16,9 +15,7 @@ export const QUERY_KEYS = {
 export function useLessonsByTopic(topicId: number, publishedOnly = false) {
     return useQuery({
         queryKey: QUERY_KEYS.lessons(topicId, publishedOnly),
-        queryFn: async () => {
-            return await lessonService.listByTopic(topicId, publishedOnly);
-        },
+        queryFn: () => lessonService.listByTopic(topicId, publishedOnly),
         enabled: !!topicId,
     });
 }
@@ -43,7 +40,7 @@ export function useCreateLesson(topicId: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: CreateLessonRequest) =>
+        mutationFn: (data: LessonRequestDTO) =>
             lessonService.create(topicId, data),
         onSuccess: () => {
             toast.success("Lesson created successfully");
@@ -54,15 +51,18 @@ export function useCreateLesson(topicId: number) {
     });
 }
 
-export function useUpdateLesson(lessonId: number) {
+export function useUpdateLesson() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: LessonRequestDTO) =>
-            lessonService.update(lessonId, data),
-        onSuccess: () => {
+        mutationFn: ({id, data}: { id: number; data: LessonRequestDTO }) =>
+            lessonService.update(id, data),
+        onSuccess: (_, variables) => {
             toast.success("Lesson updated successfully");
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lesson(lessonId)});
+            // Invalidate the specific lesson
+            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lesson(variables.id)});
+            // IMPORTANT: Also invalidate the lessons list so list views reflect the update (e.g., title changes)
+            queryClient.invalidateQueries({queryKey: ["lessons"]});
         },
     });
 }

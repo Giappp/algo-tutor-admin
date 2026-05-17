@@ -47,7 +47,7 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
     const {data: lessonsData} = useLessonsByTopic(topic.id);
     const lessons: Lesson[] = lessonsData?.data ?? [];
 
-    const topicColor = getTopicColor(topic.orderIndex);
+    const topicColor = getTopicColor(topic.displayOrder);
 
     const handleDeleteTopic = () => {
         if (confirm("Delete this topic?")) {
@@ -76,7 +76,7 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                     <div
                         className={`shrink-0 flex items-center justify-center size-8 rounded-lg ${topicColor.bg} ${topicColor.border} border group-hover:scale-105 transition-transform duration-200`}>
                         <span className={`text-xs font-black ${topicColor.text}`}>
-                            #{topic.orderIndex}
+                            #{topic.displayOrder}
                         </span>
                     </div>
 
@@ -88,22 +88,19 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                             <span className="text-xs text-muted-foreground font-medium">
                                 {topic.lessonCount} lesson{topic.lessonCount !== 1 ? "s" : ""}
                             </span>
-                            {topic.scopeTags && (
-                                <span className="text-xs text-muted-foreground truncate">
-                                    {topic.scopeTags}
-                                </span>
-                            )}
                         </div>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 ml-3">
                     {topic.isLocked ? (
-                        <div className="flex items-center justify-center size-7 rounded-md bg-destructive/10 text-destructive border border-destructive/20">
+                        <div
+                            className="flex items-center justify-center size-7 rounded-md bg-destructive/10 text-destructive border border-destructive/20">
                             <Lock className="size-3.5"/>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center size-7 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <div
+                            className="flex items-center justify-center size-7 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                             <LockOpen className="size-3.5"/>
                         </div>
                     )}
@@ -122,7 +119,8 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Lessons
                             </h4>
-                            <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md font-medium">
+                            <span
+                                className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md font-medium">
                                 {lessons.length}
                             </span>
                         </div>
@@ -143,8 +141,10 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                     </div>
 
                     {lessons.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border py-8 gap-3">
-                            <div className="flex items-center justify-center size-10 rounded-xl bg-muted border border-border">
+                        <div
+                            className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border py-8 gap-3">
+                            <div
+                                className="flex items-center justify-center size-10 rounded-xl bg-muted border border-border">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                      strokeWidth="1.75" className="text-muted-foreground">
                                     <path d="M12 5v14M5 12h14"/>
@@ -216,12 +216,11 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                         defaultValues={{
                             name: topic.name,
                             description: topic.description,
-                            scopeTags: topic.scopeTags,
                             isLocked: topic.isLocked,
                         }}
                         onSubmit={async (data) => {
                             await updateTopicMutation.mutateAsync(
-                                data as unknown as UpdateTopicRequest
+                                data as UpdateTopicRequest
                             );
                             setIsEditOpen(false);
                         }}

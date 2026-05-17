@@ -1,35 +1,35 @@
 "use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { AlertCircle, Loader2, LockKeyhole, Sparkles } from "lucide-react"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent} from "@/components/ui/card"
+import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field"
+import {Input} from "@/components/ui/input"
+import {AlertCircle, Loader2, LockKeyhole, Sparkles} from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SignInSchema } from "@/types/auth/schema"
-import { LoginCredentials } from "@/types/auth/auth"
-import { toAppError } from "@/api/core/api-error"
-import { useAuth } from "@/hooks/use-auth-hook"
+import {useState} from "react"
+import {useForm} from "react-hook-form"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {SignInSchema} from "@/types/auth/schema"
+import {LoginCredentials} from "@/types/auth/auth"
+import {toAppError} from "@/api/core/api-error"
+import {useAuth} from "@/hooks/use-auth-hook"
 
 export function LoginForm({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
-    const { login, isLoggingIn } = useAuth();
+                              className,
+                              ...props
+                          }: React.ComponentProps<"div">) {
+    const {login, isLoggingIn} = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<LoginCredentials>({
         resolver: zodResolver(SignInSchema),
         defaultValues: {
-            userName: "",
+            username: "",
             password: "",
         },
     });
@@ -51,11 +51,13 @@ export function LoginForm({
             {/* ── Branding Header ── */}
             <div className="flex flex-col items-center gap-3 text-center">
                 <div className="relative">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
-                        <Sparkles className="w-7 h-7 text-white" />
+                    <div
+                        className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
+                        <Sparkles className="w-7 h-7 text-white"/>
                     </div>
-                    <div className="absolute -bottom-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 border-2 border-background">
-                        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    <div
+                        className="absolute -bottom-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 border-2 border-background">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white"/>
                     </div>
                 </div>
                 <div>
@@ -79,8 +81,9 @@ export function LoginForm({
 
                             {/* ── Server Error Banner ── */}
                             {serverError && (
-                                <div className="flex items-center gap-3 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/30 px-4 py-3.5 text-sm text-rose-600 dark:text-rose-400 transition-all duration-200">
-                                    <AlertCircle className="size-4 shrink-0" />
+                                <div
+                                    className="flex items-center gap-3 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/30 px-4 py-3.5 text-sm text-rose-600 dark:text-rose-400 transition-all duration-200">
+                                    <AlertCircle className="size-4 shrink-0"/>
                                     <p>{serverError}</p>
                                 </div>
                             )}
@@ -109,13 +112,13 @@ export function LoginForm({
                                         type="text"
                                         placeholder="Enter your username"
                                         className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
-                                        aria-invalid={!!errors.userName}
+                                        aria-invalid={!!errors.username}
                                         disabled={isSubmitting}
-                                        {...register("userName")}
+                                        {...register("username")}
                                     />
                                 </div>
-                                {errors.userName && (
-                                    <FieldError className="text-xs">{errors.userName.message}</FieldError>
+                                {errors.username && (
+                                    <FieldError className="text-xs">{errors.username.message}</FieldError>
                                 )}
                             </Field>
 
@@ -160,12 +163,12 @@ export function LoginForm({
                                 >
                                     {isSubmitting ? (
                                         <span className="flex items-center gap-2">
-                                            <Loader2 className="size-4 animate-spin" />
+                                            <Loader2 className="size-4 animate-spin"/>
                                             Authenticating...
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            <LockKeyhole className="size-4" />
+                                            <LockKeyhole className="size-4"/>
                                             Sign in to Dashboard
                                         </span>
                                     )}
@@ -175,7 +178,7 @@ export function LoginForm({
                             {/* ── Divider ── */}
                             <div className="relative py-2">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+                                    <div className="w-full border-t border-zinc-200 dark:border-zinc-800"/>
                                 </div>
                                 <div className="relative flex justify-center">
                                     <span className="bg-background px-3 text-xs text-muted-foreground">
@@ -187,11 +190,13 @@ export function LoginForm({
                             {/* ── Footer Note ── */}
                             <p className="text-center text-xs text-muted-foreground leading-relaxed">
                                 By signing in, you agree to the platform&apos;s{" "}
-                                <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                <Link href="#"
+                                      className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                                     Terms of Service
                                 </Link>{" "}
                                 and{" "}
-                                <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                <Link href="#"
+                                      className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                                     Privacy Policy
                                 </Link>
                             </p>
@@ -203,7 +208,7 @@ export function LoginForm({
             {/* ── Security Badge ── */}
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
                     <span>Encrypted connection</span>
                 </div>
                 <span className="text-zinc-300 dark:text-zinc-700">|</span>

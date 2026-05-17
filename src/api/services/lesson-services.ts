@@ -1,5 +1,5 @@
 import {del, get, getPage, patch, post, put} from "@/api/core/http";
-import {CreateLessonRequest, Lesson} from "@/types/learning-path";
+import {Lesson} from "@/types/learning-path";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 
 export const lessonService = {
@@ -14,7 +14,7 @@ export const lessonService = {
     getBySlug: (slug: string) =>
         get<Lesson>(`/api/v1/lessons/slug/${slug}`),
 
-    create: (topicId: number, data: CreateLessonRequest) =>
+    create: (topicId: number, data: LessonRequestDTO) =>
         post<Lesson>(`/api/v1/lessons/topics/${topicId}`, data),
 
     update: (lessonId: number, data: LessonRequestDTO) =>

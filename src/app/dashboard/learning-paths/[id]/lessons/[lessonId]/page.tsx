@@ -32,7 +32,7 @@ export default function LessonDetailPage() {
     const lessonId = Number(params.lessonId);
 
     const {data: lesson, isLoading: lessonLoading} = useLesson(lessonId);
-    const updateLessonMutation = useUpdateLesson(lessonId);
+    const updateLessonMutation = useUpdateLesson();
     const deleteLessonMutation = useDeleteLesson();
     const togglePublishMutation = useTogglePublishLesson();
 
@@ -123,7 +123,7 @@ export default function LessonDetailPage() {
                                     defaultValues={{
                                         type: "CODING",
                                         title: lesson.title,
-                                        orderIndex: lesson.orderIndex,
+                                        displayOrder: lesson.displayOrder,
                                         statement: lesson.statement,
                                         difficulty: lesson.difficulty,
                                         baseTimeLimitMs: lesson.baseTimeLimitMs,
@@ -134,7 +134,7 @@ export default function LessonDetailPage() {
                                         testCases: lesson.testCases ?? [],
                                     }}
                                     onSubmit={async (data) => {
-                                        await updateLessonMutation.mutateAsync(data as Parameters<typeof updateLessonMutation.mutateAsync>[0]);
+                                        await updateLessonMutation.mutateAsync({data: data, id: lessonId});
                                         router.refresh();
                                     }}
                                     isPending={updateLessonMutation.isPending}
@@ -145,12 +145,12 @@ export default function LessonDetailPage() {
                                     defaultValues={{
                                         type: "THEORY",
                                         title: lesson.title,
-                                        orderIndex: lesson.orderIndex,
+                                        displayOrder: lesson.displayOrder,
                                         content: lesson.content,
                                         difficulty: lesson.difficulty,
                                     }}
                                     onSubmit={async (data) => {
-                                        await updateLessonMutation.mutateAsync(data as Parameters<typeof updateLessonMutation.mutateAsync>[0]);
+                                        await updateLessonMutation.mutateAsync({data: data, id: lessonId});
                                         router.refresh();
                                     }}
                                     isPending={updateLessonMutation.isPending}
@@ -161,14 +161,14 @@ export default function LessonDetailPage() {
                                     defaultValues={{
                                         type: "QUIZ",
                                         title: lesson.title,
-                                        orderIndex: lesson.orderIndex,
+                                        displayOrder: lesson.displayOrder,
                                         difficulty: lesson.difficulty,
                                         passingScore: lesson.passingScore,
                                         timeLimitMinutes: lesson.timeLimitMinutes,
                                         questions: lesson.questions,
                                     }}
                                     onSubmit={async (data) => {
-                                        await updateLessonMutation.mutateAsync(data as Parameters<typeof updateLessonMutation.mutateAsync>[0]);
+                                        await updateLessonMutation.mutateAsync({data: data, id: lessonId});
                                         router.refresh();
                                     }}
                                     isPending={updateLessonMutation.isPending}

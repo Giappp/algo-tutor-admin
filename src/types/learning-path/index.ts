@@ -61,7 +61,7 @@ export interface Lesson {
     slug: string;
     type: LessonType;
     content?: string;
-    orderIndex: number;
+    displayOrder: number;
     isPublished: boolean;
     difficulty?: Difficulty;
     // Coding-specific
@@ -88,8 +88,7 @@ export interface Topic {
     id: number;
     name: string;
     description?: string;
-    scopeTags?: string;
-    orderIndex: number;
+    displayOrder: number;
     isLocked: boolean;
     learningPathId: number;
     lessonCount: number;
@@ -155,7 +154,7 @@ export interface CreateLessonRequest {
     type: LessonType;
     title: string;
     difficulty?: Difficulty;
-    orderIndex?: number;
+    displayOrder?: number;
     // Theory
     content?: string;
     // Coding

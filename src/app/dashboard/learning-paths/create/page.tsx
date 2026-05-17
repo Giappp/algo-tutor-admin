@@ -2,7 +2,7 @@
 
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {GraduationCapIcon} from "lucide-react";
+import {GraduationCapIcon, SparklesIcon} from "lucide-react";
 import Link from "next/link";
 import {LearningPathFields} from "@/components/learning-path/learning-path-form";
 import {useCreateLearningPath} from "@/hooks/use-learning-paths";
@@ -29,6 +29,7 @@ export default function CreateLearningPathPage() {
             goal: "",
             thumbnailUrl: "",
             level: "BEGINNER",
+            isPremium: false,
         },
     });
 
@@ -40,59 +41,57 @@ export default function CreateLearningPathPage() {
     });
 
     return (
-        <div className="flex flex-col gap-6 max-w-2xl">
-            {/* Header */}
-            <div
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-transparent p-5 dark:from-emerald-950/40 dark:via-teal-950/20">
-                <div
-                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_0%,oklch(0.6_0.15_145/0.12)_0%,transparent_60%)] animate-gradient-shift pointer-events-none"/>
-                <div
-                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_100%,oklch(0.55_0.1_160/0.08)_0%,transparent_50%)] animate-gradient-shift pointer-events-none"
-                    style={{animationDelay: "2s"}}
-                />
-                <div className="absolute inset-0 dot-pattern opacity-30 pointer-events-none"/>
-
-                <div className="relative flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div
-                            className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20">
-                            <GraduationCapIcon className="size-5 text-white"/>
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-bold tracking-tight text-foreground text-gradient-emerald">
-                                Create Learning Path
-                            </h1>
-                            <p className="text-xs text-muted-foreground hidden sm:block">
-                                Fill in basic information, then add topics and lessons on the next page.
-                            </p>
-                        </div>
+        <div className="flex items-start justify-center px-4 py-8">
+            <div className="w-full max-w-2xl">
+                {/* Page Header */}
+                <div className="mb-8 text-center">
+                    <div
+                        className="inline-flex items-center justify-center size-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-xl shadow-emerald-500/25 mb-4">
+                        <GraduationCapIcon className="size-7 text-white"/>
                     </div>
-                    <Link
-                        href="/dashboard/learning-paths"
-                        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted/50"
-                    >
-                        Cancel
-                    </Link>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                        Create Learning Path
+                    </h1>
+                    <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                        Define the basics — you can add topics and lessons after creating the path.
+                    </p>
+                </div>
+
+                {/* Form Card */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                    {/* Decorative top gradient line */}
+                    <div
+                        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"/>
+
+                    <form onSubmit={onSubmit} className="p-8">
+                        <LearningPathFields
+                            control={control}
+                            errors={errors}
+                            watch={watch}
+                            register={register}
+                            setValue={setValue}
+                            isPending={createMutation.isPending}
+                        />
+
+                        <div className="flex items-center justify-between pt-6 mt-2 border-t">
+                            <Link
+                                href="/dashboard/learning-paths"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:bg-muted/60 hover:text-foreground"
+                            >
+                                Cancel
+                            </Link>
+                            <Button
+                                type="submit"
+                                disabled={createMutation.isPending}
+                                className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/20"
+                            >
+                                <SparklesIcon className="size-4"/>
+                                {createMutation.isPending ? "Creating..." : "Create Learning Path"}
+                            </Button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            {/* Form */}
-            <form onSubmit={onSubmit} className="rounded-2xl border bg-card p-6">
-                <LearningPathFields
-                    control={control}
-                    errors={errors}
-                    watch={watch}
-                    register={register}
-                    setValue={setValue}
-                    isPending={createMutation.isPending}
-                />
-
-                <div className="flex justify-end gap-3 pt-4 mt-2 border-t">
-                    <Button type="submit" disabled={createMutation.isPending}>
-                        {createMutation.isPending ? "Creating..." : "Create Learning Path"}
-                    </Button>
-                </div>
-            </form>
         </div>
     );
 }

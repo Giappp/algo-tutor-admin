@@ -1,9 +1,6 @@
 import z from "zod";
 import {QuestionType} from "@/types/learning-path";
 
-// ---------------------------------------------------------------------------
-// Level & Difficulty enums
-// ---------------------------------------------------------------------------
 export const LevelSchema = z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
 export const DifficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
 export const QuestionTypeSchema = z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TRUE_FALSE"]);
@@ -22,6 +19,7 @@ export const CreateLearningPathSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
     goal: z.string().min(1, "Goal is required"),
+    isPremium: z.boolean(),
     thumbnailUrl: z.string().optional(),
     level: LevelSchema,
 });
@@ -32,7 +30,6 @@ export const CreateLearningPathSchema = z.object({
 export const CreateTopicSchema = z.object({
     name: z.string().optional(),
     description: z.string().optional(),
-    scopeTags: z.string().optional(),
     isLocked: z.boolean().optional(),
 });
 
@@ -94,7 +91,7 @@ export type QuestionInput = {
 const BaseLessonFields = {
     title: z.string().min(1, "Title is required"),
     difficulty: DifficultySchema,
-    orderIndex: z.number().int().optional(),
+    displayOrder: z.number().int().optional(),
 };
 
 // Theory-specific fields
@@ -121,9 +118,6 @@ const CodingLessonFields = {
     testCases: z.array(CreateTestCaseSchema).optional(),
 };
 
-// ---------------------------------------------------------------------------
-// Polymorphic lesson schema — discriminated union via `type`
-// ---------------------------------------------------------------------------
 export const CreateTheoryLessonSchema = z.object({
     type: z.literal("THEORY"),
     ...BaseLessonFields,
@@ -154,9 +148,6 @@ export const CreateEditorialSchema = z.object({
     sourceCode: z.string().min(1, "Source code is required"),
 });
 
-// ---------------------------------------------------------------------------
-// Type inference
-// ---------------------------------------------------------------------------
 export type LearningPathRequestDTO = z.infer<typeof CreateLearningPathSchema>;
 export type TopicRequestDTO = z.infer<typeof CreateTopicSchema>;
 export type LessonRequestDTO = z.infer<typeof CreateLessonSchema>;

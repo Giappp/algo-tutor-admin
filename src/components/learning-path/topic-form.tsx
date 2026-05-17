@@ -33,7 +33,6 @@ export function TopicForm({
         defaultValues: {
             name: "",
             description: "",
-            scopeTags: "",
             isLocked: true,
             ...defaultValues,
         },
@@ -76,26 +75,6 @@ export function TopicForm({
                         )}
                     </FieldContent>
                 </Field>
-
-                <Field>
-                    <FieldLabel htmlFor="scopeTags">Scope Tags</FieldLabel>
-                    <FieldContent>
-                        <Input
-                            id="scopeTags"
-                            placeholder="arrays,strings,sliding-window"
-                            aria-invalid={!!errors.scopeTags}
-                            disabled={isPending}
-                            {...register("scopeTags")}
-                        />
-                        <FieldDescription>
-                            Comma-separated tags to define the topic scope.
-                        </FieldDescription>
-                        {errors.scopeTags && (
-                            <FieldError>{errors.scopeTags.message}</FieldError>
-                        )}
-                    </FieldContent>
-                </Field>
-
                 <Field orientation="horizontal">
                     <FieldLabel htmlFor="isLocked">Locked by Default</FieldLabel>
                     <Switch

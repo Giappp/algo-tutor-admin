@@ -25,12 +25,10 @@ import {useCreateTopic} from "@/hooks/use-topics";
 import {LearningPathRequestDTO} from "@/types/learning-path/schema";
 import {CreateTopicRequest} from "@/types/learning-path";
 import {Button} from "@/components/ui/button";
-import {
-    LearningPathDetailHeader,
-    LearningPathSettingsTab,
-    LearningPathStatsGrid,
-    LearningPathTopicsTab,
-} from "@/components/learning-path/detail";
+import {LearningPathDetailHeader} from "@/components/learning-path/detail/learning-path-detail-header";
+import {LearningPathStatsGrid} from "@/components/learning-path/detail/learning-path-stats-grid";
+import {LearningPathTopicsTab} from "@/components/learning-path/detail/learning-path-topics-tab";
+import {LearningPathSettingsTab} from "@/components/learning-path/detail/learning-path-settings-tab";
 
 export default function LearningPathDetailPage() {
     const params = useParams();
