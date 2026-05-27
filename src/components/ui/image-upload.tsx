@@ -1,7 +1,7 @@
 "use client";
 
 import {useCallback, useRef, useState} from "react";
-import {Trash2, UploadCloud, X} from "lucide-react";
+import {ImageIcon, Trash2, UploadCloud, X} from "lucide-react";
 import Image from "next/image";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -41,10 +41,10 @@ export function ImageUpload({
 
     const validateFile = (file: File): string | null => {
         if (!ACCEPTED_TYPES.includes(file.type)) {
-            return `File type not supported. Please use: ${ACCEPTED_TYPES.map((t) => t.split("/")[1].toUpperCase()).join(", ")}`;
+            return `File type not supported. Use: ${ACCEPTED_TYPES.map((t) => t.split("/")[1].toUpperCase()).join(", ")}`;
         }
         if (file.size > MAX_SIZE_BYTES) {
-            return `File is too large. Maximum size is ${MAX_SIZE_MB}MB.`;
+            return `File too large. Maximum ${MAX_SIZE_MB}MB.`;
         }
         return null;
     };
@@ -78,7 +78,8 @@ export function ImageUpload({
             const file = e.dataTransfer.files[0];
             if (file) uploadFile(file);
         },
-        [disabled, isUploading, uploadFile]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [disabled, isUploading]
     );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,38 +94,53 @@ export function ImageUpload({
         setError(null);
     };
 
+    // ─── Preview state (image uploaded) ──────────────────────────────────────
     if (value) {
         return (
-            <div className={cn("relative group rounded-xl overflow-hidden border bg-muted", className)}>
-                <Image
-                    src={value}
-                    alt="Uploaded image"
-                    fill
-                    className="object-cover w-full h-full"
-                />
-                <div
-                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => inputRef.current?.click()}
-                        disabled={disabled || isUploading}
-                        className="pointer-events-auto"
-                    >
-                        <UploadCloud className="size-4 mr-1.5"/>
-                        Change
-                    </Button>
-                    <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={handleRemove}
-                        disabled={disabled}
-                        className="pointer-events-auto"
-                    >
-                        <Trash2 className="size-4 mr-1.5"/>
-                        Remove
-                    </Button>
+            <div className={cn("flex flex-col gap-2", className)}>
+                <div className={cn(
+                    "relative rounded-lg overflow-hidden border bg-muted",
+                    aspectClasses[aspectRatio]
+                )}>
+                    <Image
+                        src={value}
+                        alt="Uploaded image"
+                        fill
+                        className="object-cover"
+                        unoptimized
+                    />
+
+                    {/* Hover overlay with actions */}
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => inputRef.current?.click()}
+                            disabled={disabled || isUploading}
+                        >
+                            <UploadCloud className="size-4 mr-1.5"/>
+                            Change
+                        </Button>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="destructive"
+                            onClick={handleRemove}
+                            disabled={disabled}
+                        >
+                            <Trash2 className="size-4 mr-1.5"/>
+                            Remove
+                        </Button>
+                    </div>
                 </div>
+
+                {/* URL display */}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <ImageIcon className="size-3.5 shrink-0"/>
+                    <span className="truncate">{value}</span>
+                </div>
+
                 <input
                     ref={inputRef}
                     type="file"
@@ -136,6 +152,7 @@ export function ImageUpload({
         );
     }
 
+    // ─── Upload state (no image) ─────────────────────────────────────────────
     return (
         <div className="flex flex-col gap-2">
             <div
@@ -147,11 +164,11 @@ export function ImageUpload({
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
                 className={cn(
-                    "relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200",
+                    "relative flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed cursor-pointer transition-all",
                     aspectClasses[aspectRatio],
                     isDragging
-                        ? "border-chart-1 bg-chart-1/5"
-                        : "border-border hover:border-chart-1/40 hover:bg-muted/50",
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/40 hover:bg-muted/50",
                     (disabled || isUploading) && "opacity-50 cursor-not-allowed",
                     error && "border-destructive/50",
                     className
@@ -168,25 +185,25 @@ export function ImageUpload({
 
                 {isUploading ? (
                     <>
-                        <div className="size-10 rounded-full border-2 border-chart-1/30 border-t-chart-1 animate-spin"/>
-                        <p className="text-sm text-muted-foreground font-medium">Uploading...</p>
+                        <div className="size-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin"/>
+                        <p className="text-sm text-muted-foreground">Uploading...</p>
                     </>
                 ) : (
                     <>
                         <div
                             className={cn(
-                                "flex items-center justify-center size-12 rounded-2xl transition-colors",
-                                isDragging ? "bg-chart-1/10 text-chart-1" : "bg-muted text-muted-foreground"
+                                "flex items-center justify-center size-10 rounded-lg transition-colors",
+                                isDragging ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                             )}
                         >
                             <UploadCloud className="size-5"/>
                         </div>
                         <div className="text-center px-4">
-                            <p className="text-sm font-semibold text-foreground">
+                            <p className="text-sm font-medium text-foreground">
                                 {isDragging ? "Drop image here" : "Click or drag to upload"}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                {ACCEPTED_TYPES.map((t) => t.split("/")[1].toUpperCase()).join(", ")} &middot; Max {MAX_SIZE_MB}MB
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                                {ACCEPTED_TYPES.map((t) => t.split("/")[1].toUpperCase()).join(", ")} · Max {MAX_SIZE_MB}MB
                             </p>
                         </div>
                     </>

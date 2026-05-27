@@ -2,6 +2,7 @@
 import { OverviewChart, RecentActivityTable, StatCard } from "@/components/dashboard"
 import { ArchiveIcon, CodeIcon, FileTextIcon, RocketIcon } from "lucide-react"
 import type { ActivityItem } from "@/components/dashboard/recent-activity-table"
+import { useTranslations } from "next-intl"
 
 const mockActivities: ActivityItem[] = [
     {
@@ -57,40 +58,42 @@ const mockActivities: ActivityItem[] = [
 ]
 
 export default function DashboardPage() {
+    const t = useTranslations("dashboard")
+
     return (
         <div className="flex flex-col gap-8">
             {/* Page Header */}
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground">Welcome back. Here&apos;s an overview of your platform.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+                <p className="text-muted-foreground">{t("welcome")}</p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
-                    title="Total Problems"
+                    title={t("totalProblems")}
                     value="142"
                     icon={CodeIcon}
-                    trend="+8 from last week"
+                    trend={t("fromLastWeek", { count: 8 })}
                 />
                 <StatCard
-                    title="Published"
+                    title={t("published")}
                     value="98"
                     icon={RocketIcon}
-                    description="69% of total"
-                    trend="+12% this month"
+                    description={t("ofTotal", { percentage: 69 })}
+                    trend={t("thisMonth", { percentage: 12 })}
                 />
                 <StatCard
-                    title="Drafts"
+                    title={t("drafts")}
                     value="32"
                     icon={FileTextIcon}
-                    description="22% of total"
+                    description={t("ofTotal", { percentage: 22 })}
                 />
                 <StatCard
-                    title="Archived"
+                    title={t("archived")}
                     value="12"
                     icon={ArchiveIcon}
-                    description="8% of total"
+                    description={t("ofTotal", { percentage: 8 })}
                 />
             </div>
 
@@ -98,24 +101,24 @@ export default function DashboardPage() {
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <OverviewChart
                     type="bar"
-                    title="Weekly Activity"
-                    description="Problems and users added per day"
+                    title={t("weeklyActivity")}
+                    description={t("weeklyActivityDesc")}
                 />
                 <OverviewChart
                     type="pie"
-                    title="Difficulty Distribution"
-                    description="Problems by difficulty level"
+                    title={t("difficultyDistribution")}
+                    description={t("difficultyDistributionDesc")}
                 />
                 <OverviewChart
                     type="line"
-                    title="Publishing Trend"
-                    description="Published vs drafts over 6 months"
+                    title={t("publishingTrend")}
+                    description={t("publishingTrendDesc")}
                 />
             </div>
 
             {/* Activity Table */}
             <RecentActivityTable
-                title="Recent Activity"
+                title={t("recentActivity")}
                 activities={mockActivities}
             />
         </div>

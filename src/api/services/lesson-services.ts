@@ -2,11 +2,15 @@ import {del, get, getPage, patch, post, put} from "@/api/core/http";
 import {Lesson} from "@/types/learning-path";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 
+export interface LessonListParams {
+    page?: number;
+    size?: number;
+    publishedOnly?: boolean;
+}
+
 export const lessonService = {
-    listByTopic: (topicId: number, publishedOnly = false) =>
-        getPage<Lesson>(`/api/v1/lessons/topics/${topicId}`, {
-            params: {publishedOnly},
-        }),
+    listByTopic: (topicId: number, params?: LessonListParams) =>
+        getPage<Lesson>(`/api/v1/lessons/topics/${topicId}`, {params}),
 
     getById: (lessonId: number) =>
         get<Lesson>(`/api/v1/lessons/${lessonId}`),
@@ -18,17 +22,11 @@ export const lessonService = {
         post<Lesson>(`/api/v1/lessons/topics/${topicId}`, data),
 
     update: (lessonId: number, data: LessonRequestDTO) =>
-        put<LessonRequestDTO>(`/api/v1/lessons/${lessonId}`, data),
-
-    getPublicById: (lessonId: number) =>
-        get<Lesson>(`/api/v1/lessons/public/${lessonId}`),
-
-    getPublicBySlug: (slug: string) =>
-        get<Lesson>(`/api/v1/lessons/public/slug/${slug}`),
+        put<Lesson>(`/api/v1/lessons/${lessonId}`, data),
 
     delete: (lessonId: number) =>
         del<void>(`/api/v1/lessons/${lessonId}`),
 
     togglePublish: (lessonId: number) =>
-        patch<void>(`/api/v1/lessons/${lessonId}/publish`),
+        patch<Lesson>(`/api/v1/lessons/${lessonId}/publish`),
 };

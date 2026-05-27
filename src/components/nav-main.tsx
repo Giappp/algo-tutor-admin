@@ -24,7 +24,6 @@ type NavItem = {
     title: string
     url: string
     icon: React.ReactNode
-    isActive?: boolean
     items?: {
         title: string
         url: string
@@ -36,36 +35,41 @@ type NavGroup = {
     items: NavItem[]
 }
 
-export function NavMain({
-    groups,
-    defaultLabel = "Platform",
-}: {
-    groups?: NavGroup[]
-    defaultLabel?: string
-}) {
+export function NavMain({groups}: { groups: NavGroup[] }) {
     const pathname = usePathname()
 
-    const resolvedGroups: NavGroup[] = groups ?? [
-        {
-            label: defaultLabel,
-            items: [],
-        },
-    ]
+    function isItemActive(item: NavItem) {
+        // Exact match for the item itself
+        if (pathname === item.url) return true
+        // If item has sub-items, check if any sub-item is active
+        if (item.items?.length) {
+            return item.items.some(
+                (sub) => pathname === sub.url || pathname.startsWith(sub.url + "/")
+            )
+        }
+        // For items without sub-items, match prefix but not for root "/dashboard"
+        if (item.url === "/dashboard") {
+            return pathname === "/dashboard"
+        }
+        return pathname.startsWith(item.url + "/")
+    }
 
-    function isItemActive(url: string) {
+    function isSubItemActive(url: string) {
         return pathname === url || pathname.startsWith(url + "/")
     }
 
     return (
         <>
-            {resolvedGroups.map((group) => (
-                <SidebarGroup key={group.label}>
-                    <SidebarGroupLabel className="px-2 text-[11px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+            {groups.map((group) => (
+                <SidebarGroup key={group.label} className="py-1">
+                    <SidebarGroupLabel className="px-3 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold mb-0.5">
                         {group.label}
                     </SidebarGroupLabel>
-                    <SidebarMenu>
+                    <SidebarMenu className="gap-0.5">
                         {group.items.map((item) => {
-                            const active = isItemActive(item.url)
+                            const active = isItemActive(item)
+                            const hasSubItems = !!item.items?.length
+
                             return (
                                 <Collapsible
                                     key={item.title}
@@ -76,11 +80,12 @@ export function NavMain({
                                         tooltip={item.title}
                                         data-active={active ? "true" : undefined}
                                         render={<Link href={item.url}/>}
+                                        className="h-8 text-[13px]"
                                     >
                                         {item.icon}
                                         <span>{item.title}</span>
                                     </SidebarMenuButton>
-                                    {item.items?.length ? (
+                                    {hasSubItems ? (
                                         <>
                                             <SidebarMenuAction
                                                 render={<CollapsibleTrigger/>}
@@ -91,13 +96,14 @@ export function NavMain({
                                             </SidebarMenuAction>
                                             <CollapsibleContent>
                                                 <SidebarMenuSub>
-                                                    {item.items.map((subItem) => {
-                                                        const subActive = isItemActive(subItem.url)
+                                                    {item.items!.map((subItem) => {
+                                                        const subActive = isSubItemActive(subItem.url)
                                                         return (
                                                             <SidebarMenuSubItem key={subItem.title}>
                                                                 <SidebarMenuSubButton
                                                                     data-active={subActive ? "true" : undefined}
                                                                     render={<Link href={subItem.url}/>}
+                                                                    className="text-[12px] h-7"
                                                                 >
                                                                     <span>{subItem.title}</span>
                                                                 </SidebarMenuSubButton>

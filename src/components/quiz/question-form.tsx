@@ -2,35 +2,23 @@
 
 import {useFieldArray, useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Plus, Trash2} from "lucide-react";
+import {Check, Plus, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
-import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateQuestionSchema, QuestionRequestDTO,} from "@/types/learning-path/schema";
+import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
+import {CreateQuestionSchema, QuestionRequestDTO} from "@/types/learning-path/schema";
 import {QuestionType} from "@/types/learning-path";
+import {cn} from "@/lib/utils";
 
 interface QuestionFormProps {
     defaultValues?: QuestionRequestDTO;
     onSubmit: (data: QuestionRequestDTO) => Promise<void>;
-    isPending?: boolean;
-    submitLabel?: string;
-    onCancel?: () => void;
 }
-
-const QUESTION_TYPE_OPTIONS: { value: QuestionType; label: string }[] = [
-    {value: "SINGLE_CHOICE", label: "Single Choice"},
-    {value: "MULTIPLE_CHOICE", label: "Multiple Choice"},
-    {value: "TRUE_FALSE", label: "True / False"},
-];
 
 export function QuestionForm({
                                  defaultValues,
                                  onSubmit,
-                                 isPending,
-                                 submitLabel = "Save Question",
-                                 onCancel,
                              }: QuestionFormProps) {
     const {
         register,
@@ -61,201 +49,207 @@ export function QuestionForm({
     const watchedType = useWatch({
         name: "type",
         control,
-    })
+    });
 
     const watchedChoices = useWatch({
         name: "choices",
         control,
-    })
-
-    const isTrueFalse = watchedType === "TRUE_FALSE";
+    });
 
     const handleCorrectChange = (index: number) => {
         const updated = watchedChoices.map((c, i) => ({
             ...c,
-            isCorrect: watchedType === "MULTIPLE_CHOICE" ? c.isCorrect : i === index,
+            isCorrect: watchedType === "MULTIPLE_CHOICE" ? (i === index ? !c.isCorrect : c.isCorrect) : i === index,
         }));
         setValue("choices", updated, {shouldValidate: true});
     };
 
     const handleTypeChange = (newType: QuestionType) => {
-        if (newType === "TRUE_FALSE") {
-            setValue("choices", [
-                {text: "True", isCorrect: true},
-                {text: "False", isCorrect: false},
-            ], {shouldValidate: true});
-        } else {
-            setValue("choices", [
-                {text: "", isCorrect: false},
-                {text: "", isCorrect: false},
-            ], {shouldValidate: true});
-        }
+        const updated = watchedChoices.map((c) => ({
+            ...c,
+            isCorrect: false,
+        }));
+        setValue("choices", updated);
         setValue("type", newType, {shouldValidate: true});
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+        <form id="question-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             <FieldGroup className="gap-5">
-                <Field>
-                    <FieldLabel htmlFor="question">Question Text</FieldLabel>
-                    <FieldContent>
-                        <Textarea
-                            id="question"
-                            placeholder="Enter your question..."
-                            className="min-h-20"
-                            aria-invalid={!!errors.question}
-                            disabled={isPending}
-                            {...register("question")}
-                        />
-                        {errors.question && (
-                            <FieldError>{errors.question.message}</FieldError>
-                        )}
-                    </FieldContent>
-                </Field>
-
+                {/* Row 1: Question Text & Explanation Side-by-Side (Compact grid) */}
                 <div className="grid gap-4 sm:grid-cols-2">
                     <Field>
-                        <FieldLabel htmlFor="type">Question Type</FieldLabel>
+                        <FieldLabel htmlFor="question" className="text-sm font-semibold">Question Text</FieldLabel>
                         <FieldContent>
-                            <Select
-                                value={watchedType}
-                                onValueChange={(v) => handleTypeChange(v as QuestionType)}
-                                disabled={isPending}
-                            >
-                                <SelectTrigger aria-label="Select type">
-                                    <SelectValue/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {QUESTION_TYPE_OPTIONS.map((opt) => (
-                                        <SelectItem key={opt.value} value={opt.value}>
-                                            {opt.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Textarea
+                                id="question"
+                                placeholder="Enter your question details..."
+                                className="min-h-[110px] text-sm resize-none rounded-lg"
+                                aria-invalid={!!errors.question}
+                                {...register("question")}
+                            />
+                            {errors.question && (
+                                <FieldError className="text-sm">{errors.question.message}</FieldError>
+                            )}
                         </FieldContent>
                     </Field>
 
                     <Field>
-                        <FieldLabel htmlFor="points">Points</FieldLabel>
+                        <FieldLabel htmlFor="explanation" className="text-sm font-semibold flex items-center justify-between">
+                            <span>Explanation</span>
+                            <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+                        </FieldLabel>
+                        <FieldContent>
+                            <Textarea
+                                id="explanation"
+                                placeholder="Explain why the correct answer is correct..."
+                                className="min-h-[110px] text-sm resize-none rounded-lg"
+                                {...register("explanation")}
+                            />
+                            <FieldDescription className="text-sm text-muted-foreground mt-1">
+                                Shown after answering.
+                            </FieldDescription>
+                        </FieldContent>
+                    </Field>
+                </div>
+
+                {/* Row 2: Question Type (Segmented control, NOT overly rounded Select) & Points */}
+                <div className="grid gap-4 sm:grid-cols-3 items-end">
+                    <div className="sm:col-span-2 flex flex-col gap-2">
+                        <span className="text-sm font-semibold text-foreground">Question Type</span>
+                        <div className="flex bg-muted/50 p-1 rounded-lg border border-border/80 gap-1">
+                            <button
+                                type="button"
+                                onClick={() => handleTypeChange("SINGLE_CHOICE")}
+                                className={cn(
+                                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-all duration-150",
+                                    watchedType === "SINGLE_CHOICE"
+                                        ? "bg-background text-foreground shadow-sm font-semibold border border-border/40"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                                )}
+                            >
+                                Single Choice
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleTypeChange("MULTIPLE_CHOICE")}
+                                className={cn(
+                                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-all duration-150",
+                                    watchedType === "MULTIPLE_CHOICE"
+                                        ? "bg-background text-foreground shadow-sm font-semibold border border-border/40"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                                )}
+                            >
+                                Multiple Choice
+                            </button>
+                        </div>
+                    </div>
+
+                    <Field>
+                        <FieldLabel htmlFor="points" className="text-sm font-semibold">Points</FieldLabel>
                         <FieldContent>
                             <Input
                                 id="points"
                                 type="number"
                                 min={1}
+                                className="text-sm h-10 rounded-lg"
                                 aria-invalid={!!errors.points}
-                                disabled={isPending}
                                 {...register("points", {valueAsNumber: true})}
                             />
                             {errors.points && (
-                                <FieldError>{errors.points.message}</FieldError>
+                                <FieldError className="text-sm">{errors.points.message}</FieldError>
                             )}
                         </FieldContent>
                     </Field>
                 </div>
 
+                {/* Section 3: Answer Choices (Compact side-by-side horizontal cards) */}
                 <Field>
-                    <FieldLabel htmlFor="explanation">Explanation</FieldLabel>
-                    <FieldContent>
-                        <Textarea
-                            id="explanation"
-                            placeholder="Explain why the correct answer is correct..."
-                            className="min-h-16"
-                            disabled={isPending}
-                            {...register("explanation")}
-                        />
-                        <FieldDescription>
-                            Shown to learners after answering.
-                        </FieldDescription>
-                    </FieldContent>
-                </Field>
-
-                <Field>
-                    <FieldLabel>Answer Choices</FieldLabel>
+                    <FieldLabel className="text-sm font-semibold flex items-center justify-between border-t pt-4">
+                        <span>Answer Choices</span>
+                        <span className="text-sm text-muted-foreground font-normal">
+                            {watchedType === "MULTIPLE_CHOICE" ? "Check all correct answers" : "Select the single correct answer"}
+                        </span>
+                    </FieldLabel>
                     <FieldContent className="gap-3">
-                        {fields.map((field, index) => (
-                            <div
-                                key={field.id}
-                                className="flex items-start gap-3 rounded-xl border border-border/50 bg-muted/20 p-3"
-                            >
-                                <div className="flex flex-col gap-2 flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type={watchedType === "MULTIPLE_CHOICE" ? "checkbox" : "radio"}
-                                            checked={watchedChoices[index]?.isCorrect ?? false}
-                                            onChange={() =>
-                                                handleCorrectChange(index)
-                                            }
-                                            className="size-4 rounded"
-                                            disabled={isPending}
-                                        />
-                                        <Input
-                                            placeholder={`Choice ${index + 1}`}
-                                            disabled={isPending}
-                                            {...register(`choices.${index}.text` as const)}
-                                        />
-                                        {!isTrueFalse && fields.length > 2 && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon-xs"
-                                                onClick={() => remove(index)}
-                                                disabled={isPending}
-                                            >
-                                                <Trash2 data-icon="inline-start"/>
-                                            </Button>
-                                        )}
-                                    </div>
-                                    {errors.choices?.[index]?.text && (
-                                        <FieldError>
-                                            {errors.choices[index]?.text?.message}
-                                        </FieldError>
+                        {fields.map((field, index) => {
+                            const isSelected = watchedChoices?.[index]?.isCorrect ?? false;
+                            return (
+                                <div
+                                    key={field.id}
+                                    className={cn(
+                                        "flex items-center gap-3 rounded-lg border p-3 transition-all duration-150",
+                                        isSelected
+                                            ? "bg-emerald-500/5 border-emerald-500/35 shadow-sm"
+                                            : "bg-card border-border hover:bg-muted/10 hover:border-muted-foreground/15"
                                     )}
-                                    {!isTrueFalse && (
-                                        <Input
-                                            placeholder="Explanation (optional)"
-                                            disabled={isPending}
-                                            {...register(`choices.${index}.explanation` as const)}
-                                            className="text-xs"
-                                        />
+                                >
+                                    {/* Selection button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCorrectChange(index)}
+                                        className={cn(
+                                            "shrink-0 size-5.5 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring/50",
+                                            isSelected
+                                                ? "bg-emerald-500 border-emerald-500 text-white"
+                                                : "border-muted-foreground/30 hover:border-muted-foreground/50 bg-background"
+                                        )}
+                                    >
+                                        {isSelected && <Check className="size-3.5 stroke-[3.5]"/>}
+                                    </button>
+
+                                    {/* Text inputs side-by-side for ultra-compact vertical size */}
+                                    <div className="flex-1 flex gap-3 items-center min-w-0">
+                                        <div className="flex-1 min-w-0">
+                                            <Input
+                                                placeholder={`Choice ${index + 1}`}
+                                                className="text-sm h-9 rounded-lg"
+                                                {...register(`choices.${index}.text` as const)}
+                                            />
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <Input
+                                                placeholder="Choice explanation (optional)"
+                                                className="text-sm h-9 rounded-lg bg-muted/20 border-dashed"
+                                                {...register(`choices.${index}.explanation` as const)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Delete Button */}
+                                    {fields.length > 2 && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon-xs"
+                                            onClick={() => remove(index)}
+                                            className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all"
+                                        >
+                                            <Trash2 className="size-4"/>
+                                        </Button>
                                     )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
 
                         {errors.choices?.root && (
-                            <FieldError>{errors.choices.root.message}</FieldError>
+                            <FieldError className="text-sm">{errors.choices.root.message}</FieldError>
                         )}
 
-                        {!isTrueFalse && (
-                            <Button
-                                nativeButton={true}
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    append({text: "", isCorrect: false})
-                                }
-                                disabled={isPending}
-                            >
-                                <Plus data-icon="inline-start"/>
-                                Add Choice
-                            </Button>
-                        )}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => append({text: "", isCorrect: false})}
+                            className="w-full py-4 border-dashed border-2 hover:border-amber-500 hover:text-amber-600 transition-all gap-1.5 text-sm font-semibold rounded-lg"
+                        >
+                            <Plus className="size-4"/>
+                            Add Answer Choice
+                        </Button>
                     </FieldContent>
                 </Field>
             </FieldGroup>
-
-            <div className="flex justify-end gap-3 pt-2">
-                {onCancel && (
-                    <Button type="button" variant="outline" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                )}
-                <Button type="submit" disabled={isPending}>
-                    {isPending ? "Saving..." : submitLabel}
-                </Button>
-            </div>
         </form>
     );
 }

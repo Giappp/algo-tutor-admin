@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { getBreadcrumbs } from "@/lib/breadcrumbs"
 import { PanelLeftIcon } from "lucide-react"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 
 export function SiteHeader() {
     const { toggleSidebar } = useSidebar()
@@ -59,7 +60,8 @@ export function SiteHeader() {
                         ))}
                     </BreadcrumbList>
                 </Breadcrumb>
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-3">
+                    <LocaleSwitcher />
                     <SearchForm className="w-full sm:w-auto" />
                 </div>
             </div>

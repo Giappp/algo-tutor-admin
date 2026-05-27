@@ -23,19 +23,15 @@ function toCreateQuestion(q: QuizQuestion): QuestionRequestDTO {
 }
 
 function QuestionDialog({open, onOpenChange, question, onSubmit, isPending}: QuestionDialogProps) {
-    const handleOpenChange = (open: boolean) => {
-        onOpenChange(open);
-    };
-
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+                <DialogHeader className="border-b pb-4 mb-4">
+                    <DialogTitle className="text-lg font-bold">
                         {question ? "Edit Question" : "Add Question"}
                     </DialogTitle>
-                    <DialogDescription>
-                        Create a question with multiple choice answers.
+                    <DialogDescription className="text-sm text-muted-foreground mt-1">
+                        Create a question with single or multiple choice answers.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -44,16 +40,14 @@ function QuestionDialog({open, onOpenChange, question, onSubmit, isPending}: Que
                         key={question?.id ?? "new"}
                         defaultValues={question ? toCreateQuestion(question) : undefined}
                         onSubmit={onSubmit}
-                        isPending={isPending}
-                        onCancel={() => onOpenChange(false)}
                     />
                 )}
 
-                <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                <DialogFooter className="border-t pt-4 mt-6 flex justify-end gap-3">
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending} className="text-sm h-10 px-5">
                         Cancel
                     </Button>
-                    <Button type="submit" disabled={isPending}>
+                    <Button type="submit" form="question-form" disabled={isPending} className="text-sm h-10 px-5 bg-amber-500 hover:bg-amber-600 text-white shadow-sm">
                         {isPending ? "Saving..." : question ? "Save Changes" : "Add Question"}
                     </Button>
                 </DialogFooter>

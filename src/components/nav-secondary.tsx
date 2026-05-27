@@ -25,19 +25,21 @@ export function NavSecondary({
     const pathname = usePathname()
 
     function isActive(url: string) {
+        if (url === "/dashboard") return pathname === "/dashboard"
         return pathname === url || pathname.startsWith(url + "/")
     }
 
     return (
-        <SidebarGroup {...props}>
+        <SidebarGroup {...props} className={`py-1 ${props.className ?? ""}`}>
             <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="gap-0.5">
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 size="sm"
                                 data-active={isActive(item.url) ? "true" : undefined}
                                 render={<Link href={item.url}/>}
+                                className="h-8 text-[13px]"
                             >
                                 {item.icon}
                                 <span>{item.title}</span>

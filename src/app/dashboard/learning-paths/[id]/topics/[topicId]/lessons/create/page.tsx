@@ -3,76 +3,46 @@
 import {useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import Link from "next/link";
-import {
-    ArrowLeftIcon,
-    BookOpenIcon,
-    CheckCircle2,
-    ChevronRightIcon,
-    CodeIcon,
-    FileQuestionIcon,
-    GraduationCapIcon,
-    PenLineIcon,
-    TerminalIcon,
-} from "lucide-react";
+import {ArrowLeftIcon, BookOpenIcon, CodeIcon, FileQuestionIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent} from "@/components/ui/card";
 import {TheoryForm} from "@/components/learning-path/theory-form";
 import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
 import {useCreateLesson} from "@/hooks/use-lessons";
-import {CreateLessonRequest, LessonType} from "@/types/learning-path";
-import {CodingLessonDTO, QuizLessonDTO, TheoryLessonDTO} from "@/types/learning-path/schema";
+import {useUnsavedChanges} from "@/hooks/use-unsaved-changes";
+import {LessonType} from "@/types/learning-path";
+import {CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO} from "@/types/learning-path/schema";
 import {QuizForm} from "@/components/quiz/quiz-form";
-
-type CreationPhase = "type-selection" | "form-creation";
 
 const LESSON_TYPES = [
     {
         type: "THEORY" as const,
         label: "Theory",
-        description: "Text-based lessons with rich content",
+        description: "Rich text content with templates",
         icon: BookOpenIcon,
-        color: "blue",
-        bgColor: "bg-blue-500/10",
-        borderColor: "border-blue-500/30",
-        iconColor: "text-blue-500",
-        hoverBg: "hover:bg-blue-500/10",
-        features: [
-            {icon: PenLineIcon, text: "Rich text editor with live preview"},
-            {icon: CheckCircle2, text: "Structured content with headings & lists"},
-            {icon: CheckCircle2, text: "Markdown & LaTeX support"},
-        ],
+        iconClass: "text-blue-600 dark:text-blue-400",
+        bgClass: "bg-blue-500/10",
+        borderClass: "border-blue-500/30",
+        activeClass: "ring-2 ring-blue-500/50 border-blue-500/50 bg-blue-500/5",
     },
     {
         type: "QUIZ" as const,
         label: "Quiz",
-        description: "Knowledge checks with multiple choice questions",
-        icon: GraduationCapIcon,
-        color: "amber",
-        bgColor: "bg-amber-500/10",
-        borderColor: "border-amber-500/30",
-        iconColor: "text-amber-500",
-        hoverBg: "hover:bg-amber-500/10",
-        features: [
-            {icon: FileQuestionIcon, text: "Single, multiple choice & true/false"},
-            {icon: CheckCircle2, text: "Configurable passing score & time limit"},
-            {icon: CheckCircle2, text: "Add questions after creation"},
-        ],
+        description: "Multiple choice questions",
+        icon: FileQuestionIcon,
+        iconClass: "text-amber-600 dark:text-amber-400",
+        bgClass: "bg-amber-500/10",
+        borderClass: "border-amber-500/30",
+        activeClass: "ring-2 ring-amber-500/50 border-amber-500/50 bg-amber-500/5",
     },
     {
         type: "CODING" as const,
         label: "Coding",
-        description: "Programming challenges with test cases and solutions",
+        description: "Problem with test cases & starter code",
         icon: CodeIcon,
-        color: "emerald",
-        bgColor: "bg-emerald-500/10",
-        borderColor: "border-emerald-500/30",
-        iconColor: "text-emerald-500",
-        hoverBg: "hover:bg-emerald-500/10",
-        features: [
-            {icon: TerminalIcon, text: "Test cases with verification"},
-            {icon: CheckCircle2, text: "Author solution with Monaco editor"},
-            {icon: CheckCircle2, text: "Starter code for Java, C++, Python"},
-        ],
+        iconClass: "text-emerald-600 dark:text-emerald-400",
+        bgClass: "bg-emerald-500/10",
+        borderClass: "border-emerald-500/30",
+        activeClass: "ring-2 ring-emerald-500/50 border-emerald-500/50 bg-emerald-500/5",
     },
 ];
 
@@ -83,190 +53,106 @@ export default function CreateLessonPage() {
     const topicId = Number(params.topicId);
 
     const createLessonMutation = useCreateLesson(topicId);
-
-    const [phase, setPhase] = useState<CreationPhase>("type-selection");
     const [selectedType, setSelectedType] = useState<LessonType | null>(null);
+    const [hasStartedEditing, setHasStartedEditing] = useState(false);
 
-    const handleTypeSelect = (type: LessonType) => {
-        setSelectedType(type);
-        setPhase("form-creation");
-    };
-
-    const handleBackToSelection = () => {
-        setPhase("type-selection");
-        setSelectedType(null);
-    };
+    // Warn user before leaving with unsaved form data
+    useUnsavedChanges(hasStartedEditing && !createLessonMutation.isPending);
 
     const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
-        const result = await createLessonMutation.mutateAsync(data as CreateLessonRequest);
-        router.push(
-            `/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`
-        );
+        const result = await createLessonMutation.mutateAsync(data as LessonRequestDTO);
+        router.push(`/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`);
     };
 
-    // Phase 1: Type Selection
-    if (phase === "type-selection") {
-        return (
-            <div className="flex flex-col gap-6">
-                {/* Header */}
-                <div
-                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
-                    <div
-                        className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]"/>
-                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-4">
-                            <Button
-                                nativeButton={true}
-                                variant="ghost"
-                                size="icon-sm"
-                                className="shrink-0"
-                                render={<Link href={`/dashboard/learning-paths/${learningPathId}`}/>}
-                            >
-                                <ArrowLeftIcon data-icon="inline-start"/>
-                            </Button>
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                                    Create Lesson
-                                </h1>
-                                <p className="text-muted-foreground">
-                                    Choose the type of lesson you want to create.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Type Selection Cards */}
-                <div className="grid gap-4 sm:grid-cols-3">
-                    {LESSON_TYPES.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={item.type}
-                                type="button"
-                                onClick={() => handleTypeSelect(item.type)}
-                                className={`
-                                    group relative flex flex-col rounded-2xl border-2 
-                                    ${item.borderColor} ${item.bgColor} ${item.hoverBg}
-                                    p-6 text-left transition-all duration-200
-                                    hover:scale-[1.02] hover:shadow-lg
-                                    active:scale-[0.98]
-                                `}
-                            >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className={`
-                                        flex items-center justify-center size-12 rounded-xl
-                                        bg-background/80 shadow-sm
-                                        transition-transform duration-200 group-hover:scale-110
-                                    `}>
-                                        <Icon className={`size-6 ${item.iconColor}`}/>
-                                    </div>
-                                    <ChevronRightIcon className={`
-                                        size-5 text-muted-foreground
-                                        opacity-0 transition-opacity duration-200
-                                        group-hover:opacity-100
-                                    `}/>
-                                </div>
-
-                                <div className="mb-4">
-                                    <span className="text-lg font-bold text-foreground mb-1">
-                                        {item.label}
-                                    </span>
-                                    <p className="text-sm text-muted-foreground">
-                                        {item.description}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2 mt-auto">
-                                    {item.features.map((feature, idx) => {
-                                        const FeatureIcon = feature.icon;
-                                        return (
-                                            <div key={idx}
-                                                 className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <FeatureIcon className={`size-3.5 ${item.iconColor} shrink-0`}/>
-                                                <span>{feature.text}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </button>
-                        );
-                    })}
+    return (
+        <div className="flex flex-col gap-6 p-6">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+                <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    nativeButton={false}
+                    render={<Link href={`/dashboard/learning-paths/${learningPathId}`}/>}
+                >
+                    <ArrowLeftIcon className="size-4"/>
+                </Button>
+                <div>
+                    <h1 className="text-xl font-bold tracking-tight">Create Lesson</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Choose a type and fill in the content
+                    </p>
                 </div>
             </div>
-        );
-    }
 
-    // Phase 2: Form Creation
-    const selectedItem = LESSON_TYPES.find((t) => t.type === selectedType);
-    if (!selectedItem) {
-        setPhase("type-selection");
-        return null;
-    }
-    const SelectedIcon = selectedItem!.icon;
-
-    return (
-        <div className="flex flex-col gap-6">
-            {/* Header */}
-            <div
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-6 sm:p-8">
-                <div
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.15),transparent_50%)]"/>
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="shrink-0"
-                            onClick={handleBackToSelection}
+            {/* Type Selector — always visible as tabs */}
+            <div className="flex items-center gap-2 flex-wrap">
+                {LESSON_TYPES.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = selectedType === item.type;
+                    return (
+                        <button
+                            key={item.type}
+                            type="button"
+                            onClick={() => {
+                                setSelectedType(item.type);
+                                setHasStartedEditing(true);
+                            }}
+                            className={`
+                                flex items-center gap-2.5 rounded-lg border px-4 py-3 text-left transition-all
+                                ${isActive
+                                ? item.activeClass
+                                : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                            }
+                            `}
                         >
-                            <ArrowLeftIcon data-icon="inline-start"/>
-                        </Button>
-                        <div
-                            className={`flex items-center justify-center size-10 rounded-xl ${selectedItem!.bgColor} shadow-sm`}>
-                            <SelectedIcon className={`size-5 ${selectedItem!.iconColor}`}/>
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                                Create {selectedItem!.label} Lesson
-                            </h1>
-                            <p className="text-muted-foreground text-sm">
-                                {selectedItem!.type === "THEORY" && "Write and format your lesson content"}
-                                {selectedItem!.type === "QUIZ" && "Set up quiz settings, then add questions"}
-                                {selectedItem!.type === "CODING" && "Build your coding challenge step by step"}
-                            </p>
-                        </div>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={handleBackToSelection}>
-                        Change Type
-                    </Button>
-                </div>
+                            <div className={`flex items-center justify-center size-8 rounded-md ${item.bgClass}`}>
+                                <Icon className={`size-4 ${item.iconClass}`}/>
+                            </div>
+                            <div>
+                                <span className="text-sm font-semibold block">{item.label}</span>
+                                <span className="text-xs text-muted-foreground">{item.description}</span>
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Form */}
-            <Card>
-                <CardContent className="p-6">
-                    {selectedType === "CODING" ? (
-                        <CodingLessonForm
-                            onSubmit={handleSubmit}
-                            isPending={createLessonMutation.isPending}
-                            submitLabel="Create Lesson"
-                        />
-                    ) : selectedType === "THEORY" ? (
-                        <TheoryForm
-                            onSubmit={handleSubmit}
-                            isPending={createLessonMutation.isPending}
-                            submitLabel="Create Lesson"
-                        />
-                    ) : (
-                        <QuizForm
-                            onSubmit={handleSubmit}
-                            isPending={createLessonMutation.isPending}
-                            submitLabel="Create Lesson"
-                        />
-                    )}
-                </CardContent>
-            </Card>
+            {!selectedType && (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 gap-2">
+                    <p className="text-muted-foreground text-sm">Select a lesson type above to get started</p>
+                </div>
+            )}
+
+            {selectedType === "THEORY" && (
+                <div className="rounded-lg border bg-card p-6">
+                    <TheoryForm
+                        onSubmit={handleSubmit}
+                        isPending={createLessonMutation.isPending}
+                        submitLabel="Create Lesson"
+                    />
+                </div>
+            )}
+
+            {selectedType === "QUIZ" && (
+                <div className="rounded-lg border bg-card p-6">
+                    <QuizForm
+                        onSubmit={handleSubmit}
+                        isPending={createLessonMutation.isPending}
+                        submitLabel="Create Lesson"
+                    />
+                </div>
+            )}
+
+            {selectedType === "CODING" && (
+                <div className="rounded-lg border bg-card p-6">
+                    <CodingLessonForm
+                        onSubmit={handleSubmit}
+                        isPending={createLessonMutation.isPending}
+                        submitLabel="Create Lesson"
+                    />
+                </div>
+            )}
         </div>
     );
 }

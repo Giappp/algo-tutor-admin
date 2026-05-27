@@ -199,7 +199,7 @@ function QuestionCard({question: q, index, onEdit, onDelete}: QuestionCardProps)
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm">{choice.text}</p>
                                 {choice.explanation && choice.isCorrect && (
-                                    <p className="text-xs text-muted-foreground mt-1">{choice.explanation}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">{choice.explanation}</p>
                                 )}
                             </div>
                         </div>

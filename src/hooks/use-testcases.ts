@@ -2,8 +2,8 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {CreateTestCaseRequest, UpdateTestCaseRequest,} from "@/types/learning-path";
 import {testCaseService} from "@/api/services/testcase-services";
+import {CreateTestCaseRequest, UpdateTestCaseRequest} from "@/types/learning-path";
 
 export const QUERY_KEYS = {
     testCases: (lessonId: number) => ["test-cases", lessonId] as const,
@@ -13,9 +13,7 @@ export const QUERY_KEYS = {
 export function useTestCasesByLesson(lessonId: number) {
     return useQuery({
         queryKey: QUERY_KEYS.testCases(lessonId),
-        queryFn: async () => {
-            return await testCaseService.listByLesson(lessonId);
-        },
+        queryFn: () => testCaseService.listByLesson(lessonId),
         enabled: !!lessonId,
     });
 }
@@ -41,7 +39,7 @@ export function useUpdateTestCase(testCaseId: number) {
             testCaseService.update(testCaseId, data),
         onSuccess: () => {
             toast.success("Test case updated successfully");
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.testCase(testCaseId)});
+            queryClient.invalidateQueries({queryKey: ["test-cases"]});
         },
     });
 }
@@ -54,6 +52,32 @@ export function useDeleteTestCase() {
         onSuccess: () => {
             toast.success("Test case deleted successfully");
             queryClient.invalidateQueries({queryKey: ["test-cases"]});
+        },
+    });
+}
+
+export function useReorderTestCases(lessonId: number) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            fromId,
+            fromOrder,
+            toId,
+            toOrder,
+        }: {
+            fromId: number;
+            fromOrder: number;
+            toId: number;
+            toOrder: number;
+        }) => {
+            await Promise.all([
+                testCaseService.update(fromId, {sortOrder: toOrder}),
+                testCaseService.update(toId, {sortOrder: fromOrder}),
+            ]);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: QUERY_KEYS.testCases(lessonId)});
         },
     });
 }

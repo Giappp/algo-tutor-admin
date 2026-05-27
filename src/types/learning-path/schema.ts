@@ -43,11 +43,13 @@ export const LessonExampleSchema = z.object({
 });
 
 export const CreateTestCaseSchema = z.object({
-    stdin: z.string().min(1, "Standard input is required"),
-    expectedStdout: z.string().min(1, "Expected output is required"),
-    isHidden: z.boolean().optional(),
-    orderIndex: z.number().int().optional(),
-    explanation: z.string().optional(),
+    inputFileUrl: z.string().url("Input file URL must be a valid URL"),
+    outputFileUrl: z.string().url("Output file URL must be a valid URL"),
+    inputFileKey: z.string().min(1, "Input file key is required"),
+    outputFileKey: z.string().min(1, "Output file key is required"),
+    scoreWeight: z.number().min(0, "Score weight must be at least 0"),
+    isSample: z.boolean(),
+    sortOrder: z.number().int().min(1, "Sort order must be at least 1"),
 });
 
 
@@ -90,7 +92,7 @@ export type QuestionInput = {
 // ---------------------------------------------------------------------------
 const BaseLessonFields = {
     title: z.string().min(1, "Title is required"),
-    difficulty: DifficultySchema,
+    difficulty: DifficultySchema.optional(),
     displayOrder: z.number().int().optional(),
 };
 
@@ -115,7 +117,6 @@ const CodingLessonFields = {
     constraints: z.array(z.string()).max(10).optional(),
     hints: z.array(z.string()).max(10).optional(),
     examples: z.array(LessonExampleSchema).max(5).optional(),
-    testCases: z.array(CreateTestCaseSchema).optional(),
 };
 
 export const CreateTheoryLessonSchema = z.object({
@@ -130,10 +131,38 @@ export const CreateQuizLessonSchema = z.object({
     ...QuizLessonFields,
 });
 
+/**
+ * Schema for editing quiz lesson content (relaxed question validation for existing data).
+ * Used in the edit page where questions may have extra API fields.
+ */
+export const EditQuizContentSchema = z.object({
+    type: z.literal("QUIZ"),
+    ...BaseLessonFields,
+    passingScore: z.number().int().min(0).max(100).optional(),
+    timeLimitMinutes: z.number().int().optional(),
+    questions: z.any().optional(),
+});
+
 export const CreateCodingLessonSchema = z.object({
     type: z.literal("CODING"),
     ...BaseLessonFields,
     ...CodingLessonFields,
+});
+
+/**
+ * Schema for editing coding lesson content only (without test case validation).
+ * Used in the edit page where test cases are managed in a separate tab.
+ */
+export const EditCodingContentSchema = z.object({
+    type: z.literal("CODING"),
+    ...BaseLessonFields,
+    statement: z.string().min(1, "Statement is required"),
+    baseTimeLimitMs: z.number().int().min(1).max(300000).optional(),
+    baseMemoryLimitMb: z.number().int().min(1).max(1024).optional(),
+    starterCode: z.record(z.string(), z.string()).optional(),
+    constraints: z.array(z.string()).max(10).optional(),
+    hints: z.array(z.string()).max(10).optional(),
+    examples: z.array(LessonExampleSchema).max(5).optional(),
 });
 
 export const CreateLessonSchema = z.discriminatedUnion("type", [

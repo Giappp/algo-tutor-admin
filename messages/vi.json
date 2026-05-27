@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "AlgoTutor",
+    "adminPanel": "Bảng quản trị",
+    "search": "Tìm kiếm...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "create": "Tạo mới",
+    "back": "Quay lại",
+    "loading": "Đang tải...",
+    "noResults": "Không tìm thấy kết quả",
+    "confirm": "Xác nhận",
+    "actions": "Hành động"
+  },
+  "sidebar": {
+    "overview": "Tổng quan",
+    "dashboard": "Bảng điều khiển",
+    "analytics": "Phân tích",
+    "curriculum": "Chương trình học",
+    "learningPaths": "Lộ trình học",
+    "allPaths": "Tất cả lộ trình",
+    "createNew": "Tạo mới",
+    "aiLab": "Phòng thí nghiệm AI",
+    "aiModels": "Mô hình AI",
+    "administration": "Quản trị",
+    "users": "Người dùng",
+    "settings": "Cài đặt"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "welcome": "Chào mừng trở lại. Đây là tổng quan về nền tảng của bạn.",
+    "totalProblems": "Tổng số bài",
+    "published": "Đã xuất bản",
+    "drafts": "Bản nháp",
+    "archived": "Đã lưu trữ",
+    "ofTotal": "{percentage}% tổng số",
+    "fromLastWeek": "+{count} từ tuần trước",
+    "thisMonth": "+{percentage}% tháng này",
+    "weeklyActivity": "Hoạt động tuần",
+    "weeklyActivityDesc": "Bài tập và người dùng thêm mỗi ngày",
+    "difficultyDistribution": "Phân bố độ khó",
+    "difficultyDistributionDesc": "Bài tập theo mức độ khó",
+    "publishingTrend": "Xu hướng xuất bản",
+    "publishingTrendDesc": "Đã xuất bản so với bản nháp trong 6 tháng",
+    "recentActivity": "Hoạt động gần đây"
+  },
+  "login": {
+    "welcomeBack": "Chào mừng trở lại",
+    "subtitle": "Nhập thông tin đăng nhập để truy cập bảng quản trị",
+    "username": "Tên đăng nhập",
+    "usernamePlaceholder": "Nhập tên đăng nhập",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "signIn": "Đăng nhập",
+    "authenticating": "Đang xác thực...",
+    "secureAccess": "Chỉ dành cho quản trị viên",
+    "termsNotice": "Bằng việc đăng nhập, bạn đồng ý với <terms>Điều khoản dịch vụ</terms> và <privacy>Chính sách bảo mật</privacy> của nền tảng",
+    "encryptedConnection": "Kết nối mã hóa",
+    "socCompliant": "Tuân thủ SOC 2"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "languageDescription": "Chọn ngôn ngữ ưa thích của bạn",
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  }
+}

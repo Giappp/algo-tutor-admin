@@ -1,56 +1,42 @@
+"use client";
+
 import Link from "next/link";
-import {BookOpen, Code2, FileQuestion, Pencil, Rocket, Trash2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {BookOpen, Code2, FileQuestion, GlobeIcon, Pencil, Rocket, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
+import {Badge} from "@/components/ui/badge";
 import {Difficulty, Lesson, LessonType} from "@/types/learning-path";
 
-const LESSON_TYPE_ICONS: Record<LessonType, React.ElementType> = {
-    THEORY: BookOpen,
-    QUIZ: FileQuestion,
-    CODING: Code2,
-};
-
-const LESSON_TYPE_COLORS: Record<LessonType, { bg: string; text: string; border: string; label: string; hue: number }> = {
+const LESSON_TYPE_CONFIG: Record<LessonType, { icon: React.ElementType; label: string; className: string }> = {
     THEORY: {
-        bg: "bg-blue-500/10",
-        text: "text-blue-600 dark:text-blue-400",
-        border: "border-blue-500/25",
+        icon: BookOpen,
         label: "Theory",
-        hue: 265,
+        className: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
     },
     QUIZ: {
-        bg: "bg-amber-500/10",
-        text: "text-amber-600 dark:text-amber-400",
-        border: "border-amber-500/25",
+        icon: FileQuestion,
         label: "Quiz",
-        hue: 40,
+        className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
     },
     CODING: {
-        bg: "bg-emerald-500/10",
-        text: "text-emerald-600 dark:text-emerald-400",
-        border: "border-emerald-500/25",
+        icon: Code2,
         label: "Coding",
-        hue: 170,
+        className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     },
 };
 
-const DIFFICULTY_COLORS: Record<Difficulty, { bg: string; text: string; border: string; label: string }> = {
+const DIFFICULTY_CONFIG: Record<Difficulty, { label: string; className: string }> = {
     EASY: {
-        bg: "bg-emerald-500/10",
-        text: "text-emerald-600 dark:text-emerald-400",
-        border: "border-emerald-500/25",
         label: "Easy",
+        className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
     },
     MEDIUM: {
-        bg: "bg-amber-500/10",
-        text: "text-amber-600 dark:text-amber-400",
-        border: "border-amber-500/25",
         label: "Medium",
+        className: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
     },
     HARD: {
-        bg: "bg-red-500/10",
-        text: "text-red-600 dark:text-red-400",
-        border: "border-red-500/25",
         label: "Hard",
+        className: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
     },
 };
 
@@ -68,88 +54,87 @@ export function LessonListItem({
                                    pathId,
                                    onTogglePublish,
                                    onDelete,
-                                   isTogglePublishPending = false,
-                                   isDeletePending = false,
                                }: LessonListItemProps) {
-    const typeConfig = LESSON_TYPE_COLORS[lesson.type];
-    const TypeIcon = LESSON_TYPE_ICONS[lesson.type];
-    const difficultyConfig = lesson.difficulty ? DIFFICULTY_COLORS[lesson.difficulty] : null;
+    const router = useRouter();
+    const typeConfig = LESSON_TYPE_CONFIG[lesson.type];
+    const TypeIcon = typeConfig.icon;
+    const difficultyConfig = lesson.difficulty ? DIFFICULTY_CONFIG[lesson.difficulty] : null;
 
     return (
         <div
-            className="flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-muted/40 transition-all group gap-3"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg border hover:bg-muted/40 transition-colors cursor-pointer"
+            onClick={() => router.push(`/dashboard/learning-paths/${pathId}/lessons/${lesson.id}`)}
         >
-            <div className="flex items-center gap-2.5 flex-1 min-w-0 flex-wrap">
-                {/* Type icon — colored circle with icon */}
-                <div className={`shrink-0 flex items-center justify-center size-9 rounded-xl border ${typeConfig.bg} ${typeConfig.text} ${typeConfig.border} group-hover:scale-110 transition-transform duration-200`}>
-                    <TypeIcon className="size-4" />
-                </div>
-
-                {/* Type label */}
-                <span
-                    className={`hidden xs:inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold border ${typeConfig.bg} ${typeConfig.text} ${typeConfig.border}`}>
-                    {typeConfig.label}
-                </span>
-
-                {/* Title */}
-                <span className="font-semibold text-sm text-foreground truncate max-w-xs">
-                    {lesson.title}
-                </span>
-
-                {/* Difficulty badge */}
-                {difficultyConfig && (
-                    <span
-                        className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium border ${difficultyConfig.bg} ${difficultyConfig.text} ${difficultyConfig.border}`}>
-                        {difficultyConfig.label}
-                    </span>
-                )}
-
-                {/* Published status */}
-                {lesson.isPublished ? (
-                    <span
-                        className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
-                        <span className="size-1.5 rounded-full bg-current shrink-0 animate-published-pulse"/>
-                        Published
-                    </span>
-                ) : (
-                    <span
-                        className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground border border-transparent">
-                        Draft
-                    </span>
-                )}
+            {/* Type icon */}
+            <div className={`shrink-0 flex items-center justify-center size-8 rounded-lg border ${typeConfig.className}`}>
+                <TypeIcon className="size-4"/>
             </div>
 
-            {/* Action buttons — always visible */}
-            <div className="flex items-center gap-1 shrink-0">
+            {/* Title + metadata */}
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground truncate">
+                        {lesson.title}
+                    </span>
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                    {/* Type badge */}
+                    <span className={`text-[11px] font-medium rounded-md px-1.5 py-0.5 border ${typeConfig.className}`}>
+                        {typeConfig.label}
+                    </span>
+
+                    {/* Difficulty badge */}
+                    {difficultyConfig && (
+                        <span className={`text-[11px] font-medium rounded-md px-1.5 py-0.5 border ${difficultyConfig.className}`}>
+                            {difficultyConfig.label}
+                        </span>
+                    )}
+
+                    {/* Status */}
+                    {lesson.isPublished ? (
+                        <Badge className="bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 text-[10px] px-1.5 py-0">
+                            <GlobeIcon className="mr-0.5 size-2.5"/>
+                            Live
+                        </Badge>
+                    ) : (
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 text-muted-foreground">
+                            Draft
+                        </Badge>
+                    )}
+                </div>
+            </div>
+
+            {/* Actions — always visible */}
+            <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                 <Button
+                    variant="outline"
                     size="icon-sm"
-                    variant={"outline"}
                     onClick={() => onTogglePublish(lesson.id)}
-                    disabled={isTogglePublishPending}
-                    className="text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10 border-amber-500/25 hover:border-amber-500/40 transition-all"
+                    className={
+                        lesson.isPublished
+                            ? "text-emerald-600 border-emerald-500/30 hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/30 dark:text-emerald-400"
+                            : "text-muted-foreground border-border hover:text-emerald-600 hover:bg-emerald-500/10 hover:border-emerald-500/30"
+                    }
                     title={lesson.isPublished ? "Unpublish" : "Publish"}
                 >
                     <Rocket className="size-3.5"/>
                 </Button>
                 <Button
+                    variant="outline"
                     size="icon-sm"
-                    variant={"outline"}
                     nativeButton={false}
-                    render={
-                        <Link href={`/dashboard/learning-paths/${pathId}/lessons/${lesson.id}`}/>
-                    }
-                    className="text-chart-1 hover:text-chart-1/80 hover:bg-chart-1/10 border-chart-1/25 hover:border-chart-1/40 transition-all"
-                    title="Edit lesson"
+                    render={<Link href={`/dashboard/learning-paths/${pathId}/lessons/${lesson.id}`}/>}
+                    className="text-blue-600 border-blue-500/30 hover:bg-blue-500/10 hover:border-blue-500/40 dark:text-blue-400"
+                    title="Edit"
                 >
                     <Pencil className="size-3.5"/>
                 </Button>
                 <Button
+                    variant="outline"
                     size="icon-sm"
-                    variant={"outline"}
                     onClick={() => onDelete(lesson.id)}
-                    disabled={isDeletePending}
-                    className="text-red-400/60 hover:text-destructive hover:bg-destructive/10"
-                    title="Delete lesson"
+                    className="text-red-500 border-red-500/30 hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-600 dark:text-red-400"
+                    title="Delete"
                 >
                     <Trash2 className="size-3.5"/>
                 </Button>

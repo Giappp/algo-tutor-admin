@@ -4,13 +4,7 @@ import Link from "next/link";
 import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import {InlineEdit} from "@/components/ui/inline-edit";
 import {Difficulty, LessonType} from "@/types/learning-path";
 
 const LESSON_TYPE_CONFIG: Record<LessonType, {
@@ -56,6 +50,7 @@ interface LessonHeaderProps {
     };
     learningPathId: number;
     onTogglePublish: () => void;
+    onTitleChange?: (newTitle: string) => void;
     isEditPending?: boolean;
 }
 
@@ -63,6 +58,7 @@ export function LessonHeader({
                                  lesson,
                                  learningPathId,
                                  onTogglePublish,
+                                 onTitleChange,
                                  isEditPending = false,
                              }: LessonHeaderProps) {
     const config = LESSON_TYPE_CONFIG[lesson.type];
@@ -102,9 +98,19 @@ export function LessonHeader({
 
                         {/* Title & Meta */}
                         <div className="min-w-0">
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-md">
-                                {lesson.title}
-                            </h1>
+                            {/* Inline editable title */}
+                            {onTitleChange ? (
+                                <InlineEdit
+                                    value={lesson.title}
+                                    onSave={onTitleChange}
+                                    placeholder="Lesson title..."
+                                    disabled={isEditPending}
+                                />
+                            ) : (
+                                <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-md">
+                                    {lesson.title}
+                                </h1>
+                            )}
                             <div className="flex items-center gap-2 mt-2 flex-wrap">
                                 {/* Type badge */}
                                 <Badge variant="outline" className={config.badgeClass}>
@@ -157,31 +163,6 @@ export function LessonHeader({
                         <Rocket className="size-4 mr-1.5"/>
                         {lesson.isPublished ? "Unpublish" : "Publish"}
                     </Button>
-
-                    {/* More actions dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            {/* <Button variant="ghost" size="icon-sm">
-                                <MoreHorizontal className="size-4"/>
-                                <span className="sr-only">More options</span>
-                            </Button>*/}
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={onTogglePublish}>
-                                <Rocket className="size-4 mr-2"/>
-                                {lesson.isPublished ? "Unpublish" : "Publish"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                nativeButton={false}
-                                render={<Link href={`/lessons/${lesson.slug || lesson.id}`} target="_blank"/>}
-                                className="text-destructive focus:text-destructive"
-                            >
-                                <Eye className="size-4 mr-2"/>
-                                View Public Page
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
                 </div>
             </div>
         </div>

@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "AlgoTutor",
+    "adminPanel": "Admin Panel",
+    "search": "Search...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "actions": "Actions"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "curriculum": "Curriculum",
+    "learningPaths": "Learning Paths",
+    "allPaths": "All Paths",
+    "createNew": "Create New",
+    "aiLab": "AI Lab",
+    "aiModels": "AI Models",
+    "administration": "Administration",
+    "users": "Users",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back. Here's an overview of your platform.",
+    "totalProblems": "Total Problems",
+    "published": "Published",
+    "drafts": "Drafts",
+    "archived": "Archived",
+    "ofTotal": "{percentage}% of total",
+    "fromLastWeek": "+{count} from last week",
+    "thisMonth": "+{percentage}% this month",
+    "weeklyActivity": "Weekly Activity",
+    "weeklyActivityDesc": "Problems and users added per day",
+    "difficultyDistribution": "Difficulty Distribution",
+    "difficultyDistributionDesc": "Problems by difficulty level",
+    "publishingTrend": "Publishing Trend",
+    "publishingTrendDesc": "Published vs drafts over 6 months",
+    "recentActivity": "Recent Activity"
+  },
+  "login": {
+    "welcomeBack": "Welcome back",
+    "subtitle": "Enter your credentials to access the admin panel",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in to Dashboard",
+    "authenticating": "Authenticating...",
+    "secureAccess": "Secure admin access only",
+    "termsNotice": "By signing in, you agree to the platform's <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
+    "encryptedConnection": "Encrypted connection",
+    "socCompliant": "SOC 2 compliant"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageDescription": "Select your preferred language",
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  }
+}

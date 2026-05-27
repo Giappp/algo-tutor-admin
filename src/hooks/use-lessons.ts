@@ -2,27 +2,23 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
-import {lessonService} from "@/api/services/lesson-services";
+import {queryKeys} from "@/api/query-keys";
+import {lessonService, LessonListParams} from "@/api/services/lesson-services";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 
-export const QUERY_KEYS = {
-    lessons: (topicId: number, publishedOnly?: boolean) =>
-        ["lessons", topicId, publishedOnly] as const,
-    lesson: (id: number) => ["lesson", id] as const,
-    lessonBySlug: (slug: string) => ["lesson-slug", slug] as const,
-};
+// ─── Queries ─────────────────────────────────────────────────────────────────
 
-export function useLessonsByTopic(topicId: number, publishedOnly = false) {
+export function useLessonsByTopic(topicId: number, params?: LessonListParams) {
     return useQuery({
-        queryKey: QUERY_KEYS.lessons(topicId, publishedOnly),
-        queryFn: () => lessonService.listByTopic(topicId, publishedOnly),
+        queryKey: queryKeys.lessons.byTopic(topicId, params?.publishedOnly),
+        queryFn: () => lessonService.listByTopic(topicId, params),
         enabled: !!topicId,
     });
 }
 
 export function useLesson(id: number) {
     return useQuery({
-        queryKey: QUERY_KEYS.lesson(id),
+        queryKey: queryKeys.lessons.detail(id),
         queryFn: () => lessonService.getById(id),
         enabled: !!id,
     });
@@ -30,11 +26,13 @@ export function useLesson(id: number) {
 
 export function useLessonBySlug(slug: string) {
     return useQuery({
-        queryKey: QUERY_KEYS.lessonBySlug(slug),
+        queryKey: queryKeys.lessons.bySlug(slug),
         queryFn: () => lessonService.getBySlug(slug),
         enabled: !!slug,
     });
 }
+
+// ─── Mutations ───────────────────────────────────────────────────────────────
 
 export function useCreateLesson(topicId: number) {
     const queryClient = useQueryClient();
@@ -44,9 +42,8 @@ export function useCreateLesson(topicId: number) {
             lessonService.create(topicId, data),
         onSuccess: () => {
             toast.success("Lesson created successfully");
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lessons(topicId)});
-            // Also invalidate the parent learning path so the topic lesson count updates
-            queryClient.invalidateQueries({queryKey: ["learning-path", "topics"]});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.byTopic(topicId)});
+            queryClient.invalidateQueries({queryKey: queryKeys.topics.detail(topicId)});
         },
     });
 }
@@ -57,24 +54,25 @@ export function useUpdateLesson() {
     return useMutation({
         mutationFn: ({id, data}: { id: number; data: LessonRequestDTO }) =>
             lessonService.update(id, data),
-        onSuccess: (_, variables) => {
+        onSuccess: (_, {id}) => {
             toast.success("Lesson updated successfully");
-            // Invalidate the specific lesson
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lesson(variables.id)});
-            // IMPORTANT: Also invalidate the lessons list so list views reflect the update (e.g., title changes)
-            queryClient.invalidateQueries({queryKey: ["lessons"]});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.detail(id)});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
         },
     });
 }
 
-export function useDeleteLesson() {
+export function useDeleteLesson(topicId?: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (lessonId: number) => lessonService.delete(lessonId),
         onSuccess: () => {
             toast.success("Lesson deleted successfully");
-            queryClient.invalidateQueries({queryKey: ["lessons"]});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
+            if (topicId) {
+                queryClient.invalidateQueries({queryKey: queryKeys.topics.detail(topicId)});
+            }
         },
     });
 }
@@ -86,8 +84,8 @@ export function useTogglePublishLesson() {
         mutationFn: (lessonId: number) => lessonService.togglePublish(lessonId),
         onSuccess: (_, lessonId) => {
             toast.success("Lesson publish status updated");
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.lesson(lessonId)});
-            queryClient.invalidateQueries({queryKey: ["lessons"]});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.detail(lessonId)});
+            queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
         },
     });
 }

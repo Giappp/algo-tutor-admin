@@ -32,11 +32,13 @@ export interface QuizQuestion {
 
 export interface TestCase {
     id: number;
-    stdin: string;
-    expectedStdout: string;
-    isHidden: boolean;
-    orderIndex: number;
-    explanation?: string;
+    inputFileUrl: string;
+    outputFileUrl: string;
+    inputFileKey: string;
+    outputFileKey: string;
+    scoreWeight: number;
+    isSample: boolean;
+    sortOrder: number;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -105,12 +107,13 @@ export interface LearningPath {
     description: string;
     goal: string;
     thumbnailUrl?: string;
-    deleted: boolean;
+    isPremium: boolean;
     isPublished: boolean;
     topicCount: number;
     totalLessonCount: number;
     publishedLessonCount: number;
     enrollmentCount: number;
+    deleted?: boolean;
     topics: Topic[];
     createdAt?: string;
     updatedAt?: string;
@@ -124,6 +127,7 @@ export interface CreateLearningPathRequest {
     name: string;
     description: string;
     goal: string;
+    isPremium: boolean;
     thumbnailUrl?: string;
     level: Level;
 }
@@ -176,14 +180,39 @@ export interface CreateLessonRequest {
 export type UpdateLessonRequest = CreateLessonRequest;
 
 export interface CreateTestCaseRequest {
-    stdin: string;
-    expectedStdout: string;
-    isHidden?: boolean;
-    orderIndex?: number;
-    explanation?: string;
+    inputFileUrl: string;
+    outputFileUrl: string;
+    inputFileKey: string;
+    outputFileKey: string;
+    scoreWeight: number;
+    isSample: boolean;
+    sortOrder: number;
 }
 
 export type UpdateTestCaseRequest = Partial<CreateTestCaseRequest>;
+
+// ---------------------------------------------------------------------------
+// Presigned URL DTOs
+// ---------------------------------------------------------------------------
+
+export type TestCaseFileType = "INPUT" | "OUTPUT";
+
+export interface PresignedUrlFileRequest {
+    fileName: string;
+    fileType: TestCaseFileType;
+}
+
+export interface PresignedUrlRequest {
+    files: PresignedUrlFileRequest[];
+}
+
+export interface PresignedUrlFileResponse {
+    fileName: string;
+    fileType: TestCaseFileType;
+    uploadUrl: string;
+    downloadUrl: string;
+    fileKey: string;
+}
 
 export interface CreateEditorialRequest {
     language: ProgrammingLanguage;

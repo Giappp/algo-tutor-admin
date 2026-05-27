@@ -1,11 +1,13 @@
 "use client";
 
-import {useState} from "react";
-import {Check, Code2, Copy, FileCode, Pencil, Plus, Trash2} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent} from "@/components/ui/card";
-import {Label} from "@/components/ui/label";
-import {Textarea} from "@/components/ui/textarea";
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import { Check, Code2, Copy, FileCode, Maximize2, Minimize2, Pencil, Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
     Dialog,
     DialogContent,
@@ -14,9 +16,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Editorial, ProgrammingLanguage} from "@/types/learning-path";
-import {EditorialRequestDTO} from "@/types/learning-path/schema";
+import { Editorial, ProgrammingLanguage } from "@/types/learning-path";
+import { EditorialRequestDTO } from "@/types/learning-path/schema";
 import {
     useCreateEditorial,
     useDeleteEditorial,
@@ -24,25 +25,35 @@ import {
     useUpdateEditorial
 } from "@/hooks/use-editorials";
 
+const MonacoEditor = dynamic(
+    () => import("@monaco-editor/react").then((mod) => mod.default),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="h-64 rounded-lg border border-input bg-muted animate-pulse" />
+        ),
+    }
+);
+
 interface EditorialsTabProps {
     lessonId: number;
 }
 
-const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string; icon: string }[] = [
-    {value: "JAVA", label: "Java", icon: "☕"},
-    {value: "PYTHON", label: "Python", icon: "🐍"},
+const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string; icon: string; monacoLang: string }[] = [
+    { value: "JAVA", label: "Java", icon: "☕", monacoLang: "java" },
+    { value: "PYTHON", label: "Python", icon: "🐍", monacoLang: "python" },
 ];
 
-const LANGUAGE_COLORS: Record<ProgrammingLanguage, { bg: string; text: string }> = {
-    JAVA: {bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400"},
-    PYTHON: {bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400"},
+const LANGUAGE_COLORS: Record<ProgrammingLanguage, { bg: string; text: string; border: string }> = {
+    JAVA: { bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400", border: "border-l-orange-500" },
+    PYTHON: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-l-blue-500" },
 };
 
-export function EditorialsTab({lessonId}: EditorialsTabProps) {
+export function EditorialsTab({ lessonId }: EditorialsTabProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editing, setEditing] = useState<Editorial | null>(null);
 
-    const {data: editorials = [], isLoading} = useEditorialsByLesson(lessonId);
+    const { data: editorials = [], isLoading } = useEditorialsByLesson(lessonId);
     const createMutation = useCreateEditorial(lessonId);
     const updateMutation = useUpdateEditorial(editing?.id ?? 0);
     const deleteMutation = useDeleteEditorial();
@@ -70,14 +81,14 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
                 <div>
                     <h2 className="text-lg font-semibold tracking-tight">Editorials</h2>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                        Add solution code to help students learn
+                        Solution code to help students learn different approaches
                     </p>
                 </div>
                 <Button onClick={() => {
                     setEditing(null);
                     setIsFormOpen(true);
                 }}>
-                    <Plus className="size-4 mr-2"/>
+                    <Plus className="size-4 mr-2" />
                     Add Editorial
                 </Button>
             </div>
@@ -86,7 +97,7 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
             {isLoading && (
                 <div className="space-y-3">
                     {[1, 2].map((i) => (
-                        <div key={i} className="h-48 rounded-xl bg-muted animate-pulse"/>
+                        <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
                     ))}
                 </div>
             )}
@@ -96,18 +107,17 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
                 <Card className="border-dashed">
                     <CardContent className="flex flex-col items-center justify-center py-16">
                         <div className="size-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                            <FileCode className="size-8 text-muted-foreground"/>
+                            <FileCode className="size-8 text-muted-foreground" />
                         </div>
                         <h3 className="text-lg font-medium mb-2">No editorials yet</h3>
                         <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
-                            Add solution code in multiple programming languages to help students understand different
-                            approaches.
+                            Add solution code in multiple programming languages to help students understand different approaches.
                         </p>
                         <Button onClick={() => {
                             setEditing(null);
                             setIsFormOpen(true);
                         }}>
-                            <Plus className="size-4 mr-2"/>
+                            <Plus className="size-4 mr-2" />
                             Add First Editorial
                         </Button>
                     </CardContent>
@@ -131,7 +141,7 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
                 </div>
             )}
 
-            {/* Form Dialog */}
+            {/* Form Dialog — Full-screen Monaco editor */}
             <EditorialDialog
                 open={isFormOpen}
                 onOpenChange={(open) => {
@@ -149,7 +159,7 @@ export function EditorialsTab({lessonId}: EditorialsTabProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Editorial Card Component
+// Editorial Card — with Monaco read-only viewer
 // ---------------------------------------------------------------------------
 interface EditorialCardProps {
     editorial: Editorial;
@@ -157,8 +167,13 @@ interface EditorialCardProps {
     onDelete: () => void;
 }
 
-function EditorialCard({editorial: ed, onEdit, onDelete}: EditorialCardProps) {
+function EditorialCard({ editorial: ed, onEdit, onDelete }: EditorialCardProps) {
     const [copied, setCopied] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const langConfig = LANGUAGE_OPTIONS.find((l) => l.value === ed.language);
+    const colors = LANGUAGE_COLORS[ed.language];
+    const lineCount = ed.sourceCode.split("\n").length;
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(ed.sourceCode);
@@ -167,53 +182,69 @@ function EditorialCard({editorial: ed, onEdit, onDelete}: EditorialCardProps) {
     };
 
     return (
-        <Card className="border-l-4 border-l-purple-500">
-            <CardContent className="p-5">
+        <Card className={cn("border-l-4 overflow-hidden", colors.border)}>
+            <CardContent className="p-0">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between px-5 py-3 border-b bg-muted/20">
                     <div className="flex items-center gap-3">
-                        <div
-                            className={`flex items-center justify-center size-10 rounded-lg ${LANGUAGE_COLORS[ed.language].bg}`}>
-                            <Code2 className={`size-5 ${LANGUAGE_COLORS[ed.language].text}`}/>
+                        <div className={cn("flex items-center justify-center size-8 rounded-lg", colors.bg)}>
+                            <Code2 className={cn("size-4", colors.text)} />
                         </div>
                         <div>
-                            <h3 className="font-semibold">{ed.language === "JAVA" ? "Java" : "Python"} Solution</h3>
-                            <p className="text-xs text-muted-foreground">
-                                {ed.sourceCode.split("\n").length} lines
-                            </p>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-semibold text-sm">
+                                    {langConfig?.label ?? ed.language} Solution
+                                </h3>
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                    {lineCount} lines
+                                </Badge>
+                            </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon-xs" onClick={handleCopy}>
-                            {copied ? <Check className="size-4 text-emerald-500"/> : <Copy className="size-4"/>}
+                        <Button variant="ghost" size="icon-xs" onClick={() => setIsExpanded(!isExpanded)} title={isExpanded ? "Collapse" : "Expand"}>
+                            {isExpanded ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={onEdit}>
-                            <Pencil className="size-4"/>
+                        <Button variant="ghost" size="icon-xs" onClick={handleCopy} title="Copy code">
+                            {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={onDelete}
-                                className="text-destructive hover:text-destructive">
-                            <Trash2 className="size-4"/>
+                        <Button variant="ghost" size="icon-xs" onClick={onEdit} title="Edit">
+                            <Pencil className="size-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon-xs" onClick={onDelete} className="text-destructive hover:text-destructive" title="Delete">
+                            <Trash2 className="size-3.5" />
                         </Button>
                     </div>
                 </div>
 
-                {/* Code block */}
-                <div className="relative">
-                    <pre className="text-sm bg-muted/50 rounded-lg p-4 overflow-x-auto max-h-80 overflow-y-auto">
-                        <code className={`font-mono ${
-                            ed.language === "JAVA" ? "text-orange-600 dark:text-orange-400" : "text-blue-600 dark:text-blue-400"
-                        }`}>
-                            {ed.sourceCode}
-                        </code>
-                    </pre>
-                </div>
+                {/* Code viewer with Monaco (read-only) */}
+                <MonacoEditor
+                    height={isExpanded ? "400px" : "200px"}
+                    language={langConfig?.monacoLang ?? "plaintext"}
+                    value={ed.sourceCode}
+                    theme="vs-dark"
+                    options={{
+                        readOnly: true,
+                        minimap: { enabled: false },
+                        fontSize: 12,
+                        lineNumbers: "on",
+                        scrollBeyondLastLine: false,
+                        automaticLayout: true,
+                        tabSize: 4,
+                        padding: { top: 8, bottom: 8 },
+                        wordWrap: "on",
+                        renderLineHighlight: "none",
+                        scrollbar: { vertical: "auto", horizontal: "auto" },
+                        domReadOnly: true,
+                    }}
+                />
             </CardContent>
         </Card>
     );
 }
 
 // ---------------------------------------------------------------------------
-// Editorial Form Dialog
+// Editorial Form Dialog — Full Monaco editor experience
 // ---------------------------------------------------------------------------
 interface EditorialDialogProps {
     open: boolean;
@@ -223,7 +254,7 @@ interface EditorialDialogProps {
     isPending: boolean;
 }
 
-function EditorialDialog({open, onOpenChange, editorial, onSubmit, isPending}: EditorialDialogProps) {
+function EditorialDialog({ open, onOpenChange, editorial, onSubmit, isPending }: EditorialDialogProps) {
     const [language, setLanguage] = useState<ProgrammingLanguage>(editorial?.language ?? "JAVA");
     const [sourceCode, setSourceCode] = useState(editorial?.sourceCode ?? "");
 
@@ -237,65 +268,83 @@ function EditorialDialog({open, onOpenChange, editorial, onSubmit, isPending}: E
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await onSubmit({
-            language,
-            sourceCode,
-        });
+        await onSubmit({ language, sourceCode });
     };
 
+    const langConfig = LANGUAGE_OPTIONS.find((l) => l.value === language);
     const isValid = sourceCode.trim().length > 0;
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
+            <DialogContent className="max-w-4xl max-h-[92vh] flex flex-col p-0 gap-0">
+                <DialogHeader className="px-6 pt-6 pb-4">
                     <DialogTitle>
                         {editorial ? "Edit Editorial" : "Add Editorial"}
                     </DialogTitle>
                     <DialogDescription>
-                        Add solution code to help students understand the problem.
+                        Write the solution code with full syntax highlighting and autocomplete.
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium">Programming Language</Label>
-                        <Select value={language} onValueChange={(v) => setLanguage(v as ProgrammingLanguage)}>
-                            <SelectTrigger>
-                                <SelectValue/>
-                            </SelectTrigger>
-                            <SelectContent>
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    {/* Language selector */}
+                    <div className="px-6 pb-4">
+                        <div className="flex items-center gap-3">
+                            <Label className="text-sm font-medium shrink-0">Language:</Label>
+                            <div className="flex items-center gap-1">
                                 {LANGUAGE_OPTIONS.map((opt) => (
-                                    <SelectItem key={opt.value} value={opt.value}>
-                                        <span className="flex items-center gap-2">
-                                            <span>{opt.icon}</span>
-                                            {opt.label}
-                                        </span>
-                                    </SelectItem>
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        onClick={() => setLanguage(opt.value)}
+                                        className={cn(
+                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                                            language === opt.value
+                                                ? `${LANGUAGE_COLORS[opt.value].bg} ${LANGUAGE_COLORS[opt.value].text} ring-1 ring-current/20`
+                                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                        )}
+                                    >
+                                        <span>{opt.icon}</span>
+                                        {opt.label}
+                                    </button>
                                 ))}
-                            </SelectContent>
-                        </Select>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="sourceCode" className="text-sm font-medium">
-                            Source Code <span className="text-destructive">*</span>
-                        </Label>
-                        <Textarea
-                            id="sourceCode"
+                    {/* Monaco Editor — takes remaining space */}
+                    <div className="flex-1 min-h-0 border-y">
+                        <MonacoEditor
+                            height="100%"
+                            language={langConfig?.monacoLang ?? "plaintext"}
                             value={sourceCode}
-                            onChange={(e) => setSourceCode(e.target.value)}
-                            placeholder={
-                                language === "JAVA"
-                                    ? "public class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your solution here\n    }\n}"
-                                    : "class Solution:\n    def two_sum(self, nums: List[int], target: int) -> List[int]:\n        # Your solution here\n        pass"
-                            }
-                            className="font-mono text-sm min-h-[300px]"
-                            required
+                            onChange={(val) => setSourceCode(val ?? "")}
+                            theme="vs-dark"
+                            options={{
+                                minimap: { enabled: true, maxColumn: 80 },
+                                fontSize: 13,
+                                lineNumbers: "on",
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                                tabSize: 4,
+                                padding: { top: 12, bottom: 12 },
+                                wordWrap: "off",
+                                renderLineHighlight: "all",
+                                bracketPairColorization: { enabled: true },
+                                guides: { bracketPairs: true },
+                                suggest: { showKeywords: true, showSnippets: true },
+                                quickSuggestions: true,
+                            }}
                         />
                     </div>
 
-                    <DialogFooter>
+                    {/* Footer */}
+                    <DialogFooter className="px-6 py-4">
+                        <div className="flex items-center gap-2 mr-auto text-xs text-muted-foreground">
+                            <span>{sourceCode.split("\n").length} lines</span>
+                            <span className="text-muted-foreground/40">|</span>
+                            <span>{sourceCode.length} chars</span>
+                        </div>
                         <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                             Cancel
                         </Button>

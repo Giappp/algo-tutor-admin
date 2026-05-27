@@ -1,5 +1,5 @@
 import {del, get, getPage, patch, post, put} from "@/api/core/http";
-import {LearningPath,} from "@/types/learning-path";
+import {LearningPath} from "@/types/learning-path";
 import {LearningPathRequestDTO} from "@/types/learning-path/schema";
 
 export interface LearningPathListParams {
@@ -26,5 +26,5 @@ export const learningPathService = {
         del<void>(`/api/v1/learning-paths/${id}`),
 
     togglePublish: (id: number) =>
-        patch<void>(`/api/v1/learning-paths/${id}/publish`),
+        patch<LearningPath>(`/api/v1/learning-paths/${id}/publish`),
 };

@@ -14,11 +14,13 @@ import {SignInSchema} from "@/types/auth/schema"
 import {LoginCredentials} from "@/types/auth/auth"
 import {toAppError} from "@/api/core/api-error"
 import {useAuth} from "@/hooks/use-auth-hook"
+import {useTranslations} from "next-intl"
 
 export function LoginForm({
                               className,
                               ...props
                           }: React.ComponentProps<"div">) {
+    const t = useTranslations("login");
     const {login, isLoggingIn} = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -65,7 +67,7 @@ export function LoginForm({
                         AlgoTutor
                     </h1>
                     <p className="text-sm text-muted-foreground font-medium">
-                        Admin Portal
+                        {t("subtitle")}
                     </p>
                 </div>
             </div>
@@ -91,10 +93,10 @@ export function LoginForm({
                             {/* ── Welcome Text ── */}
                             <div className="text-center pb-2">
                                 <h2 className="text-lg font-semibold text-foreground">
-                                    Welcome back
+                                    {t("welcomeBack")}
                                 </h2>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                    Enter your credentials to access the admin panel
+                                    {t("subtitle")}
                                 </p>
                             </div>
 
@@ -104,13 +106,13 @@ export function LoginForm({
                                     htmlFor="userName"
                                     className="text-sm font-medium text-foreground/80"
                                 >
-                                    Username
+                                    {t("username")}
                                 </FieldLabel>
                                 <div className="relative">
                                     <Input
                                         id="userName"
                                         type="text"
-                                        placeholder="Enter your username"
+                                        placeholder={t("usernamePlaceholder")}
                                         className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
                                         aria-invalid={!!errors.username}
                                         disabled={isSubmitting}
@@ -129,20 +131,20 @@ export function LoginForm({
                                         htmlFor="password"
                                         className="text-sm font-medium text-foreground/80"
                                     >
-                                        Password
+                                        {t("password")}
                                     </FieldLabel>
                                     <Link
                                         href="#"
                                         className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
                                     >
-                                        Forgot password?
+                                        {t("forgotPassword")}
                                     </Link>
                                 </div>
                                 <div className="relative">
                                     <Input
                                         id="password"
                                         type="password"
-                                        placeholder="Enter your password"
+                                        placeholder={t("passwordPlaceholder")}
                                         className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
                                         aria-invalid={!!errors.password}
                                         disabled={isSubmitting}
@@ -164,12 +166,12 @@ export function LoginForm({
                                     {isSubmitting ? (
                                         <span className="flex items-center gap-2">
                                             <Loader2 className="size-4 animate-spin"/>
-                                            Authenticating...
+                                            {t("authenticating")}
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             <LockKeyhole className="size-4"/>
-                                            Sign in to Dashboard
+                                            {t("signIn")}
                                         </span>
                                     )}
                                 </Button>
@@ -182,23 +184,27 @@ export function LoginForm({
                                 </div>
                                 <div className="relative flex justify-center">
                                     <span className="bg-background px-3 text-xs text-muted-foreground">
-                                        Secure admin access only
+                                        {t("secureAccess")}
                                     </span>
                                 </div>
                             </div>
 
                             {/* ── Footer Note ── */}
                             <p className="text-center text-xs text-muted-foreground leading-relaxed">
-                                By signing in, you agree to the platform&apos;s{" "}
-                                <Link href="#"
-                                      className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                    Terms of Service
-                                </Link>{" "}
-                                and{" "}
-                                <Link href="#"
-                                      className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                    Privacy Policy
-                                </Link>
+                                {t.rich("termsNotice", {
+                                    terms: (chunks) => (
+                                        <Link href="#"
+                                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                            {chunks}
+                                        </Link>
+                                    ),
+                                    privacy: (chunks) => (
+                                        <Link href="#"
+                                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                            {chunks}
+                                        </Link>
+                                    ),
+                                })}
                             </p>
                         </FieldGroup>
                     </form>
@@ -209,10 +215,10 @@ export function LoginForm({
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
-                    <span>Encrypted connection</span>
+                    <span>{t("encryptedConnection")}</span>
                 </div>
                 <span className="text-zinc-300 dark:text-zinc-700">|</span>
-                <span>SOC 2 compliant</span>
+                <span>{t("socCompliant")}</span>
             </div>
         </div>
     )
