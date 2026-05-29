@@ -28,4 +28,12 @@ export const queryKeys = {
         detail: (id: number) => ["lessons", "detail", id] as const,
         bySlug: (slug: string) => ["lessons", "by-slug", slug] as const,
     },
+
+    // ─── Dashboard ───────────────────────────────────────────────────────
+    dashboard: {
+        all: ["dashboard"] as const,
+        overview: () => ["dashboard", "overview"] as const,
+        aiTokens: (days?: number) => ["dashboard", "ai-tokens", { days }] as const,
+        apiQuotas: () => ["dashboard", "api-quotas"] as const,
+    },
 } as const;

@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {Check, FileQuestion, Pencil, Plus, Trash2} from "lucide-react";
+import {Check, FileQuestion, Pencil, Plus, Trash2, Sparkles} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent} from "@/components/ui/card";
@@ -9,6 +9,8 @@ import {QuizQuestion} from "@/types/learning-path";
 import {QuestionRequestDTO} from "@/types/learning-path/schema";
 import {useCreateQuestion, useDeleteQuestion, useQuestionsByLesson, useUpdateQuestion} from "@/hooks/use-quiz";
 import QuestionDialog from "@/components/quiz/question-dialog";
+import {AIQuestionGeneratorDialog} from "@/components/quiz/ai-question-generator-dialog";
+import {toast} from "sonner";
 
 interface QuestionsTabProps {
     lessonId: number;
@@ -17,6 +19,8 @@ interface QuestionsTabProps {
 export function QuestionsTab({lessonId}: QuestionsTabProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editing, setEditing] = useState<QuizQuestion | null>(null);
+    const [isAiOpen, setIsAiOpen] = useState(false);
+    const [isAddingAi, setIsAddingAi] = useState(false);
 
     const {data: questions = [], isLoading} = useQuestionsByLesson(lessonId);
     const createMutation = useCreateQuestion(lessonId);
@@ -31,6 +35,21 @@ export function QuestionsTab({lessonId}: QuestionsTabProps) {
         }
         setIsFormOpen(false);
         setEditing(null);
+    };
+
+    const handleAiQuestionsAdd = async (newQuestions: QuestionRequestDTO[]) => {
+        setIsAddingAi(true);
+        try {
+            for (const q of newQuestions) {
+                await createMutation.mutateAsync(q);
+            }
+            toast.success(`Successfully added ${newQuestions.length} AI generated questions`);
+        } catch {
+            toast.error("Failed to add some questions");
+        } finally {
+            setIsAddingAi(false);
+            setIsAiOpen(false);
+        }
     };
 
     const handleDelete = async (id: number) => {
@@ -49,13 +68,24 @@ export function QuestionsTab({lessonId}: QuestionsTabProps) {
                         Create questions to assess student understanding
                     </p>
                 </div>
-                <Button onClick={() => {
-                    setEditing(null);
-                    setIsFormOpen(true);
-                }}>
-                    <Plus className="size-4 mr-2"/>
-                    Add Question
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        type="button"
+                        variant="outline"
+                        className="border-amber-500/20 hover:border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 hover:bg-amber-500/10 gap-1.5 h-10 text-sm font-semibold rounded-lg"
+                        onClick={() => setIsAiOpen(true)}
+                    >
+                        <Sparkles className="size-4" />
+                        Generate with AI
+                    </Button>
+                    <Button onClick={() => {
+                        setEditing(null);
+                        setIsFormOpen(true);
+                    }} className="gap-1.5 h-10 text-sm font-semibold rounded-lg">
+                        <Plus className="size-4"/>
+                        Add Question
+                    </Button>
+                </div>
             </div>
 
             {/* Loading state */}
@@ -129,6 +159,14 @@ export function QuestionsTab({lessonId}: QuestionsTabProps) {
                 question={editing}
                 onSubmit={handleSubmit}
                 isPending={editing ? updateMutation.isPending : createMutation.isPending}
+            />
+
+            {/* AI Generator Dialog */}
+            <AIQuestionGeneratorDialog
+                open={isAiOpen}
+                onOpenChange={setIsAiOpen}
+                onAddQuestions={handleAiQuestionsAdd}
+                isPending={isAddingAi}
             />
         </div>
     );

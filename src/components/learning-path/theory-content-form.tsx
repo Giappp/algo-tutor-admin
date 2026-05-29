@@ -191,6 +191,16 @@ export function TheoryContentForm({
     const watchedDifficulty = useWatch({ control, name: "difficulty" });
     const watchedData = useWatch({ control });
 
+    const handleTemplateSelect = (templateContent: string) => {
+        if (watchedContent && watchedContent.trim() !== "") {
+            if (confirm("Applying this template will overwrite your existing content. Are you sure you want to proceed?")) {
+                setValue("content", templateContent, { shouldValidate: true, shouldDirty: true });
+            }
+        } else {
+            setValue("content", templateContent, { shouldValidate: true, shouldDirty: true });
+        }
+    };
+
     // Autosave
     const handleAutoSave = useCallback(async () => {
         await RHhandleSubmit(onSubmit)();
@@ -298,7 +308,7 @@ export function TheoryContentForm({
                                     type="button"
                                     variant="outline"
                                     size="xs"
-                                    onClick={() => setValue("content", tpl.content, { shouldValidate: true })}
+                                    onClick={() => handleTemplateSelect(tpl.content)}
                                     disabled={isPending}
                                     className="gap-1.5 text-xs h-7"
                                 >

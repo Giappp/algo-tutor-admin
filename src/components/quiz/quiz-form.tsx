@@ -1,18 +1,18 @@
 "use client";
 
-import React, {useCallback, useImperativeHandle} from "react";
-import {useForm, useWatch} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {cn} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {TooltipProvider} from "@/components/ui/tooltip";
-import {FormField} from "@/components/learning-path/form-field";
-import type {QuizLessonDTO} from "@/types/learning-path/schema";
-import {CreateQuizLessonSchema, EditQuizContentSchema} from "@/types/learning-path/schema";
-import {Difficulty} from "@/types/learning-path";
-import {Loader2} from "lucide-react";
-import {toast} from "sonner";
+import React, { useCallback, useImperativeHandle } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { FormField } from "@/components/learning-path/form-field";
+import type { QuizLessonDTO } from "@/types/learning-path/schema";
+import { CreateQuizLessonSchema, EditQuizContentSchema } from "@/types/learning-path/schema";
+import { Difficulty } from "@/types/learning-path";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const DIFFICULTY_OPTIONS: {
     value: Difficulty;
@@ -21,28 +21,28 @@ const DIFFICULTY_OPTIONS: {
     bgColor: string;
     borderColor: string;
 }[] = [
-    {
-        value: "EASY",
-        label: "Easy",
-        color: "text-emerald-600 dark:text-emerald-400",
-        bgColor: "bg-emerald-500/10",
-        borderColor: "border-emerald-500/30"
-    },
-    {
-        value: "MEDIUM",
-        label: "Medium",
-        color: "text-amber-600 dark:text-amber-400",
-        bgColor: "bg-amber-500/10",
-        borderColor: "border-amber-500/30"
-    },
-    {
-        value: "HARD",
-        label: "Hard",
-        color: "text-red-600 dark:text-red-400",
-        bgColor: "bg-red-500/10",
-        borderColor: "border-red-500/30"
-    },
-];
+        {
+            value: "EASY",
+            label: "Easy",
+            color: "text-emerald-600 dark:text-emerald-400",
+            bgColor: "bg-emerald-500/10",
+            borderColor: "border-emerald-500/30"
+        },
+        {
+            value: "MEDIUM",
+            label: "Medium",
+            color: "text-amber-600 dark:text-amber-400",
+            bgColor: "bg-amber-500/10",
+            borderColor: "border-amber-500/30"
+        },
+        {
+            value: "HARD",
+            label: "Hard",
+            color: "text-red-600 dark:text-red-400",
+            bgColor: "bg-red-500/10",
+            borderColor: "border-red-500/30"
+        },
+    ];
 
 export type QuizFormHandle = {
     triggerValidation: () => Promise<boolean>;
@@ -59,13 +59,13 @@ interface QuizFormProps {
 }
 
 export function QuizForm({
-                             defaultValues,
-                             onSubmit,
-                             isPending,
-                             submitLabel = "Create Lesson",
-                             editMode = false,
-                             formRef: externalFormRef,
-                         }: QuizFormProps) {
+    defaultValues,
+    onSubmit,
+    isPending,
+    submitLabel = "Create Lesson",
+    editMode = false,
+    formRef: externalFormRef,
+}: QuizFormProps) {
 
     const {
         register,
@@ -73,7 +73,7 @@ export function QuizForm({
         setValue,
         control,
         trigger,
-        formState: {errors},
+        formState: { errors },
     } = useForm<QuizLessonDTO>({
         resolver: zodResolver(editMode ? EditQuizContentSchema : CreateQuizLessonSchema),
         defaultValues: {
@@ -82,7 +82,6 @@ export function QuizForm({
             difficulty: undefined,
             passingScore: 70,
             timeLimitMinutes: undefined,
-            questions: [],
             ...defaultValues,
         },
     });
@@ -102,8 +101,8 @@ export function QuizForm({
         const findFirstError = (obj: Record<string, unknown>): string | undefined => {
             for (const value of Object.values(obj)) {
                 if (value && typeof value === "object") {
-                    if ("message" in value && typeof (value as {message: unknown}).message === "string") {
-                        return (value as {message: string}).message;
+                    if ("message" in value && typeof (value as { message: unknown }).message === "string") {
+                        return (value as { message: string }).message;
                     }
                     const nested = findFirstError(value as Record<string, unknown>);
                     if (nested) return nested;
@@ -135,9 +134,9 @@ export function QuizForm({
                 <div className="flex items-center gap-4 border-b pb-6">
                     <div className="flex items-center justify-center size-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/20 shadow-sm shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-600 dark:text-amber-400">
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.75"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.75" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                     </div>
                     <div className="flex flex-col">
@@ -201,7 +200,7 @@ export function QuizForm({
                                         min={0}
                                         max={100}
                                         className="pr-10 text-sm h-11"
-                                        {...register("passingScore", {valueAsNumber: true})}
+                                        {...register("passingScore", { valueAsNumber: true })}
                                         disabled={isPending}
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">%</span>
@@ -210,7 +209,7 @@ export function QuizForm({
                                     <div className="h-2 rounded-full bg-muted overflow-hidden">
                                         <div
                                             className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all"
-                                            style={{width: `${watchedPassingScore ?? 70}%`}}
+                                            style={{ width: `${watchedPassingScore ?? 70}%` }}
                                         />
                                     </div>
                                     <p className="text-sm text-muted-foreground mt-2">
@@ -228,7 +227,7 @@ export function QuizForm({
                                         max={300}
                                         placeholder="No limit"
                                         className="pr-12 text-sm h-11"
-                                        {...register("timeLimitMinutes", {valueAsNumber: true})}
+                                        {...register("timeLimitMinutes", { valueAsNumber: true })}
                                         disabled={isPending}
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">min</span>
@@ -243,15 +242,15 @@ export function QuizForm({
                     <Button type="submit" disabled={isPending} size="lg" className="px-8 gap-2 text-sm h-11">
                         {isPending ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin"/>
+                                <Loader2 className="w-4 h-4 animate-spin" />
                                 Saving...
                             </>
                         ) : (
                             <>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                                    <polyline points="17 21 17 13 7 13 7 21"/>
-                                    <polyline points="7 3 7 8 15 8"/>
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                    <polyline points="17 21 17 13 7 13 7 21" />
+                                    <polyline points="7 3 7 8 15 8" />
                                 </svg>
                                 {submitLabel}
                             </>
