@@ -2,9 +2,9 @@
 
 import * as React from "react"
 
-import {NavMain} from "@/components/nav-main"
-import {NavSecondary} from "@/components/nav-secondary"
-import {NavUser} from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main"
+import { NavSecondary } from "@/components/nav-secondary"
+import { NavUser } from "@/components/nav-user"
 import {
     Sidebar,
     SidebarContent,
@@ -19,14 +19,13 @@ import {
     CodeIcon,
     GraduationCapIcon,
     LayoutDashboardIcon,
-    LineChartIcon,
     Settings2Icon,
     UsersIcon,
 } from "lucide-react"
 import Link from "next/link"
-import {useTranslations} from "next-intl"
+import { useTranslations } from "next-intl"
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const t = useTranslations("sidebar")
 
     const groups = [
@@ -35,14 +34,9 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             items: [
                 {
                     title: t("dashboard"),
-                    url: "/dashboard",
-                    icon: <LayoutDashboardIcon className="size-4"/>,
-                },
-                {
-                    title: t("analytics"),
-                    url: "/dashboard/analytics",
-                    icon: <LineChartIcon className="size-4"/>,
-                },
+                    url: "/",
+                    icon: <LayoutDashboardIcon className="size-4" />,
+                }
             ],
         },
         {
@@ -50,11 +44,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             items: [
                 {
                     title: t("learningPaths"),
-                    url: "/dashboard/learning-paths",
-                    icon: <GraduationCapIcon className="size-4"/>,
+                    url: "/learning-paths",
+                    icon: <GraduationCapIcon className="size-4" />,
                     items: [
-                        {title: t("allPaths"), url: "/dashboard/learning-paths"},
-                        {title: t("createNew"), url: "/dashboard/learning-paths/create"},
+                        { title: t("allPaths"), url: "/learning-paths" },
+                        { title: t("createNew"), url: "/learning-paths/create" },
                     ],
                 },
             ],
@@ -64,8 +58,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             items: [
                 {
                     title: t("aiModels"),
-                    url: "/dashboard/models",
-                    icon: <BotIcon className="size-4"/>,
+                    url: "/models",
+                    icon: <BotIcon className="size-4" />,
                 }
             ],
         },
@@ -74,8 +68,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             items: [
                 {
                     title: t("users"),
-                    url: "/dashboard/users",
-                    icon: <UsersIcon className="size-4"/>,
+                    url: "/users",
+                    icon: <UsersIcon className="size-4" />,
                 },
             ],
         },
@@ -84,8 +78,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const navSecondary = [
         {
             title: t("settings"),
-            url: "/dashboard/settings",
-            icon: <Settings2Icon className="size-4"/>,
+            url: "/settings",
+            icon: <Settings2Icon className="size-4" />,
         },
     ]
 
@@ -97,24 +91,24 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader className="pb-0">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" render={<Link href="/dashboard"/>}>
+                        <SidebarMenuButton size="lg" render={<Link href="/" />}>
                             <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-sm">
-                                <CodeIcon className="size-3.5 text-white"/>
+                                <CodeIcon className="size-3.5 text-white" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold text-foreground">AlgoTutor</span>
-                                <span className="truncate text-[11px] text-muted-foreground">{t("dashboard")}</span>
+                                <span className="truncate text-sm text-muted-foreground">{t("dashboard")}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent className="pt-2">
-                <NavMain groups={groups}/>
-                <NavSecondary items={navSecondary} className="mt-auto"/>
+                <NavMain groups={groups} />
+                <NavSecondary items={navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter className="pt-0">
-                <NavUser/>
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )

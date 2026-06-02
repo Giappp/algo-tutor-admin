@@ -193,12 +193,9 @@ export function TopicAccordionItem({topic, pathId}: TopicAccordionItemProps) {
                         defaultValues={{
                             name: topic.name,
                             description: topic.description,
-                            isLocked: topic.isLocked,
                         }}
                         onSubmit={async (data) => {
-                            await updateTopicMutation.mutateAsync(
-                                data as UpdateTopicRequest
-                            );
+                            await updateTopicMutation.mutateAsync(data);
                             setIsEditOpen(false);
                         }}
                         isPending={updateTopicMutation.isPending}

@@ -1,6 +1,6 @@
 "use client"
 
-import {usePathname} from "next/navigation"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import {
     Collapsible,
@@ -18,7 +18,7 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import {ChevronRightIcon} from "lucide-react"
+import { ChevronRightIcon } from "lucide-react"
 
 type NavItem = {
     title: string
@@ -35,7 +35,7 @@ type NavGroup = {
     items: NavItem[]
 }
 
-export function NavMain({groups}: { groups: NavGroup[] }) {
+export function NavMain({ groups }: { groups: NavGroup[] }) {
     const pathname = usePathname()
 
     function isItemActive(item: NavItem) {
@@ -47,9 +47,9 @@ export function NavMain({groups}: { groups: NavGroup[] }) {
                 (sub) => pathname === sub.url || pathname.startsWith(sub.url + "/")
             )
         }
-        // For items without sub-items, match prefix but not for root "/dashboard"
-        if (item.url === "/dashboard") {
-            return pathname === "/dashboard"
+
+        if (item.url === "/") {
+            return pathname === "/"
         }
         return pathname.startsWith(item.url + "/")
     }
@@ -74,12 +74,12 @@ export function NavMain({groups}: { groups: NavGroup[] }) {
                                 <Collapsible
                                     key={item.title}
                                     defaultOpen={active}
-                                    render={<SidebarMenuItem/>}
+                                    render={<SidebarMenuItem />}
                                 >
                                     <SidebarMenuButton
                                         tooltip={item.title}
                                         data-active={active ? "true" : undefined}
-                                        render={<Link href={item.url}/>}
+                                        render={<Link href={item.url} />}
                                         className="h-8 text-[13px]"
                                     >
                                         {item.icon}
@@ -88,10 +88,10 @@ export function NavMain({groups}: { groups: NavGroup[] }) {
                                     {hasSubItems ? (
                                         <>
                                             <SidebarMenuAction
-                                                render={<CollapsibleTrigger/>}
+                                                render={<CollapsibleTrigger />}
                                                 className="aria-expanded:rotate-90"
                                             >
-                                                <ChevronRightIcon/>
+                                                <ChevronRightIcon />
                                                 <span className="sr-only">Toggle</span>
                                             </SidebarMenuAction>
                                             <CollapsibleContent>
@@ -102,7 +102,7 @@ export function NavMain({groups}: { groups: NavGroup[] }) {
                                                             <SidebarMenuSubItem key={subItem.title}>
                                                                 <SidebarMenuSubButton
                                                                     data-active={subActive ? "true" : undefined}
-                                                                    render={<Link href={subItem.url}/>}
+                                                                    render={<Link href={subItem.url} />}
                                                                     className="text-[12px] h-7"
                                                                 >
                                                                     <span>{subItem.title}</span>

@@ -1,13 +1,13 @@
 "use client";
 
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Switch} from "@/components/ui/switch";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field";
-import {CreateTopicSchema, TopicRequestDTO,} from "@/types/learning-path/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, } from "@/components/ui/field";
+import { CreateTopicSchema, TopicRequestDTO, } from "@/types/learning-path/schema";
 
 interface TopicFormProps {
     defaultValues?: Partial<TopicRequestDTO>;
@@ -17,28 +17,26 @@ interface TopicFormProps {
 }
 
 export function TopicForm({
-                              defaultValues,
-                              onSubmit,
-                              isPending,
-                              submitLabel = "Save",
-                          }: TopicFormProps) {
+    defaultValues,
+    onSubmit,
+    isPending,
+    submitLabel = "Save",
+}: TopicFormProps) {
     const {
         register,
         handleSubmit,
         setValue,
         watch,
-        formState: {errors},
+        formState: { errors },
     } = useForm<TopicRequestDTO>({
         resolver: zodResolver(CreateTopicSchema),
         defaultValues: {
             name: "",
             description: "",
-            isLocked: true,
             ...defaultValues,
         },
     });
 
-    const isLocked = watch("isLocked");
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -74,20 +72,6 @@ export function TopicForm({
                             <FieldError>{errors.description.message}</FieldError>
                         )}
                     </FieldContent>
-                </Field>
-                <Field orientation="horizontal">
-                    <FieldLabel htmlFor="isLocked">Locked by Default</FieldLabel>
-                    <Switch
-                        id="isLocked"
-                        checked={isLocked}
-                        onCheckedChange={(checked) =>
-                            setValue("isLocked", checked, {shouldValidate: true})
-                        }
-                        disabled={isPending}
-                    />
-                    <FieldDescription>
-                        When locked, learners must complete previous topics first.
-                    </FieldDescription>
                 </Field>
             </FieldGroup>
 

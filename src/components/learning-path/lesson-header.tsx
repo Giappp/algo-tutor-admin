@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Badge} from "@/components/ui/badge";
-import {InlineEdit} from "@/components/ui/inline-edit";
-import {Difficulty, LessonType} from "@/types/learning-path";
+import { ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { InlineEdit } from "@/components/ui/inline-edit";
+import { Difficulty, LessonType } from "@/types/learning-path";
 
 const LESSON_TYPE_CONFIG: Record<LessonType, {
     icon: React.ElementType;
@@ -34,9 +34,9 @@ const LESSON_TYPE_CONFIG: Record<LessonType, {
 };
 
 const DIFFICULTY_CONFIG: Record<Difficulty, { class: string; label: string }> = {
-    EASY: {class: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", label: "Easy"},
-    MEDIUM: {class: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20", label: "Medium"},
-    HARD: {class: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20", label: "Hard"},
+    EASY: { class: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", label: "Easy" },
+    MEDIUM: { class: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20", label: "Medium" },
+    HARD: { class: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20", label: "Hard" },
 };
 
 interface LessonHeaderProps {
@@ -55,12 +55,12 @@ interface LessonHeaderProps {
 }
 
 export function LessonHeader({
-                                 lesson,
-                                 learningPathId,
-                                 onTogglePublish,
-                                 onTitleChange,
-                                 isEditPending = false,
-                             }: LessonHeaderProps) {
+    lesson,
+    learningPathId,
+    onTogglePublish,
+    onTitleChange,
+    isEditPending = false,
+}: LessonHeaderProps) {
     const config = LESSON_TYPE_CONFIG[lesson.type];
     const TypeIcon = config.icon;
 
@@ -70,11 +70,11 @@ export function LessonHeader({
         >
             {/* Decorative accent */}
             <div
-                className={`absolute left-0 top-0 bottom-0 w-1 ${config.borderColor} bg-gradient-to-b from-transparent via-current to-transparent opacity-60`}/>
+                className={`absolute left-0 top-0 bottom-0 w-1 ${config.borderColor} bg-gradient-to-b from-transparent via-current to-transparent opacity-60`} />
 
             {/* Decorative glow */}
             <div
-                className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"/>
+                className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none" />
 
             <div className="relative flex items-start justify-between gap-4">
                 {/* Left section: Back + Lesson info */}
@@ -83,17 +83,17 @@ export function LessonHeader({
                         variant="ghost"
                         size="icon"
                         nativeButton={false}
-                        render={<Link href={`/dashboard/learning-paths/${learningPathId}`}/>}
+                        render={<Link href={`/learning-paths/${learningPathId}`} />}
                         className="shrink-0 mt-1"
                     >
-                        <ArrowLeft className="size-5"/>
+                        <ArrowLeft className="size-5" />
                     </Button>
 
                     <div className="flex items-start gap-4">
                         {/* Icon */}
                         <div
                             className={`shrink-0 flex items-center justify-center size-12 rounded-xl bg-background/80 backdrop-blur-sm shadow-sm border border-border/50`}>
-                            <TypeIcon className={`size-6 ${config.badgeClass.split(" ")[1]}`}/>
+                            <TypeIcon className={`size-6 ${config.badgeClass.split(" ")[1]}`} />
                         </div>
 
                         {/* Title & Meta */}
@@ -146,10 +146,10 @@ export function LessonHeader({
                         variant="ghost"
                         size="sm"
                         nativeButton={false}
-                        render={<Link href={`/lessons/${lesson.slug || lesson.id}`} target="_blank"/>}
+                        render={<Link href={`/lessons/${lesson.slug || lesson.id}`} target="_blank" />}
                         className="text-muted-foreground hover:text-foreground"
                     >
-                        <Eye className="size-4 mr-1.5"/>
+                        <Eye className="size-4 mr-1.5" />
                         Preview
                     </Button>
 
@@ -160,7 +160,7 @@ export function LessonHeader({
                         onClick={onTogglePublish}
                         disabled={isEditPending}
                     >
-                        <Rocket className="size-4 mr-1.5"/>
+                        <Rocket className="size-4 mr-1.5" />
                         {lesson.isPublished ? "Unpublish" : "Publish"}
                     </Button>
                 </div>
@@ -169,4 +169,4 @@ export function LessonHeader({
     );
 }
 
-export {LESSON_TYPE_CONFIG, DIFFICULTY_CONFIG};
+export { LESSON_TYPE_CONFIG, DIFFICULTY_CONFIG };

@@ -1,14 +1,14 @@
 "use client";
 
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {useRouter} from "next/navigation";
-import {toast} from "sonner";
-import {queryKeys} from "@/api/query-keys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { queryKeys } from "@/api/query-keys";
 import {
     LearningPathListParams,
     learningPathService,
 } from "@/api/services/learning-path-services";
-import {LearningPathRequestDTO} from "@/types/learning-path/schema";
+import { LearningPathRequestDTO } from "@/types/learning-path/schema";
 
 // ─── Queries ─────────────────────────────────────────────────────────────────
 
@@ -38,8 +38,8 @@ export function useCreateLearningPath() {
             learningPathService.create(data),
         onSuccess: (result) => {
             toast.success("Learning path created successfully");
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.all});
-            router.push(`/dashboard/learning-paths/${result.id}`);
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.all });
+            router.push(`/learning-paths/${result.id}`);
         },
     });
 }
@@ -52,8 +52,8 @@ export function useUpdateLearningPath(id: number) {
             learningPathService.update(id, data),
         onSuccess: () => {
             toast.success("Learning path updated successfully");
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.detail(id)});
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.all});
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.detail(id) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.all });
         },
     });
 }
@@ -65,7 +65,7 @@ export function useDeleteLearningPath() {
         mutationFn: (id: number) => learningPathService.delete(id),
         onSuccess: () => {
             toast.success("Learning path deleted successfully");
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.all});
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.all });
         },
     });
 }
@@ -77,8 +77,8 @@ export function useTogglePublishLearningPath() {
         mutationFn: (id: number) => learningPathService.togglePublish(id),
         onSuccess: (_, id) => {
             toast.success("Publish status updated");
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.detail(id)});
-            queryClient.invalidateQueries({queryKey: queryKeys.learningPaths.all});
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.detail(id) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.learningPaths.all });
         },
     });
 }

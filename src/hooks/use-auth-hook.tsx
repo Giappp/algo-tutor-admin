@@ -1,11 +1,11 @@
 "use client";
 
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {get, post} from "@/api/core/http";
-import {clearAuthenticated, setAuthenticated} from "@/store/authStore";
-import {LoginCredentials} from "@/types/auth/auth";
-import {SignInSchema} from "@/types/auth/schema";
-import {useRouter} from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { get, post } from "@/api/core/http";
+import { clearAuthenticated, setAuthenticated } from "@/store/authStore";
+import { LoginCredentials } from "@/types/auth/auth";
+import { SignInSchema } from "@/types/auth/schema";
+import { useRouter } from "next/navigation";
 
 type UserInfoResponse = {
     userId: number;
@@ -29,7 +29,7 @@ export function useAuth() {
                 email: userInfo.email,
                 username: userInfo.userName,
             });
-            router.push("/dashboard");
+            router.push("/");
         },
     });
 

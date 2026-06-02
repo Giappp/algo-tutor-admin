@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {usePathname} from "next/navigation"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 
 import {
@@ -25,7 +25,7 @@ export function NavSecondary({
     const pathname = usePathname()
 
     function isActive(url: string) {
-        if (url === "/dashboard") return pathname === "/dashboard"
+        if (url === "/") return pathname === "/"
         return pathname === url || pathname.startsWith(url + "/")
     }
 
@@ -38,7 +38,7 @@ export function NavSecondary({
                             <SidebarMenuButton
                                 size="sm"
                                 data-active={isActive(item.url) ? "true" : undefined}
-                                render={<Link href={item.url}/>}
+                                render={<Link href={item.url} />}
                                 className="h-8 text-[13px]"
                             >
                                 {item.icon}

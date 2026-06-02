@@ -1,17 +1,17 @@
 "use client";
 
-import {useState} from "react";
-import {useParams, useRouter} from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import {ArrowLeftIcon, BookOpenIcon, CodeIcon, FileQuestionIcon} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {TheoryForm} from "@/components/learning-path/theory-form";
-import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
-import {useCreateLesson} from "@/hooks/use-lessons";
-import {useUnsavedChanges} from "@/hooks/use-unsaved-changes";
-import {LessonType} from "@/types/learning-path";
-import {CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO} from "@/types/learning-path/schema";
-import {QuizForm} from "@/components/quiz/quiz-form";
+import { ArrowLeftIcon, BookOpenIcon, CodeIcon, FileQuestionIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TheoryForm } from "@/components/learning-path/theory-form";
+import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
+import { useCreateLesson } from "@/hooks/use-lessons";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { LessonType } from "@/types/learning-path";
+import { CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO } from "@/types/learning-path/schema";
+import { QuizForm } from "@/components/quiz/quiz-form";
 
 const LESSON_TYPES = [
     {
@@ -61,7 +61,7 @@ export default function CreateLessonPage() {
 
     const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
         const result = await createLessonMutation.mutateAsync(data as LessonRequestDTO);
-        router.push(`/dashboard/learning-paths/${learningPathId}/lessons/${result.id}`);
+        router.push(`/learning-paths/${learningPathId}/lessons/${result.id}`);
     };
 
     return (
@@ -72,9 +72,9 @@ export default function CreateLessonPage() {
                     variant="ghost"
                     size="icon-sm"
                     nativeButton={false}
-                    render={<Link href={`/dashboard/learning-paths/${learningPathId}`}/>}
+                    render={<Link href={`/learning-paths/${learningPathId}`} />}
                 >
-                    <ArrowLeftIcon className="size-4"/>
+                    <ArrowLeftIcon className="size-4" />
                 </Button>
                 <div>
                     <h1 className="text-xl font-bold tracking-tight">Create Lesson</h1>
@@ -100,13 +100,13 @@ export default function CreateLessonPage() {
                             className={`
                                 flex items-center gap-2.5 rounded-lg border px-4 py-3 text-left transition-all
                                 ${isActive
-                                ? item.activeClass
-                                : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
-                            }
+                                    ? item.activeClass
+                                    : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                                }
                             `}
                         >
                             <div className={`flex items-center justify-center size-8 rounded-md ${item.bgClass}`}>
-                                <Icon className={`size-4 ${item.iconClass}`}/>
+                                <Icon className={`size-4 ${item.iconClass}`} />
                             </div>
                             <div>
                                 <span className="text-sm font-semibold block">{item.label}</span>

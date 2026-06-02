@@ -27,7 +27,7 @@ export default function LessonDetailPage() {
         return (
             <div className="flex flex-col items-center justify-center gap-4 py-16">
                 <p className="text-muted-foreground">Lesson not found.</p>
-                <Button variant="outline" render={<Link href={`/dashboard/learning-paths/${learningPathId}`} />}>
+                <Button variant="outline" render={<Link href={`/learning-paths/${learningPathId}`} />}>
                     <ArrowLeftIcon data-icon="inline-start" />
                     Back
                 </Button>

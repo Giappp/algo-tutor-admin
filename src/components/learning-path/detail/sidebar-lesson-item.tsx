@@ -1,9 +1,10 @@
 "use client";
 
-import {Draggable} from "@hello-pangea/dnd";
-import {BookOpen, Code2, FileQuestion, GripVertical} from "lucide-react";
-import {cn} from "@/lib/utils";
-import {Lesson} from "@/types/learning-path";
+import { useTranslations } from "next-intl";
+import { Draggable } from "@hello-pangea/dnd";
+import { BookOpen, Code2, FileQuestion, GripVertical } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Lesson } from "@/types/learning-path";
 
 // Color & icon mapping for lesson types
 const LESSON_TYPE_CONFIG = {
@@ -32,11 +33,12 @@ interface SidebarLessonItemProps {
 }
 
 export function SidebarLessonItem({
-                                      lesson,
-                                      index,
-                                      isActive,
-                                      onSelect,
-                                  }: SidebarLessonItemProps) {
+    lesson,
+    index,
+    isActive,
+    onSelect,
+}: SidebarLessonItemProps) {
+    const t = useTranslations("learningPaths");
     const config = LESSON_TYPE_CONFIG[lesson.type];
     const Icon = config.icon;
 
@@ -76,7 +78,7 @@ export function SidebarLessonItem({
                         {/* Title */}
                         <span className={cn(
                             "text-[11px] truncate flex-1 leading-tight",
-                            isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                            isActive ? "text-primary font-bold" : "text-muted-foreground group-hover:text-foreground"
                         )}>
                             {lesson.title}
                         </span>
@@ -85,9 +87,9 @@ export function SidebarLessonItem({
                     {/* Status Badge */}
                     <div className="shrink-0 flex items-center pr-1">
                         {lesson.isPublished ? (
-                            <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" title="Published"/>
+                            <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" title={t("published")} />
                         ) : (
-                            <span className="size-1.5 rounded-full bg-muted-foreground/30" title="Draft"/>
+                            <span className="size-1.5 rounded-full bg-muted-foreground/30" title={t("draft")} />
                         )}
                     </div>
                 </div>

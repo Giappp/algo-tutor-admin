@@ -1,5 +1,5 @@
 import z from "zod";
-import {QuestionType} from "@/types/learning-path";
+import { QuestionType } from "@/types/learning-path";
 
 export const LevelSchema = z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
 export const DifficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
@@ -28,9 +28,8 @@ export const CreateLearningPathSchema = z.object({
 // Topic schemas
 // ---------------------------------------------------------------------------
 export const CreateTopicSchema = z.object({
-    name: z.string().optional(),
+    name: z.string().min(1, "Name is required"),
     description: z.string().optional(),
-    isLocked: z.boolean().optional(),
 });
 
 // ---------------------------------------------------------------------------

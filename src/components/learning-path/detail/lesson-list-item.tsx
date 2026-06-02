@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {useRouter} from "next/navigation";
-import {BookOpen, Code2, FileQuestion, GlobeIcon, Pencil, Rocket, Trash2} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Badge} from "@/components/ui/badge";
-import {Difficulty, Lesson, LessonType} from "@/types/learning-path";
+import { useRouter } from "next/navigation";
+import { BookOpen, Code2, FileQuestion, GlobeIcon, Pencil, Rocket, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Difficulty, Lesson, LessonType } from "@/types/learning-path";
 
 const LESSON_TYPE_CONFIG: Record<LessonType, { icon: React.ElementType; label: string; className: string }> = {
     THEORY: {
@@ -50,11 +50,11 @@ interface LessonListItemProps {
 }
 
 export function LessonListItem({
-                                   lesson,
-                                   pathId,
-                                   onTogglePublish,
-                                   onDelete,
-                               }: LessonListItemProps) {
+    lesson,
+    pathId,
+    onTogglePublish,
+    onDelete,
+}: LessonListItemProps) {
     const router = useRouter();
     const typeConfig = LESSON_TYPE_CONFIG[lesson.type];
     const TypeIcon = typeConfig.icon;
@@ -63,11 +63,11 @@ export function LessonListItem({
     return (
         <div
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg border hover:bg-muted/40 transition-colors cursor-pointer"
-            onClick={() => router.push(`/dashboard/learning-paths/${pathId}/lessons/${lesson.id}`)}
+            onClick={() => router.push(`/learning-paths/${pathId}/lessons/${lesson.id}`)}
         >
             {/* Type icon */}
             <div className={`shrink-0 flex items-center justify-center size-8 rounded-lg border ${typeConfig.className}`}>
-                <TypeIcon className="size-4"/>
+                <TypeIcon className="size-4" />
             </div>
 
             {/* Title + metadata */}
@@ -93,7 +93,7 @@ export function LessonListItem({
                     {/* Status */}
                     {lesson.isPublished ? (
                         <Badge className="bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 text-[10px] px-1.5 py-0">
-                            <GlobeIcon className="mr-0.5 size-2.5"/>
+                            <GlobeIcon className="mr-0.5 size-2.5" />
                             Live
                         </Badge>
                     ) : (
@@ -117,17 +117,17 @@ export function LessonListItem({
                     }
                     title={lesson.isPublished ? "Unpublish" : "Publish"}
                 >
-                    <Rocket className="size-3.5"/>
+                    <Rocket className="size-3.5" />
                 </Button>
                 <Button
                     variant="outline"
                     size="icon-sm"
                     nativeButton={false}
-                    render={<Link href={`/dashboard/learning-paths/${pathId}/lessons/${lesson.id}`}/>}
+                    render={<Link href={`/learning-paths/${pathId}/lessons/${lesson.id}`} />}
                     className="text-blue-600 border-blue-500/30 hover:bg-blue-500/10 hover:border-blue-500/40 dark:text-blue-400"
                     title="Edit"
                 >
-                    <Pencil className="size-3.5"/>
+                    <Pencil className="size-3.5" />
                 </Button>
                 <Button
                     variant="outline"
@@ -136,7 +136,7 @@ export function LessonListItem({
                     className="text-red-500 border-red-500/30 hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-600 dark:text-red-400"
                     title="Delete"
                 >
-                    <Trash2 className="size-3.5"/>
+                    <Trash2 className="size-3.5" />
                 </Button>
             </div>
         </div>

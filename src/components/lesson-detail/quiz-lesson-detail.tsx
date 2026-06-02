@@ -1,16 +1,17 @@
 "use client";
 
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {BookOpenIcon, FileQuestion, SettingsIcon} from "lucide-react";
-import {Card, CardContent} from "@/components/ui/card";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {QuizSettingsForm} from "@/components/quiz/quiz-settings-form";
-import {QuestionsTab} from "@/components/quiz/questions-tab";
-import {DangerZoneCard} from "@/components/lesson-detail/danger-zone-card";
-import {DeleteLessonDialog} from "@/components/lesson-detail/delete-lesson-dialog";
-import {Lesson} from "@/types/learning-path";
-import {useDeleteLesson, useUpdateLesson} from "@/hooks/use-lessons";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { BookOpenIcon, FileQuestion, SettingsIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { QuizSettingsForm } from "@/components/quiz/quiz-settings-form";
+import { QuestionsTab } from "@/components/quiz/questions-tab";
+import { DangerZoneCard } from "@/components/lesson-detail/danger-zone-card";
+import { DeleteLessonDialog } from "@/components/lesson-detail/delete-lesson-dialog";
+import { Lesson } from "@/types/learning-path";
+import { useDeleteLesson, useUpdateLesson } from "@/hooks/use-lessons";
 
 interface QuizLessonDetailProps {
     lesson: Lesson;
@@ -19,43 +20,48 @@ interface QuizLessonDetailProps {
     updateMutation: ReturnType<typeof useUpdateLesson>;
 }
 
-export function QuizLessonDetail({lesson, lessonId, learningPathId, updateMutation}: QuizLessonDetailProps) {
+export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutation }: QuizLessonDetailProps) {
+    const t = useTranslations("learningPaths");
+    const tCommon = useTranslations("common");
     const router = useRouter();
     const deleteMutation = useDeleteLesson();
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     const handleDelete = () => {
         deleteMutation.mutate(lessonId, {
-            onSuccess: () => router.push(`/dashboard/learning-paths/${learningPathId}`),
+            onSuccess: () => router.push(`/learning-paths/${learningPathId}`),
         });
     };
 
     return (
-        <>
-            <Tabs defaultValue="settings">
-                <TabsList>
-                    <TabsTrigger value="settings">
-                        <BookOpenIcon data-icon="inline-start"/>
-                        Settings
+        <div className="relative">
+            <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
+
+            <Tabs defaultValue="settings" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 max-w-[420px] bg-muted/60 p-1 rounded-xl">
+                    <TabsTrigger value="settings" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                        <BookOpenIcon className="size-3.5" />
+                        {t("settingsTab")}
                     </TabsTrigger>
-                    <TabsTrigger value="questions">
-                        <FileQuestion data-icon="inline-start"/>
-                        Questions
+                    <TabsTrigger value="questions" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                        <FileQuestion className="size-3.5" />
+                        {t("questionsTab")}
                         {lesson.questions && lesson.questions.length > 0 && (
-                            <span className="ml-2 inline-flex items-center justify-center size-6 rounded-full bg-muted text-sm font-bold text-foreground">
+                            <span className="inline-flex items-center justify-center size-5 rounded-md bg-muted text-[10px] font-extrabold border border-border/40 text-foreground shrink-0 shadow-inner">
                                 {lesson.questions.length}
                             </span>
                         )}
                     </TabsTrigger>
-                    <TabsTrigger value="danger">
-                        <SettingsIcon data-icon="inline-start"/>
-                        Danger Zone
+                    <TabsTrigger value="danger" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                        <SettingsIcon className="size-3.5" />
+                        {t("dangerZone")}
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="settings" className="mt-6">
-                    <Card>
-                        <CardContent className="p-6">
+                <TabsContent value="settings" className="mt-4 focus-visible:outline-none">
+                    <Card className="border-border/40 shadow-sm overflow-hidden relative">
+                        <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
+                        <CardContent className="p-5">
                             <QuizSettingsForm
                                 defaultValues={{
                                     type: "QUIZ",
@@ -66,7 +72,7 @@ export function QuizLessonDetail({lesson, lessonId, learningPathId, updateMutati
                                     timeLimitMinutes: lesson.timeLimitMinutes,
                                 }}
                                 onSubmit={async (data) => {
-                                    await updateMutation.mutateAsync({data, id: lessonId});
+                                    await updateMutation.mutateAsync({ data, id: lessonId });
                                 }}
                                 isPending={updateMutation.isPending}
                                 enableAutosave
@@ -75,12 +81,18 @@ export function QuizLessonDetail({lesson, lessonId, learningPathId, updateMutati
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="questions" className="mt-6">
-                    <QuestionsTab lessonId={lessonId}/>
+                <TabsContent value="questions" className="mt-4 focus-visible:outline-none">
+                    <QuestionsTab lessonId={lessonId} />
                 </TabsContent>
 
-                <TabsContent value="danger" className="mt-6">
-                    <DangerZoneCard onDelete={() => setIsDeleteOpen(true)}/>
+                <TabsContent value="danger" className="mt-4 focus-visible:outline-none">
+                    <DangerZoneCard
+                        onDelete={() => setIsDeleteOpen(true)}
+                        title={t("dangerZone")}
+                        actionLabel={t("deleteLessonSub")}
+                        description={t("deleteLessonDescShort")}
+                        buttonText={tCommon("delete")}
+                    />
                 </TabsContent>
             </Tabs>
 
@@ -91,6 +103,6 @@ export function QuizLessonDetail({lesson, lessonId, learningPathId, updateMutati
                 onConfirm={handleDelete}
                 isPending={deleteMutation.isPending}
             />
-        </>
+        </div>
     );
 }
