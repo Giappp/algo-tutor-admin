@@ -2,11 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, } from "@/components/ui/field";
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel, } from "@/components/ui/field";
 import { CreateTopicSchema, TopicRequestDTO, } from "@/types/learning-path/schema";
 
 interface TopicFormProps {
@@ -25,8 +24,6 @@ export function TopicForm({
     const {
         register,
         handleSubmit,
-        setValue,
-        watch,
         formState: { errors },
     } = useForm<TopicRequestDTO>({
         resolver: zodResolver(CreateTopicSchema),

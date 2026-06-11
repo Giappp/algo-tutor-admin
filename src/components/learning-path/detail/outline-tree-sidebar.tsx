@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpen, ChevronDown, Code2, FileQuestion, Plus, GraduationCap, PlusCircle } from "lucide-react";
+import { ChevronDown, Plus, GraduationCap, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useLessonsByTopic } from "@/hooks/use-lessons";
-import { Lesson, Level, Topic } from "@/types/learning-path";
+import { Lesson, Topic } from "@/types/learning-path";
 import { SidebarLessonList } from "./sidebar-lesson-list";
 
 interface ActiveItem {
@@ -28,7 +28,6 @@ interface OutlineTreeSidebarProps {
 
 export function OutlineTreeSidebar({
     topics,
-    pathId,
     pathName,
     isPremium,
     level,

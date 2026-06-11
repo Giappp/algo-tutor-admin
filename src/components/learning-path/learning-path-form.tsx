@@ -56,9 +56,9 @@ export function LearningPathFields({
 
     const labelClassName = "text-sm font-semibold text-foreground";
     const inputClassName =
-        "h-10 w-full min-w-0 rounded-xl border-border/60 text-sm focus-visible:ring-primary/20";
+        "w-full min-w-0 text-sm";
     const textareaClassName =
-        "w-full min-w-0 resize-y rounded-xl border-border/60 text-sm leading-relaxed focus-visible:ring-primary/20";
+        "w-full min-w-0 resize-y text-sm leading-relaxed";
 
     return (
         <FieldGroup className="min-w-0 max-w-full gap-5">
@@ -189,8 +189,8 @@ export function LearningPathFields({
                         }
                         disabled={isPending}
                         className={cn(
-                            "flex w-full min-w-0 items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 p-3 text-left transition-colors",
-                            "hover:bg-muted/40 active:scale-[0.99]",
+                            "flex w-full min-w-0 items-center justify-between gap-4 rounded-lg border border-border bg-background p-3 text-left shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition-colors",
+                            "hover:border-foreground/25 active:scale-[0.99]",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                             "disabled:cursor-not-allowed disabled:opacity-50"
                         )}

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
 
+function calculateRemainingTime(oldestTimestampMs: number, windowSeconds: number) {
+    const expireTime = oldestTimestampMs + windowSeconds * 1000;
+    return Math.max(0, expireTime - Date.now());
+}
+
 export function RealtimeCountdown({
     oldestTimestampMs,
     windowSeconds,
@@ -11,18 +16,13 @@ export function RealtimeCountdown({
     windowSeconds: number;
     onExpire?: () => void;
 }) {
-    const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [timeLeft, setTimeLeft] = useState(() =>
+        calculateRemainingTime(oldestTimestampMs, windowSeconds)
+    );
 
     useEffect(() => {
-        const calculateTime = () => {
-            const expireTime = oldestTimestampMs + windowSeconds * 1000;
-            return Math.max(0, expireTime - Date.now());
-        };
-
-        setTimeLeft(calculateTime());
-
         const interval = setInterval(() => {
-            const rem = calculateTime();
+            const rem = calculateRemainingTime(oldestTimestampMs, windowSeconds);
             setTimeLeft(rem);
             if (rem <= 0) {
                 clearInterval(interval);

@@ -15,7 +15,6 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
-    BotIcon,
     CodeIcon,
     GraduationCapIcon,
     LayoutDashboardIcon,
@@ -35,7 +34,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {
                     title: t("dashboard"),
                     url: "/",
-                    icon: <LayoutDashboardIcon className="size-4" />,
+                    icon: <LayoutDashboardIcon className="size-4 text-sky-600 dark:text-sky-400" />,
                 }
             ],
         },
@@ -45,7 +44,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {
                     title: t("learningPaths"),
                     url: "/learning-paths",
-                    icon: <GraduationCapIcon className="size-4" />,
+                    icon: <GraduationCapIcon className="size-4 text-violet-600 dark:text-violet-400" />,
                     items: [
                         { title: t("allPaths"), url: "/learning-paths" },
                         { title: t("createNew"), url: "/learning-paths/create" },
@@ -54,22 +53,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ],
         },
         {
-            label: t("aiLab"),
-            items: [
-                {
-                    title: t("aiModels"),
-                    url: "/models",
-                    icon: <BotIcon className="size-4" />,
-                }
-            ],
-        },
-        {
             label: t("administration"),
             items: [
                 {
                     title: t("users"),
                     url: "/users",
-                    icon: <UsersIcon className="size-4" />,
+                    icon: <UsersIcon className="size-4 text-emerald-600 dark:text-emerald-400" />,
                 },
             ],
         },
@@ -79,35 +68,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
             title: t("settings"),
             url: "/settings",
-            icon: <Settings2Icon className="size-4" />,
+            icon: <Settings2Icon className="size-4 text-slate-500 dark:text-slate-400" />,
         },
     ]
 
     return (
         <Sidebar
-            className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+            className="top-(--header-height) h-[calc(100svh-var(--header-height))]! [&_[data-slot=sidebar-inner]]:bg-[radial-gradient(circle_at_top_left,oklch(0.94_0.04_272),transparent_42%),var(--sidebar)] dark:[&_[data-slot=sidebar-inner]]:bg-[radial-gradient(circle_at_top_left,oklch(0.24_0.06_272),transparent_44%),var(--sidebar)]"
             {...props}
         >
-            <SidebarHeader className="pb-0">
+            <SidebarHeader className="p-3 pb-1">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" render={<Link href="/" />}>
-                            <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-sm">
-                                <CodeIcon className="size-3.5 text-white" />
+                        <SidebarMenuButton
+                            size="lg"
+                            tooltip="AlgoTutor"
+                            render={<Link href="/" />}
+                            className="h-16 rounded-xl border border-indigo-200/60 bg-white/65 px-3 shadow-sm shadow-indigo-950/5 backdrop-blur-sm hover:bg-white/90 dark:border-indigo-400/10 dark:bg-white/5 dark:hover:bg-white/10 group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none"
+                        >
+                            <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-indigo-600 shadow-md shadow-indigo-600/20">
+                                <CodeIcon className="size-4.5 text-white" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold text-foreground">AlgoTutor</span>
-                                <span className="truncate text-sm text-muted-foreground">{t("dashboard")}</span>
+                                <span className="truncate font-heading font-semibold tracking-tight text-foreground">AlgoTutor</span>
+                                <span className="truncate text-xs font-medium text-indigo-600/75 dark:text-indigo-300/75">{t("adminWorkspace")}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent className="pt-2">
+            <SidebarContent className="pt-3">
                 <NavMain groups={groups} />
                 <NavSecondary items={navSecondary} className="mt-auto" />
             </SidebarContent>
-            <SidebarFooter className="pt-0">
+            <SidebarFooter className="border-t border-sidebar-border/70 bg-sidebar/50 pt-2 backdrop-blur-sm">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -17,7 +17,7 @@ import { getBreadcrumbs } from "@/lib/breadcrumbs"
 import { PanelLeftIcon } from "lucide-react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 
-export function SiteHeader() {
+export function SiteHeader({hideSidebarToggle = false}: {hideSidebarToggle?: boolean}) {
     const { toggleSidebar } = useSidebar()
     const pathname = usePathname()
     const breadcrumbs = getBreadcrumbs(pathname)
@@ -25,18 +25,19 @@ export function SiteHeader() {
     return (
         <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-14 w-full items-center gap-4 px-4">
-                <Button
-                    className="size-9 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleSidebar}
-                >
-                    <PanelLeftIcon className="size-[18px]" />
-                </Button>
-                <Separator
-                    orientation="vertical"
-                    className="h-5"
-                />
+                {!hideSidebarToggle && (
+                    <>
+                        <Button
+                            className="size-9 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleSidebar}
+                        >
+                            <PanelLeftIcon className="size-[18px]" />
+                        </Button>
+                        <Separator orientation="vertical" className="h-5"/>
+                    </>
+                )}
                 <Breadcrumb className="hidden sm:block">
                     <BreadcrumbList>
                         {breadcrumbs.map((item, index) => (

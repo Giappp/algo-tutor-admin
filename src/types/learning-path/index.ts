@@ -6,7 +6,7 @@ export type LessonType = "THEORY" | "QUIZ" | "CODING";
 
 export type QuestionType = "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "TRUE_FALSE";
 
-export type ProgrammingLanguage = "JAVA" | "PYTHON";
+export type ProgrammingLanguage = "JAVA" | "PYTHON" | "CPP";
 
 // ---------------------------------------------------------------------------
 // Core Entities

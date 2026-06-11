@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CodeIcon, FileCode, SettingsIcon } from "lucide-react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { CodingContentForm } from "@/components/learning-path/coding-content-form";
+import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
 import { TestCasesTab } from "@/components/learning-path/test-cases-tab";
 import { EditorialsTab } from "@/components/learning-path/editorials-tab";
 import { DangerZoneCard } from "@/components/lesson-detail/danger-zone-card";
@@ -36,18 +36,15 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
     };
 
     return (
-        <div className="relative w-full rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm">
-            <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-
+        <div className="relative w-full overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_18px_50px_-44px_rgba(0,0,0,0.5)]">
             <ResizablePanelGroup
                 orientation="horizontal"
-                className="min-h-[calc(100vh-230px)] items-stretch"
+                className="min-h-[calc(100vh-245px)] items-stretch"
             >
                 {/* Left Panel: Content Form */}
                 <ResizablePanel defaultSize={50} minSize={35} maxSize={65} className="flex flex-col">
-                    <div className="h-full overflow-y-auto p-5 scrollbar-thin relative flex-1">
-                        <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-                        <CodingContentForm
+                    <div className="relative h-full flex-1 overflow-y-auto p-5 scrollbar-thin">
+                        <CodingLessonForm
                             defaultValues={{
                                 type: "CODING",
                                 title: lesson.title,
@@ -70,19 +67,17 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
                     </div>
                 </ResizablePanel>
 
-                <ResizableHandle withHandle className="bg-border/30 w-1.5 hover:bg-primary/20 transition-colors" />
+                <ResizableHandle withHandle className="w-1.5 bg-border/40 transition-colors hover:bg-primary/20" />
 
                 {/* Right Panel: Test Cases / Editorials / Settings */}
-                <ResizablePanel defaultSize={50} minSize={35} maxSize={65} className="flex flex-col border-l border-border/10 bg-muted/5">
-                    <div className="h-full flex flex-col relative flex-1">
-                        <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-                        {/* Right panel tabs */}
-                        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border/30 bg-muted/20">
+                <ResizablePanel defaultSize={50} minSize={35} maxSize={65} className="flex flex-col border-l border-border/20 bg-muted/[0.08]">
+                    <div className="relative flex h-full flex-1 flex-col">
+                        <div className="flex items-center gap-1 overflow-x-auto border-b border-border/50 bg-muted/20 px-3 py-2.5">
                             <TabButton
                                 active={rightTab === "test-cases"}
                                 onClick={() => setRightTab("test-cases")}
                                 badge={lesson.testCases?.length}
-                                className="text-xs font-bold transition-all h-8 px-3 rounded-lg"
+                                className="h-9 rounded-md px-3 text-sm font-medium transition-all"
                             >
                                 <CodeIcon className="size-3.5" />
                                 {t("testCasesTab")}
@@ -90,7 +85,7 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
                             <TabButton
                                 active={rightTab === "editorials"}
                                 onClick={() => setRightTab("editorials")}
-                                className="text-xs font-bold transition-all h-8 px-3 rounded-lg"
+                                className="h-9 rounded-md px-3 text-sm font-medium transition-all"
                             >
                                 <FileCode className="size-3.5" />
                                 {t("editorialsTab")}
@@ -98,7 +93,7 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
                             <TabButton
                                 active={rightTab === "settings"}
                                 onClick={() => setRightTab("settings")}
-                                className="text-xs font-bold transition-all h-8 px-3 rounded-lg"
+                                className="h-9 rounded-md px-3 text-sm font-medium transition-all"
                             >
                                 <SettingsIcon className="size-3.5" />
                                 {t("settingsTab")}

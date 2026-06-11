@@ -1,42 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { InlineEdit } from "@/components/ui/inline-edit";
-import { Difficulty, LessonType } from "@/types/learning-path";
+import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket} from "lucide-react";
+import {useTranslations} from "next-intl";
+import {Button} from "@/components/ui/button";
+import {Badge} from "@/components/ui/badge";
+import {InlineEdit} from "@/components/ui/inline-edit";
+import {Difficulty, LessonType} from "@/types/learning-path";
 
-const LESSON_TYPE_CONFIG: Record<LessonType, {
-    icon: React.ElementType;
-    bgGradient: string;
-    borderColor: string;
-    badgeClass: string;
-}> = {
-    THEORY: {
-        icon: BookOpen,
-        bgGradient: "from-blue-500/10 via-indigo-500/5 to-transparent",
-        borderColor: "border-l-blue-500",
-        badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    },
-    QUIZ: {
-        icon: FileQuestion,
-        bgGradient: "from-amber-500/10 via-orange-500/5 to-transparent",
-        borderColor: "border-l-amber-500",
-        badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    },
-    CODING: {
-        icon: Code2,
-        bgGradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
-        borderColor: "border-l-emerald-500",
-        badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    },
+const LESSON_TYPE_CONFIG: Record<LessonType, {icon: React.ElementType}> = {
+    THEORY: {icon: BookOpen},
+    QUIZ: {icon: FileQuestion},
+    CODING: {icon: Code2},
 };
 
-const DIFFICULTY_CONFIG: Record<Difficulty, { class: string; label: string }> = {
-    EASY: { class: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", label: "Easy" },
-    MEDIUM: { class: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20", label: "Medium" },
-    HARD: { class: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20", label: "Hard" },
+const DIFFICULTY_CONFIG: Record<Difficulty, {class: string; translationKey: "easy" | "medium" | "hard"}> = {
+    EASY: {class: "border-emerald-500/20 bg-emerald-500/8 text-emerald-700 dark:text-emerald-400", translationKey: "easy"},
+    MEDIUM: {class: "border-amber-500/20 bg-amber-500/8 text-amber-700 dark:text-amber-400", translationKey: "medium"},
+    HARD: {class: "border-red-500/20 bg-red-500/8 text-red-700 dark:text-red-400", translationKey: "hard"},
 };
 
 interface LessonHeaderProps {
@@ -61,112 +42,92 @@ export function LessonHeader({
     onTitleChange,
     isEditPending = false,
 }: LessonHeaderProps) {
-    const config = LESSON_TYPE_CONFIG[lesson.type];
-    const TypeIcon = config.icon;
+    const t = useTranslations("learningPaths");
+    const tLessonForm = useTranslations("lessonForm");
+    const TypeIcon = LESSON_TYPE_CONFIG[lesson.type].icon;
+    const typeKey = lesson.type === "THEORY" ? "theory" : lesson.type === "QUIZ" ? "quiz" : "coding";
 
     return (
-        <div
-            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${config.bgGradient} p-6`}
-        >
-            {/* Decorative accent */}
-            <div
-                className={`absolute left-0 top-0 bottom-0 w-1 ${config.borderColor} bg-gradient-to-b from-transparent via-current to-transparent opacity-60`} />
-
-            {/* Decorative glow */}
-            <div
-                className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none" />
-
-            <div className="relative flex items-start justify-between gap-4">
-                {/* Left section: Back + Lesson info */}
-                <div className="flex items-start gap-4">
+        <header className="relative overflow-hidden rounded-2xl border border-border/70 bg-card px-4 py-5 shadow-[0_18px_50px_-44px_rgba(0,0,0,0.5)] sm:px-6">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"/>
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                     <Button
                         variant="ghost"
-                        size="icon"
+                        size="icon-sm"
                         nativeButton={false}
-                        render={<Link href={`/learning-paths/${learningPathId}`} />}
-                        className="shrink-0 mt-1"
+                        render={<Link href={`/learning-paths/${learningPathId}`}/>}
+                        className="mt-1 shrink-0"
                     >
-                        <ArrowLeft className="size-5" />
+                        <ArrowLeft className="size-4"/>
                     </Button>
 
-                    <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div
-                            className={`shrink-0 flex items-center justify-center size-12 rounded-xl bg-background/80 backdrop-blur-sm shadow-sm border border-border/50`}>
-                            <TypeIcon className={`size-6 ${config.badgeClass.split(" ")[1]}`} />
+                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                        <div className="hidden size-11 shrink-0 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.06] text-primary sm:flex">
+                            <TypeIcon className="size-5"/>
                         </div>
-
-                        {/* Title & Meta */}
-                        <div className="min-w-0">
-                            {/* Inline editable title */}
+                        <div className="min-w-0 pt-0.5">
+                            <p className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                <span className="size-1.5 rounded-full bg-primary"/>
+                                {t(typeKey)}
+                            </p>
                             {onTitleChange ? (
                                 <InlineEdit
                                     value={lesson.title}
                                     onSave={onTitleChange}
                                     placeholder="Lesson title..."
                                     disabled={isEditPending}
+                                    className="max-w-2xl text-xl font-semibold tracking-tight sm:text-2xl"
                                 />
                             ) : (
-                                <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-md">
+                                <h1 className="max-w-2xl truncate text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
                                     {lesson.title}
                                 </h1>
                             )}
-                            <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                {/* Type badge */}
-                                <Badge variant="outline" className={config.badgeClass}>
-                                    {lesson.type.charAt(0) + lesson.type.slice(1).toLowerCase()}
-                                </Badge>
-
-                                {/* Difficulty badge */}
+                            <div className="mt-2.5 flex flex-wrap items-center gap-2">
                                 {lesson.difficulty && (
                                     <Badge variant="outline" className={DIFFICULTY_CONFIG[lesson.difficulty].class}>
-                                        {DIFFICULTY_CONFIG[lesson.difficulty].label}
+                                        {tLessonForm(`difficulty.${DIFFICULTY_CONFIG[lesson.difficulty].translationKey}`)}
                                     </Badge>
                                 )}
-
-                                {/* Publish status */}
                                 <Badge
-                                    variant={lesson.isPublished ? "default" : "outline"}
+                                    variant="outline"
                                     className={lesson.isPublished
-                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                        : "text-muted-foreground"
+                                        ? "border-primary/20 bg-primary/[0.06] text-primary"
+                                        : "border-border/70 bg-muted/35 text-muted-foreground"
                                     }
                                 >
-                                    {lesson.isPublished ? "Published" : "Draft"}
+                                    {lesson.isPublished ? t("published") : t("draft")}
                                 </Badge>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right section: Actions */}
-                <div className="flex items-center gap-2 shrink-0">
-                    {/* Preview link */}
+                <div className="flex shrink-0 items-center gap-2 pl-11 sm:pl-14 lg:pl-0">
                     <Button
                         variant="ghost"
                         size="sm"
                         nativeButton={false}
-                        render={<Link href={`/lessons/${lesson.slug || lesson.id}`} target="_blank" />}
+                        render={<Link href={`/lessons/${lesson.slug || lesson.id}`} target="_blank"/>}
                         className="text-muted-foreground hover:text-foreground"
                     >
-                        <Eye className="size-4 mr-1.5" />
-                        Preview
+                        <Eye className="size-4"/>
+                        {t("preview")}
                     </Button>
-
-                    {/* Toggle publish */}
                     <Button
-                        variant="outline"
+                        variant={lesson.isPublished ? "outline" : "default"}
                         size="sm"
                         onClick={onTogglePublish}
                         disabled={isEditPending}
                     >
-                        <Rocket className="size-4 mr-1.5" />
-                        {lesson.isPublished ? "Unpublish" : "Publish"}
+                        <Rocket className="size-4"/>
+                        {lesson.isPublished ? t("unpublish") : t("publish")}
                     </Button>
                 </div>
             </div>
-        </div>
+        </header>
     );
 }
 
-export { LESSON_TYPE_CONFIG, DIFFICULTY_CONFIG };
+export {LESSON_TYPE_CONFIG, DIFFICULTY_CONFIG};

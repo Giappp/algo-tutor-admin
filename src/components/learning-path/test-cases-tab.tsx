@@ -360,6 +360,8 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
         }
     });
 
+    // React Hook Form's watch function is intentionally reactive and not compiler-memoizable.
+    // eslint-disable-next-line react-hooks/incompatible-library
     const inputFileUrl = watch("inputFileUrl");
     const outputFileUrl = watch("outputFileUrl");
     const isSample = watch("isSample");

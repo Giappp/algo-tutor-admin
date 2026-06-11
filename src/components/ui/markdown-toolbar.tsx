@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback, useRef} from "react";
+import {useTranslations} from "next-intl";
 import {
     Bold,
     Code,
@@ -154,6 +155,7 @@ const CONSTRAINT_SNIPPET = `**Constraints:**
 // ---------------------------------------------------------------------------
 
 export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbarProps) {
+    const t = useTranslations("lessonForm");
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageUpload = useCallback(
@@ -169,10 +171,10 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                     after: "",
                 });
             } catch {
-                toast.error("Image upload failed. Please try again.");
+                toast.error(t("markdown.imageUploadFailed"));
             }
         },
-        [onInsert]
+        [onInsert, t]
     );
 
     return (
@@ -193,7 +195,7 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                                 type="button"
                                 variant="ghost"
                                 size="icon-xs"
-                                title={item.label}
+                                title={t(`markdown.toolbar.${item.id}`)}
                                 disabled={disabled}
                                 onClick={() => onInsert(item.action)}
                                 className="size-7 rounded-md"
@@ -212,7 +214,7 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                 type="button"
                 variant="ghost"
                 size="icon-xs"
-                title="Upload Image"
+                title={t("markdown.toolbar.uploadImage")}
                 disabled={disabled}
                 onClick={() => fileInputRef.current?.click()}
                 className="size-7 rounded-md"
@@ -234,23 +236,23 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                 type="button"
                 variant="ghost"
                 size="xs"
-                title="Sample IO Block"
+                title={t("markdown.toolbar.sampleIo")}
                 disabled={disabled}
                 onClick={() => onInsert({before: SAMPLE_IO_SNIPPET, after: "", placeholder: ""})}
                 className="h-7 px-2 text-[11px] font-medium text-muted-foreground"
             >
-                Sample IO
+                {t("markdown.toolbar.sampleIoShort")}
             </Button>
             <Button
                 type="button"
                 variant="ghost"
                 size="xs"
-                title="Constraint Template"
+                title={t("markdown.toolbar.constraints")}
                 disabled={disabled}
                 onClick={() => onInsert({before: CONSTRAINT_SNIPPET, after: "", placeholder: ""})}
                 className="h-7 px-2 text-[11px] font-medium text-muted-foreground"
             >
-                Constraints
+                {t("markdown.toolbar.constraintsShort")}
             </Button>
         </div>
     );

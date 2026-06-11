@@ -10,7 +10,7 @@ import {TopicForm} from "@/components/learning-path/topic-form";
 import {LessonListItem} from "./lesson-list-item";
 import {useDeleteLesson, useLessonsByTopic, useTogglePublishLesson} from "@/hooks/use-lessons";
 import {useDeleteTopic, useUpdateTopic} from "@/hooks/use-topics";
-import {Lesson, Topic, UpdateTopicRequest} from "@/types/learning-path";
+import {Lesson, Topic} from "@/types/learning-path";
 
 interface TopicAccordionItemProps {
     topic: Topic;

@@ -4,7 +4,7 @@ import { QuestionType } from "@/types/learning-path";
 export const LevelSchema = z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
 export const DifficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
 export const QuestionTypeSchema = z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TRUE_FALSE"]);
-export const ProgrammingLanguageSchema = z.enum(["JAVA", "PYTHON"]);
+export const ProgrammingLanguageSchema = z.enum(["JAVA", "PYTHON", "CPP"]);
 
 export const LessonChoiceSchema = z.object({
     text: z.string().min(1, "Choice text is required"),

@@ -6,89 +6,36 @@ import {Badge} from "@/components/ui/badge";
 interface SectionCardProps {
     number: string;
     title: string;
-    color: "indigo" | "amber" | "rose" | "cyan" | "violet" | "emerald";
     badge?: number;
     isOpen: boolean;
     onToggle: () => void;
     children: React.ReactNode;
 }
 
-const COLOR_MAP: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-    indigo: {
-        bg: "bg-indigo-500/10",
-        text: "text-indigo-600 dark:text-indigo-400",
-        border: "border-indigo-500/20",
-        dot: "bg-indigo-500",
-    },
-    amber: {
-        bg: "bg-amber-500/10",
-        text: "text-amber-600 dark:text-amber-400",
-        border: "border-amber-500/20",
-        dot: "bg-amber-500",
-    },
-    rose: {
-        bg: "bg-rose-500/10",
-        text: "text-rose-600 dark:text-rose-400",
-        border: "border-rose-500/20",
-        dot: "bg-rose-500",
-    },
-    cyan: {
-        bg: "bg-cyan-500/10",
-        text: "text-cyan-600 dark:text-cyan-400",
-        border: "border-cyan-500/20",
-        dot: "bg-cyan-500",
-    },
-    violet: {
-        bg: "bg-violet-500/10",
-        text: "text-violet-600 dark:text-violet-400",
-        border: "border-violet-500/20",
-        dot: "bg-violet-500",
-    },
-    emerald: {
-        bg: "bg-emerald-500/10",
-        text: "text-emerald-600 dark:text-emerald-400",
-        border: "border-emerald-500/20",
-        dot: "bg-emerald-500",
-    },
-};
-
 export const SectionCard = React.memo(function SectionCard({
     number,
     title,
-    color,
     badge,
     isOpen,
     onToggle,
     children,
 }: SectionCardProps) {
-    const cfg = COLOR_MAP[color];
-
     return (
-        <div
-            className={cn(
-                "border rounded-2xl overflow-hidden transition-all duration-200",
-                isOpen
-                    ? "bg-muted/20 border-muted-foreground/10 shadow-sm"
-                    : "bg-card hover:bg-muted/30 hover:border-muted-foreground/15"
-            )}
-        >
+        <section className="border-t border-border/60 first:border-t-0">
             <button
                 type="button"
                 onClick={onToggle}
-                className="w-full flex items-center gap-3.5 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                className={cn(
+                    "flex w-full items-center gap-3 px-1 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                    isOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
             >
-                <div
-                    className={cn(
-                        "shrink-0 flex items-center justify-center size-8 rounded-lg font-black text-sm tracking-tight",
-                        cfg.bg,
-                        cfg.text
-                    )}
-                >
+                <span className="w-5 shrink-0 font-mono text-xs text-muted-foreground">
                     {number}
-                </div>
-                <span className="flex-1 font-semibold text-sm">{title}</span>
+                </span>
+                <span className="flex-1 text-base font-semibold">{title}</span>
                 {badge !== undefined && (
-                    <Badge variant="secondary" className="shrink-0 tabular-nums">
+                    <Badge variant="secondary" className="h-5 shrink-0 rounded-md px-1.5 text-xs tabular-nums">
                         {badge}
                     </Badge>
                 )}
@@ -97,18 +44,11 @@ export const SectionCard = React.memo(function SectionCard({
                 </span>
             </button>
             {isOpen && (
-                <div className="px-5 pb-6">
-                    <div
-                        className={cn(
-                            "h-px bg-gradient-to-r from-transparent",
-                            cfg.bg.replace("/10", "/20"),
-                            "to-transparent mb-6 -mt-1"
-                        )}
-                    />
+                <div className="pb-7 pl-8 pr-1">
                     {children}
                 </div>
             )}
-        </div>
+        </section>
     );
 });
 

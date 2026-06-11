@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { BookOpenIcon, SettingsIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TheoryContentForm } from "@/components/learning-path/theory-content-form";
 import { DangerZoneCard } from "@/components/lesson-detail/danger-zone-card";
@@ -34,24 +33,20 @@ export function TheoryLessonDetail({ lesson, lessonId, learningPathId, updateMut
 
     return (
         <div className="relative">
-            <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-
             <Tabs defaultValue="content" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 max-w-[280px] bg-muted/60 p-1 rounded-xl">
-                    <TabsTrigger value="content" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                <TabsList variant="line" className="w-full justify-start border-b border-border/60">
+                    <TabsTrigger value="content" className="flex-none gap-1.5 rounded-none px-3 text-sm font-medium">
                         <BookOpenIcon className="size-3.5" />
                         {t("contentTab")}
                     </TabsTrigger>
-                    <TabsTrigger value="settings" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                    <TabsTrigger value="settings" className="flex-none gap-1.5 rounded-none px-3 text-sm font-medium">
                         <SettingsIcon className="size-3.5" />
                         {t("settingsTab")}
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="content" className="mt-4 focus-visible:outline-none">
-                    <Card className="border-border/40 shadow-sm overflow-hidden relative">
-                        <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-                        <CardContent className="p-5">
+                    <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-[0_18px_50px_-44px_rgba(0,0,0,0.5)] sm:p-6">
                             <TheoryContentForm
                                 defaultValues={{
                                     type: "THEORY",
@@ -66,8 +61,7 @@ export function TheoryLessonDetail({ lesson, lessonId, learningPathId, updateMut
                                 isPending={updateMutation.isPending}
                                 enableAutosave
                             />
-                        </CardContent>
-                    </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="settings" className="mt-4 focus-visible:outline-none">

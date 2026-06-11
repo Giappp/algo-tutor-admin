@@ -47,6 +47,40 @@ interface AITokensTabProps {
     setAiDays: (days: number) => void;
 }
 
+interface TokenTooltipEntry {
+    name?: string;
+    value?: number;
+    color?: string;
+    payload?: {
+        date?: string;
+        fill?: string;
+    };
+}
+
+function TokenChartTooltip({
+    active,
+    payload,
+}: {
+    active?: boolean;
+    payload?: TokenTooltipEntry[];
+}) {
+    if (!active || !payload?.length) return null;
+
+    return (
+        <div className="backdrop-blur-md bg-background/80 dark:bg-card/85 border border-border/40 px-3.5 py-2.5 rounded-xl shadow-lg flex flex-col gap-1.5 text-[11px] font-sans">
+            <span className="font-semibold text-foreground">{payload[0].payload?.date || payload[0].name}</span>
+            <div className="flex flex-col gap-0.5 mt-1 font-mono text-[10px]">
+                {payload.map((item, index) => (
+                    <span key={`${item.name}-${index}`} className="flex items-center gap-1.5 text-muted-foreground">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color || item.payload?.fill }} />
+                        {item.name}: <strong className="text-foreground font-extrabold">{item.value?.toLocaleString()}</strong>
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
     const t = useTranslations("dashboard");
 
@@ -105,26 +139,6 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
             fill
         };
     });
-
-    // Custom Glassmorphism Tooltip for Token Charts
-    const CustomTooltip = ({ active, payload }: any) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="backdrop-blur-md bg-background/80 dark:bg-card/85 border border-border/40 px-3.5 py-2.5 rounded-xl shadow-lg flex flex-col gap-1.5 text-[11px] font-sans">
-                    <span className="font-semibold text-foreground">{payload[0].payload.date || payload[0].name}</span>
-                    <div className="flex flex-col gap-0.5 mt-1 font-mono text-[10px]">
-                        {payload.map((p: any) => (
-                            <span key={p.name} className="flex items-center gap-1.5 text-muted-foreground">
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p.color || p.payload.fill }} />
-                                {p.name}: <strong className="text-foreground font-extrabold">{p.value.toLocaleString()}</strong>
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-        return null;
-    };
 
     return (
         <div className="flex flex-col gap-6 fadeInUp">
@@ -219,7 +233,7 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                                 axisLine={false}
                                 tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                             />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<TokenChartTooltip />} />
                             <Area
                                 type="monotone"
                                 dataKey="inputTokens"
@@ -270,7 +284,7 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                                             <Cell key={`cell-${index}`} fill={entry.fill} className="hover:opacity-90 hover:scale-[1.02] origin-center transition-all duration-300 cursor-pointer" />
                                         ))}
                                     </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <Tooltip content={<TokenChartTooltip />} />
                                 </PieChart>
                             </ChartContainer>
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">

@@ -282,7 +282,7 @@ export function AIQuestionGeneratorDialog({
                                     placeholder="e.g. Balanced BST Rotations, Graph DFS recursion, Heap sort..."
                                     value={topic}
                                     onChange={(e) => setTopic(e.target.value)}
-                                    className="h-11 text-sm rounded-lg"
+                                    className="h-11 text-sm"
                                 />
                             </div>
 

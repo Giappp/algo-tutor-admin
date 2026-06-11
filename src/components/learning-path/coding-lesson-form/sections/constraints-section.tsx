@@ -1,6 +1,7 @@
 "use client";
 
 import {UseFormRegister} from "react-hook-form";
+import {useTranslations} from "next-intl";
 import {Plus, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
@@ -30,13 +31,15 @@ export function ConstraintsSection({
     onUpdate,
     isPending,
 }: ConstraintsSectionProps) {
+    const t = useTranslations("lessonForm");
+
     return (
         <div className="flex flex-col gap-6">
             <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
-                    label="Time Limit"
+                    label={t("coding.timeLimit")}
                     error={errors.baseTimeLimitMs?.message}
-                    description="Maximum execution time in milliseconds"
+                    description={t("coding.timeLimitDescription")}
                 >
                     <div className="relative">
                         <Input
@@ -54,9 +57,9 @@ export function ConstraintsSection({
                     </div>
                 </FormField>
                 <FormField
-                    label="Memory Limit"
+                    label={t("coding.memoryLimit")}
                     error={errors.baseMemoryLimitMb?.message}
-                    description="Maximum memory usage in megabytes"
+                    description={t("coding.memoryLimitDescription")}
                 >
                     <div className="relative">
                         <Input
@@ -76,14 +79,14 @@ export function ConstraintsSection({
             </div>
 
             <FormField
-                label="Constraints"
+                label={t("coding.constraints")}
                 error={errors.constraints?.message as string | undefined}
-                description="Define input bounds. Each constraint appears on its own line."
+                description={t("coding.constraintsDescription")}
             >
                 <div className="flex flex-col gap-2">
                     {constraints.length === 0 && (
                         <p className="text-sm text-muted-foreground italic py-1">
-                            No constraints added yet.
+                            {t("coding.noConstraints")}
                         </p>
                     )}
                     {constraints.map((field, i) => (
@@ -93,7 +96,7 @@ export function ConstraintsSection({
                                     {String(i + 1).padStart(2, "0")}
                                 </span>
                                 <Input
-                                    placeholder="e.g. 2 <= nums.length <= 10^4"
+                                    placeholder={t("coding.constraintPlaceholder")}
                                     className="pl-8 font-mono text-sm"
                                     value={field}
                                     onChange={(e) => onUpdate(i, e.target.value)}
@@ -119,7 +122,7 @@ export function ConstraintsSection({
                         className="self-start mt-1"
                     >
                         <Plus className="w-3.5 h-3.5 mr-1.5"/>
-                        Add Constraint
+                        {t("coding.addConstraint")}
                     </Button>
                 </div>
             </FormField>

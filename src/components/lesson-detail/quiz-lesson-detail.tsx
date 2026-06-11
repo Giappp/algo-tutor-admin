@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { BookOpenIcon, FileQuestion, SettingsIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuizSettingsForm } from "@/components/quiz/quiz-settings-form";
 import { QuestionsTab } from "@/components/quiz/questions-tab";
@@ -35,33 +34,29 @@ export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutat
 
     return (
         <div className="relative">
-            <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-
             <Tabs defaultValue="settings" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 max-w-[420px] bg-muted/60 p-1 rounded-xl">
-                    <TabsTrigger value="settings" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                <TabsList variant="line" className="w-full justify-start overflow-x-auto border-b border-border/60">
+                    <TabsTrigger value="settings" className="flex-none gap-1.5 rounded-none px-3 text-sm font-medium">
                         <BookOpenIcon className="size-3.5" />
                         {t("settingsTab")}
                     </TabsTrigger>
-                    <TabsTrigger value="questions" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                    <TabsTrigger value="questions" className="flex-none gap-1.5 rounded-none px-3 text-sm font-medium">
                         <FileQuestion className="size-3.5" />
                         {t("questionsTab")}
                         {lesson.questions && lesson.questions.length > 0 && (
-                            <span className="inline-flex items-center justify-center size-5 rounded-md bg-muted text-[10px] font-extrabold border border-border/40 text-foreground shrink-0 shadow-inner">
+                            <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-md border border-border/40 bg-muted text-xs font-semibold tabular-nums text-foreground">
                                 {lesson.questions.length}
                             </span>
                         )}
                     </TabsTrigger>
-                    <TabsTrigger value="danger" className="rounded-lg text-xs font-bold transition-all gap-1.5">
+                    <TabsTrigger value="danger" className="flex-none gap-1.5 rounded-none px-3 text-sm font-medium">
                         <SettingsIcon className="size-3.5" />
                         {t("dangerZone")}
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="settings" className="mt-4 focus-visible:outline-none">
-                    <Card className="border-border/40 shadow-sm overflow-hidden relative">
-                        <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
-                        <CardContent className="p-5">
+                    <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-[0_18px_50px_-44px_rgba(0,0,0,0.5)] sm:p-6">
                             <QuizSettingsForm
                                 defaultValues={{
                                     type: "QUIZ",
@@ -77,8 +72,7 @@ export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutat
                                 isPending={updateMutation.isPending}
                                 enableAutosave
                             />
-                        </CardContent>
-                    </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="questions" className="mt-4 focus-visible:outline-none">

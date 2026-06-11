@@ -122,7 +122,7 @@ export function QuestionForm({
                                 <Textarea
                                     id="question"
                                     placeholder="Ví dụ: Độ phức tạp thời gian của Binary Search là gì?"
-                                    className="min-h-[132px] resize-none rounded-xl text-base leading-7 placeholder:text-muted-foreground/60"
+                                    className="min-h-[132px] resize-none text-base leading-7"
                                     aria-invalid={!!errors.question}
                                     {...register("question")}
                                 />
@@ -150,7 +150,7 @@ export function QuestionForm({
                                 <Textarea
                                     id="explanation"
                                     placeholder="Giải thích vì sao đáp án đúng là chính xác..."
-                                    className="min-h-[132px] resize-none rounded-xl text-base leading-7 placeholder:text-muted-foreground/60"
+                                    className="min-h-[132px] resize-none text-base leading-7"
                                     {...register("explanation")}
                                 />
 
@@ -174,16 +174,16 @@ export function QuestionForm({
                                 </p>
                             </div>
 
-                            <div className="grid gap-2 rounded-xl border bg-muted/40 p-1 sm:grid-cols-2">
+                            <div className="grid gap-2 rounded-md border border-border bg-background p-1 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:grid-cols-2">
                                 <button
                                     type="button"
                                     onClick={() => handleTypeChange("SINGLE_CHOICE")}
                                     className={cn(
-                                        "rounded-lg px-4 py-2.5 text-sm font-semibold transition-all",
+                                        "rounded-sm px-4 py-2.5 text-sm font-semibold transition-all",
                                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                         watchedType === "SINGLE_CHOICE"
-                                            ? "border border-border bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
                                     )}
                                 >
                                     Một đáp án đúng
@@ -193,11 +193,11 @@ export function QuestionForm({
                                     type="button"
                                     onClick={() => handleTypeChange("MULTIPLE_CHOICE")}
                                     className={cn(
-                                        "rounded-lg px-4 py-2.5 text-sm font-semibold transition-all",
+                                        "rounded-sm px-4 py-2.5 text-sm font-semibold transition-all",
                                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                         watchedType === "MULTIPLE_CHOICE"
-                                            ? "border border-border bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
                                     )}
                                 >
                                     Nhiều đáp án đúng
@@ -218,7 +218,7 @@ export function QuestionForm({
                                     id="points"
                                     type="number"
                                     min={1}
-                                    className="h-11 rounded-xl text-base font-medium"
+                                    className="h-11 text-base font-medium"
                                     aria-invalid={!!errors.points}
                                     {...register("points", { valueAsNumber: true })}
                                 />
@@ -309,7 +309,7 @@ export function QuestionForm({
 
                                                             <Input
                                                                 placeholder={`Nhập đáp án ${index + 1}`}
-                                                                className="h-11 rounded-xl text-base placeholder:text-muted-foreground/60"
+                                                                className="h-11 text-base"
                                                                 {...register(
                                                                     `choices.${index}.text` as const
                                                                 )}
@@ -323,7 +323,7 @@ export function QuestionForm({
 
                                                             <Input
                                                                 placeholder="Giải thích ngắn cho lựa chọn này"
-                                                                className="h-11 rounded-xl border-dashed bg-muted/20 text-base placeholder:text-muted-foreground/60"
+                                                                className="h-11 border-dashed text-base"
                                                                 {...register(
                                                                     `choices.${index}.explanation` as const
                                                                 )}

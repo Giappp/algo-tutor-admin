@@ -22,15 +22,15 @@ export function FormField({
                               className,
                           }: FormFieldProps) {
     return (
-        <div className={cn("flex flex-col gap-1", className)}>
+        <div className={cn("flex flex-col gap-2", className)}>
             {label && (
-                <Label className="text-sm font-medium">
+                <Label className="text-[13px] font-semibold leading-none text-foreground/90">
                     {label}
                     {required && <span className="text-destructive ml-0.5">*</span>}
                 </Label>
             )}
             {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
+                <p className="-mt-0.5 text-xs leading-relaxed text-muted-foreground">{description}</p>
             )}
             {children}
             {error && (

@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback, useRef, useState} from "react";
+import {useTranslations} from "next-intl";
 import {Eye, Pencil, Columns2} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -30,11 +31,12 @@ interface MarkdownSplitEditorProps {
 export function MarkdownSplitEditor({
     value,
     onChange,
-    placeholder = "Write markdown content...",
+    placeholder,
     disabled,
     className,
     minHeight = "400px",
 }: MarkdownSplitEditorProps) {
+    const t = useTranslations("lessonForm");
     const [viewMode, setViewMode] = useState<ViewMode>("split");
     const editorRef = useRef<MarkdownEditorHandle>(null);
 
@@ -75,7 +77,7 @@ export function MarkdownSplitEditor({
                             ref={editorRef}
                             value={value}
                             onChange={onChange}
-                            placeholder={placeholder}
+                            placeholder={placeholder ?? t("markdown.placeholder")}
                             disabled={disabled}
                             minHeight={minHeight}
                         />
@@ -89,7 +91,7 @@ export function MarkdownSplitEditor({
                             <MarkdownDisplay content={value}/>
                         ) : (
                             <p className="text-sm text-muted-foreground italic">
-                                Preview will appear here...
+                                {t("markdown.emptyPreview")}
                             </p>
                         )}
                     </div>
@@ -109,10 +111,11 @@ interface ViewModeToggleProps {
 }
 
 function ViewModeToggle({value, onChange}: ViewModeToggleProps) {
+    const t = useTranslations("lessonForm");
     const modes: {id: ViewMode; icon: React.ElementType; label: string}[] = [
-        {id: "edit", icon: Pencil, label: "Editor only"},
-        {id: "split", icon: Columns2, label: "Split view"},
-        {id: "preview", icon: Eye, label: "Preview only"},
+        {id: "edit", icon: Pencil, label: t("markdown.editorOnly")},
+        {id: "split", icon: Columns2, label: t("markdown.splitView")},
+        {id: "preview", icon: Eye, label: t("markdown.previewOnly")},
     ];
 
     return (

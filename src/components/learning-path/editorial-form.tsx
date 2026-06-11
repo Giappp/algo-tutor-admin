@@ -31,11 +31,13 @@ interface EditorialFormProps {
 const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string }[] = [
     {value: "JAVA", label: "Java"},
     {value: "PYTHON", label: "Python"},
+    {value: "CPP", label: "C++"},
 ];
 
 const LANGUAGE_MAP: Record<ProgrammingLanguage, string> = {
     JAVA: "java",
     PYTHON: "python",
+    CPP: "cpp",
 };
 
 export function EditorialForm({

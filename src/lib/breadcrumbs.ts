@@ -25,6 +25,7 @@ const BREADCRUMB_MAP: Record<string, BreadcrumbItem[]> = {
   "/dashboard/users": [{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }],
   "/dashboard/models": [{ label: "Dashboard", href: "/dashboard" }, { label: "AI Models" }],
   "/dashboard/settings": [{ label: "Dashboard", href: "/dashboard" }, { label: "Settings" }],
+  "/account": [{ label: "Dashboard", href: "/" }, { label: "Account" }],
   "/dashboard/playground": [{ label: "Dashboard", href: "/dashboard" }, { label: "Playground" }],
 }
 

@@ -61,8 +61,8 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
     return (
         <>
             {groups.map((group) => (
-                <SidebarGroup key={group.label} className="py-1">
-                    <SidebarGroupLabel className="px-3 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold mb-0.5">
+                <SidebarGroup key={group.label} className="py-1.5">
+                    <SidebarGroupLabel className="mb-1 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/65">
                         {group.label}
                     </SidebarGroupLabel>
                     <SidebarMenu className="gap-0.5">
@@ -80,7 +80,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                                         tooltip={item.title}
                                         data-active={active ? "true" : undefined}
                                         render={<Link href={item.url} />}
-                                        className="h-8 text-[13px]"
+                                        className="h-9 rounded-lg text-sm hover:bg-white/70 dark:hover:bg-white/5 data-active:bg-indigo-100/80 data-active:text-indigo-800 data-active:shadow-sm data-active:shadow-indigo-950/5 dark:data-active:bg-indigo-400/15 dark:data-active:text-indigo-200"
                                     >
                                         {item.icon}
                                         <span>{item.title}</span>
@@ -103,7 +103,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                                                                 <SidebarMenuSubButton
                                                                     data-active={subActive ? "true" : undefined}
                                                                     render={<Link href={subItem.url} />}
-                                                                    className="text-[12px] h-7"
+                                                                    className="text-sm h-7"
                                                                 >
                                                                     <span>{subItem.title}</span>
                                                                 </SidebarMenuSubButton>

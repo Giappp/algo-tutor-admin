@@ -1,6 +1,7 @@
 "use client";
 
 import {useState} from "react";
+import {useTranslations} from "next-intl";
 import {FileCode2, Sparkles} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
@@ -19,6 +20,7 @@ interface CodingTemplatePickerProps {
 }
 
 export function CodingTemplatePicker({onSelect, disabled}: CodingTemplatePickerProps) {
+    const t = useTranslations("lessonForm");
     const [isOpen, setIsOpen] = useState(false);
 
     const handleSelect = (template: ProblemTemplate) => {
@@ -37,7 +39,7 @@ export function CodingTemplatePicker({onSelect, disabled}: CodingTemplatePickerP
                 className="gap-1.5"
             >
                 <Sparkles className="size-3.5"/>
-                Use Template
+                {t("coding.useTemplate")}
             </Button>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -45,11 +47,10 @@ export function CodingTemplatePicker({onSelect, disabled}: CodingTemplatePickerP
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <FileCode2 className="size-5"/>
-                            Problem Templates
+                            {t("coding.templateDialogTitle")}
                         </DialogTitle>
                         <DialogDescription>
-                            Choose a template to pre-fill the problem statement, constraints, examples, and hints.
-                            You can customize everything after selecting.
+                            {t("coding.templateDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -62,20 +63,20 @@ export function CodingTemplatePicker({onSelect, disabled}: CodingTemplatePickerP
                                 className="flex flex-col gap-2 rounded-lg border p-4 text-left transition-all hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm"
                             >
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm font-semibold">{template.label}</span>
+                                    <span className="text-sm font-semibold">{t(`coding.templates.${template.id}.label`)}</span>
                                     <Badge variant="secondary" className="text-[10px]">
-                                        {template.category}
+                                    {t(`coding.templates.${template.id}.category`)}
                                     </Badge>
                                 </div>
                                 <p className="text-xs text-muted-foreground leading-relaxed">
-                                    {template.description}
+                                    {t(`coding.templates.${template.id}.description`)}
                                 </p>
                                 <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-1">
-                                    <span>{template.constraints.length} constraints</span>
+                                    <span>{t("coding.templateConstraints", {count: template.constraints.length})}</span>
                                     <span>·</span>
-                                    <span>{template.examples.length} example{template.examples.length !== 1 ? "s" : ""}</span>
+                                    <span>{t("coding.templateExamples", {count: template.examples.length})}</span>
                                     <span>·</span>
-                                    <span>{template.hints.length} hint{template.hints.length !== 1 ? "s" : ""}</span>
+                                    <span>{t("coding.templateHints", {count: template.hints.length})}</span>
                                 </div>
                             </button>
                         ))}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { GraduationCap, Settings } from "lucide-react";
@@ -42,11 +42,16 @@ interface ActiveItem {
     topicId?: number;
 }
 
+function isActiveItemType(value: string | null): value is ActiveItem["type"] {
+    return value === "path" || value === "topic" || value === "lesson" || value === "create-lesson";
+}
+
 export default function LearningPathDetailPage() {
     const t = useTranslations("learningPaths");
     const tCommon = useTranslations("common");
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const id = Number(params.id);
 
     const { data: lp, isLoading } = useLearningPath(id);
@@ -61,7 +66,15 @@ export default function LearningPathDetailPage() {
     const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
 
     // Active item workspace state
-    const [activeItem, setActiveItemState] = useState<ActiveItem>({ type: "path" });
+    const [activeItem, setActiveItemState] = useState<ActiveItem>(() => {
+        const type = searchParams.get("type");
+
+        return {
+            type: isActiveItemType(type) ? type : "path",
+            id: searchParams.get("id") ? Number(searchParams.get("id")) : undefined,
+            topicId: searchParams.get("topicId") ? Number(searchParams.get("topicId")) : undefined,
+        };
+    });
 
     // Sync active state to URL query parameters
     const setActiveItem = (item: ActiveItem) => {
@@ -73,23 +86,9 @@ export default function LearningPathDetailPage() {
         router.replace(`/learning-paths/${id}?${searchParams.toString()}`, { scroll: false });
     };
 
-    // On mount, read initial state from search query parameters
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const searchParams = new URLSearchParams(window.location.search);
-            const type = (searchParams.get("type") as any) || "path";
-            const itemId = searchParams.get("id") ? Number(searchParams.get("id")) : undefined;
-            const topicId = searchParams.get("topicId") ? Number(searchParams.get("topicId")) : undefined;
-
-            if (["path", "topic", "lesson", "create-lesson"].includes(type)) {
-                setActiveItemState({ type, id: itemId, topicId });
-            }
-        }
-    }, []);
-
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto">
+            <div className="flex flex-col gap-6 p-4 xl:p-5 w-full">
                 <div className="flex items-center gap-3">
                     <Skeleton className="size-8 rounded-lg" />
                     <div className="space-y-2">
@@ -131,7 +130,7 @@ export default function LearningPathDetailPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 p-6 min-h-[calc(100vh-80px)] w-full max-w-7xl mx-auto stagger-children">
+        <div className="flex min-h-[calc(100dvh-var(--header-height))] w-full flex-col gap-4 p-3 sm:p-4 xl:p-5 stagger-children">
             {/* Ambient Background Glows */}
             <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.55_0.22_272/0.03)_0%,transparent_70%)] pointer-events-none -z-10 animate-gradient-shift" />
 
@@ -164,9 +163,9 @@ export default function LearningPathDetailPage() {
             </div>
 
             {/* Workspace Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="grid flex-1 grid-cols-1 items-start gap-4 lg:grid-cols-[19rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
                 {/* Left Column: Outline Tree Sidebar */}
-                <div className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-border/40 bg-card/60 backdrop-blur-md shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-190px)] min-h-[550px] relative">
+                <div className="relative flex min-h-[550px] flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/60 shadow-sm backdrop-blur-md lg:sticky lg:top-[calc(var(--header-height)+1rem)] lg:max-h-[calc(100dvh-var(--header-height)-2rem)]">
                     <div className="absolute inset-0 noise-overlay opacity-[0.01] pointer-events-none" />
                     <OutlineTreeSidebar
                         topics={lp.topics ?? []}
@@ -181,7 +180,7 @@ export default function LearningPathDetailPage() {
                 </div>
 
                 {/* Right Column: Editor Canvas */}
-                <div className="lg:col-span-8 xl:col-span-9 rounded-2xl border border-border/40 bg-card shadow-sm p-6 overflow-y-auto max-h-[calc(100vh-190px)] min-h-[550px] flex flex-col relative">
+                <div className="relative flex min-h-[650px] min-w-0 flex-col overflow-y-auto rounded-2xl border border-border/40 bg-card p-4 shadow-sm sm:p-5 xl:p-6 lg:max-h-[calc(100dvh-var(--header-height)-2rem)]">
                     <div className="absolute inset-0 noise-overlay opacity-[0.01] pointer-events-none" />
                     {activeItem.type === "path" && (
                         <div className="space-y-6 flex-1">

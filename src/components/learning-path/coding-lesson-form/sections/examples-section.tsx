@@ -1,9 +1,11 @@
 "use client";
 
 import {FieldArrayWithId, UseFormRegister} from "react-hook-form";
+import {useTranslations} from "next-intl";
 import {Plus, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
 import {FormField} from "@/components/learning-path/form-field";
 import {CodingLessonDTO} from "@/types/learning-path/schema";
 
@@ -22,15 +24,15 @@ export function ExamplesSection({
     onRemove,
     isPending,
 }: ExamplesSectionProps) {
+    const t = useTranslations("lessonForm");
+
     return (
         <div className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">
-                Show worked examples to help students understand the problem.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("coding.examplesDescription")}</p>
             {fields.map((field, i) => (
-                <div key={field.id} className="rounded-xl border border-dashed bg-card">
-                    <div className="flex items-center justify-between px-4 py-2.5 border-b bg-muted/20">
-                        <span className="text-sm font-semibold">Example {i + 1}</span>
+                <div key={field.id} className="border-l-2 border-border pl-4">
+                    <div className="mb-3 flex items-center justify-between">
+                        <span className="text-sm font-semibold">{t("coding.example", {number: i + 1})}</span>
                         {fields.length > 1 && (
                             <Button
                                 type="button"
@@ -43,26 +45,26 @@ export function ExamplesSection({
                             </Button>
                         )}
                     </div>
-                    <div className="p-4 flex flex-col gap-3">
+                    <div className="flex flex-col gap-3">
                         <div className="grid gap-3 sm:grid-cols-2">
-                            <FormField label="Input" className="text-xs">
-                                <textarea
+                            <FormField label={t("coding.input")} className="text-sm">
+                                <Textarea
                                     placeholder="[2,7,11,15], target=9"
-                                    className="w-full min-h-16 rounded-lg border border-input bg-background px-3 py-2 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring/50"
+                                    className="min-h-20 resize-y font-mono text-sm"
                                     {...register(`examples.${i}.input` as const)}
                                     disabled={isPending}
                                 />
                             </FormField>
-                            <FormField label="Expected Output" className="text-xs">
-                                <textarea
+                            <FormField label={t("coding.expectedOutput")} className="text-sm">
+                                <Textarea
                                     placeholder="[0,1]"
-                                    className="w-full min-h-16 rounded-lg border border-input bg-background px-3 py-2 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring/50"
+                                    className="min-h-20 resize-y font-mono text-sm"
                                     {...register(`examples.${i}.output` as const)}
                                     disabled={isPending}
                                 />
                             </FormField>
                         </div>
-                        <FormField label="Explanation (optional)" className="text-xs">
+                        <FormField label={t("coding.explanationOptional")} className="text-sm">
                             <Input
                                 placeholder="Because nums[0] + nums[1] == 9..."
                                 {...register(`examples.${i}.explanation` as const)}
@@ -80,7 +82,7 @@ export function ExamplesSection({
                 className="self-start"
             >
                 <Plus className="w-3.5 h-3.5 mr-1.5"/>
-                Add Example
+                {t("coding.addExample")}
             </Button>
         </div>
     );

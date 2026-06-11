@@ -42,11 +42,13 @@ interface EditorialsTabProps {
 const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string; icon: string; monacoLang: string }[] = [
     { value: "JAVA", label: "Java", icon: "☕", monacoLang: "java" },
     { value: "PYTHON", label: "Python", icon: "🐍", monacoLang: "python" },
+    { value: "CPP", label: "C++", icon: "C++", monacoLang: "cpp" },
 ];
 
 const LANGUAGE_COLORS: Record<ProgrammingLanguage, { bg: string; text: string; border: string }> = {
     JAVA: { bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400", border: "border-l-orange-500" },
     PYTHON: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-l-blue-500" },
+    CPP: { bg: "bg-sky-500/10", text: "text-sky-600 dark:text-sky-400", border: "border-l-sky-500" },
 };
 
 export function EditorialsTab({ lessonId }: EditorialsTabProps) {

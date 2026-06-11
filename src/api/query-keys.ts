@@ -36,4 +36,10 @@ export const queryKeys = {
         aiTokens: (days?: number) => ["dashboard", "ai-tokens", { days }] as const,
         apiQuotas: () => ["dashboard", "api-quotas"] as const,
     },
+
+    // ─── Admin Users ─────────────────────────────────────────────────────
+    adminUsers: {
+        all: ["admin-users"] as const,
+        list: (params?: object) => ["admin-users", "list", params] as const,
+    },
 } as const;

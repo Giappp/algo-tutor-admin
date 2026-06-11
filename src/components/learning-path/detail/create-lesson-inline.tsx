@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpenIcon, CodeIcon, FileQuestionIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {cn} from "@/lib/utils";
 import { TheoryForm } from "@/components/learning-path/theory-form";
 import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
 import { QuizForm } from "@/components/quiz/quiz-form";
@@ -15,23 +16,14 @@ const LESSON_TYPES = [
     {
         type: "THEORY" as const,
         icon: BookOpenIcon,
-        iconClass: "text-blue-600 dark:text-blue-400",
-        bgClass: "bg-blue-500/10 border-blue-500/20",
-        activeClass: "ring-2 ring-blue-500/30 border-blue-500/40 bg-blue-500/5 dark:bg-blue-500/10 shadow-sm shadow-blue-500/5",
     },
     {
         type: "QUIZ" as const,
         icon: FileQuestionIcon,
-        iconClass: "text-amber-600 dark:text-amber-400",
-        bgClass: "bg-amber-500/10 border-amber-500/20",
-        activeClass: "ring-2 ring-amber-500/30 border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10 shadow-sm shadow-amber-500/5",
     },
     {
         type: "CODING" as const,
         icon: CodeIcon,
-        iconClass: "text-emerald-600 dark:text-emerald-400",
-        bgClass: "bg-emerald-500/10 border-emerald-500/20",
-        activeClass: "ring-2 ring-emerald-500/30 border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10 shadow-sm shadow-emerald-500/5",
     },
 ];
 
@@ -44,7 +36,6 @@ interface CreateLessonInlineProps {
 
 export function CreateLessonInline({
     topicId,
-    learningPathId,
     onSuccess,
     onCancel,
 }: CreateLessonInlineProps) {
@@ -115,20 +106,17 @@ export function CreateLessonInline({
                             key={item.type}
                             type="button"
                             onClick={() => setSelectedType(item.type)}
-                            className={`
-                                flex items-center gap-3.5 rounded-xl border p-4 text-left transition-all duration-300 select-none cursor-pointer active:scale-[0.99]
-                                ${isActive
-                                    ? item.activeClass
-                                    : "border-border/50 bg-background/50 hover:border-border/90 hover:bg-muted/30 shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
-                                }
-                            `}
+                            className={cn(
+                                "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors active:translate-y-px",
+                                isActive ? "border-primary/40 bg-primary/5" : "border-border/70 bg-background hover:bg-muted/30",
+                            )}
                         >
-                            <div className={`flex items-center justify-center size-10 rounded-xl shrink-0 border border-transparent ${item.bgClass}`}>
-                                <Icon className={`size-5 ${item.iconClass}`} />
+                            <div className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg border bg-muted/40", isActive && "border-primary/30 text-primary")}>
+                                <Icon className="size-4" />
                             </div>
                             <div className="min-w-0 space-y-0.5">
-                                <span className="text-xs font-bold block text-foreground tracking-tight">{details.label}</span>
-                                <span className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">{details.description}</span>
+                                <span className="block text-xs font-semibold text-foreground">{details.label}</span>
+                                <span className="line-clamp-2 text-[10px] leading-snug text-muted-foreground">{details.description}</span>
                             </div>
                         </button>
                     );
@@ -142,8 +130,7 @@ export function CreateLessonInline({
                     <p className="text-muted-foreground text-xs font-bold">{t("selectLessonType")}</p>
                 </div>
             ) : (
-                <div className="rounded-2xl border border-border/40 bg-card p-5 shadow-sm relative overflow-hidden">
-                    <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
+                <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-4 sm:p-5">
                     {selectedType === "THEORY" && (
                         <TheoryForm
                             onSubmit={handleSubmit}

@@ -1,6 +1,6 @@
 "use client";
 
-import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SidebarLessonItem } from "./sidebar-lesson-item";
@@ -30,7 +30,7 @@ export function SidebarLessonList({
 }: SidebarLessonListProps) {
     const queryClient = useQueryClient();
 
-    const handleDragEnd = async (result: any) => {
+    const handleDragEnd = async (result: DropResult) => {
         // Destination is invalid or dropped outside list
         if (!result.destination) return;
 
@@ -88,7 +88,7 @@ export function SidebarLessonList({
             );
 
             toast.success("Lessons reordered successfully");
-        } catch (err) {
+        } catch {
             // Revert cache on failure
             if (previousLessons) {
                 queryClient.setQueryData(queryKeys.lessons.byTopic(topicId), previousLessons);

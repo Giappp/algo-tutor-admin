@@ -1,13 +1,13 @@
 "use client";
 
 import {Control, Controller, UseFormRegister, UseFormSetValue} from "react-hook-form";
-import {cn} from "@/lib/utils";
+import {useTranslations} from "next-intl";
 import {Input} from "@/components/ui/input";
 import {FormField} from "@/components/learning-path/form-field";
+import {DifficultyField} from "@/components/learning-path/lesson-form-ui";
 import {MarkdownSplitEditor} from "@/components/ui/markdown-split-editor";
 import {Difficulty} from "@/types/learning-path";
 import {CodingLessonDTO} from "@/types/learning-path/schema";
-import {DIFFICULTY_OPTIONS} from "../constants";
 
 interface BasicInfoSectionProps {
     control: Control<CodingLessonDTO>;
@@ -30,17 +30,19 @@ export function BasicInfoSection({
     watchedDifficulty,
     isPending,
 }: BasicInfoSectionProps) {
+    const t = useTranslations("lessonForm");
+
     return (
         <div className="flex flex-col gap-6">
             <FormField
-                label="Problem Title"
+                label={t("coding.problemTitle")}
                 error={errors.title?.message}
                 required
-                description="A clear, concise name for the problem"
+                description={t("coding.problemTitleDescription")}
             >
                 <Input
                     id="title"
-                    placeholder="e.g. Two Sum"
+                    placeholder={t("coding.problemTitlePlaceholder")}
                     className="text-base h-11"
                     aria-invalid={!!errors.title}
                     disabled={isPending}
@@ -48,7 +50,7 @@ export function BasicInfoSection({
                 />
             </FormField>
 
-            <FormField label="Problem Statement" error={errors.statement?.message} required>
+            <FormField label={t("coding.statement")} error={errors.statement?.message} required>
                 <Controller
                     name="statement"
                     control={control}
@@ -56,7 +58,7 @@ export function BasicInfoSection({
                         <MarkdownSplitEditor
                             value={field.value}
                             onChange={field.onChange}
-                            placeholder="Given an array of integers nums and an integer target..."
+                            placeholder={t("coding.statementPlaceholder")}
                             disabled={isPending}
                             minHeight="350px"
                         />
@@ -64,35 +66,12 @@ export function BasicInfoSection({
                 />
             </FormField>
 
-            <FormField
-                label="Difficulty"
+            <DifficultyField
+                value={watchedDifficulty}
+                onChange={(value) => setValue("difficulty", value as Difficulty, {shouldValidate: true, shouldDirty: true})}
                 error={errors.difficulty?.message}
-                description="How challenging is this problem for learners?"
-            >
-                <div className="flex items-center gap-3 flex-wrap">
-                    {DIFFICULTY_OPTIONS.map((opt) => {
-                        const isSelected = watchedDifficulty === opt.value;
-                        return (
-                            <button
-                                key={opt.value}
-                                type="button"
-                                onClick={() => setValue("difficulty", opt.value as Difficulty)}
-                                className={cn(
-                                    "flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-150",
-                                    isSelected
-                                        ? opt.bgColor + " " + opt.borderColor + " " + opt.color + " shadow-sm scale-[1.02]"
-                                        : "border-border/60 hover:border-muted-foreground/40 hover:bg-muted/60"
-                                )}
-                            >
-                                <span className="text-xs font-black tracking-widest">
-                                    {opt.label.charAt(0)}
-                                </span>
-                                <span>{opt.label}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </FormField>
+                disabled={isPending}
+            />
         </div>
     );
 }

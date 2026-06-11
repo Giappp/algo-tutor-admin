@@ -25,7 +25,7 @@ export default function LessonDetailPage() {
 
     if (!lesson) {
         return (
-            <div className="flex flex-col items-center justify-center gap-4 py-16">
+            <div className="mx-auto flex min-h-[50vh] max-w-xl flex-col items-center justify-center gap-4 py-16 text-center">
                 <p className="text-muted-foreground">Lesson not found.</p>
                 <Button variant="outline" render={<Link href={`/learning-paths/${learningPathId}`} />}>
                     <ArrowLeftIcon data-icon="inline-start" />
@@ -71,7 +71,7 @@ export default function LessonDetailPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5">
             <LessonHeader
                 lesson={lesson}
                 learningPathId={learningPathId}

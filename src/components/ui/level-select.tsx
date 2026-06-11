@@ -90,10 +90,9 @@ export function LevelSelect({value, onChange, disabled, className}: LevelSelectP
                     aria-label={`${opt.label}: ${opt.description}`}
                     data-state={value === opt.value ? "on" : "off"}
                     className={cn(
-                        "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 py-3.5 px-2 cursor-pointer transition-all duration-200",
+                        "relative flex flex-col items-center justify-center gap-2 rounded-lg border py-3.5 px-2 cursor-pointer transition-all duration-200",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        "data-[state=on]:scale-[1.02]",
-                        "data-[state=off]:border-border data-[state=off]:bg-card hover:border-muted-foreground/30 hover:bg-muted/30",
+                        "data-[state=off]:border-border data-[state=off]:bg-background hover:border-foreground/25",
                         opt.borderColor,
                         opt.activeBg,
                         disabled && "opacity-50 cursor-not-allowed"
@@ -101,7 +100,7 @@ export function LevelSelect({value, onChange, disabled, className}: LevelSelectP
                 >
                     <div
                         className={cn(
-                            "flex size-10 items-center justify-center rounded-xl transition-transform duration-200",
+                            "flex size-10 items-center justify-center rounded-md transition-transform duration-200",
                             opt.iconBg,
                             opt.iconColor,
                             value === opt.value && "scale-110"

@@ -1,6 +1,7 @@
 "use client";
 
 import {Check, AlertCircle, Loader2, Circle} from "lucide-react";
+import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
 import {AutosaveStatus} from "@/hooks/use-autosave";
 
@@ -17,31 +18,32 @@ export function SaveStatusIndicator({
     lastSavedAt,
     className,
 }: SaveStatusIndicatorProps) {
+    const t = useTranslations("lessonForm");
     const getStatusDisplay = () => {
         switch (status) {
             case "saving":
                 return {
                     icon: <Loader2 className="size-3.5 animate-spin" />,
-                    text: "Saving...",
+                    text: t("status.saving"),
                     className: "text-muted-foreground",
                 };
             case "saved":
                 return {
                     icon: <Check className="size-3.5" />,
-                    text: "Saved",
+                    text: t("status.saved"),
                     className: "text-emerald-600 dark:text-emerald-400",
                 };
             case "error":
                 return {
                     icon: <AlertCircle className="size-3.5" />,
-                    text: "Save failed",
+                    text: t("status.failed"),
                     className: "text-destructive",
                 };
             default:
                 if (isDirty) {
                     return {
                         icon: <Circle className="size-2.5 fill-amber-500 text-amber-500" />,
-                        text: "Unsaved changes",
+                        text: t("status.unsaved"),
                         className: "text-amber-600 dark:text-amber-400",
                     };
                 }
@@ -63,21 +65,21 @@ export function SaveStatusIndicator({
             )}
             {!display && lastSavedAt && (
                 <span className="text-muted-foreground">
-                    Last saved {formatRelativeTime(lastSavedAt)}
+                    {t("status.lastSaved", {time: formatRelativeTime(lastSavedAt, t)})}
                 </span>
             )}
         </div>
     );
 }
 
-function formatRelativeTime(date: Date): string {
+function formatRelativeTime(date: Date, t: ReturnType<typeof useTranslations<"lessonForm">>): string {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffSec = Math.floor(diffMs / 1000);
     const diffMin = Math.floor(diffSec / 60);
 
-    if (diffSec < 10) return "just now";
-    if (diffSec < 60) return `${diffSec}s ago`;
-    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffSec < 10) return t("status.justNow");
+    if (diffSec < 60) return t("status.secondsAgo", {count: diffSec});
+    if (diffMin < 60) return t("status.minutesAgo", {count: diffMin});
     return date.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
 }

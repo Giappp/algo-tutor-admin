@@ -31,7 +31,11 @@
     "aiModels": "Mô hình AI",
     "administration": "Quản trị",
     "users": "Người dùng",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "adminWorkspace": "Không gian quản trị",
+    "account": "Tài khoản",
+    "logout": "Đăng xuất",
+    "loggingOut": "Đang đăng xuất..."
   },
   "dashboard": {
     "title": "Bảng điều khiển",
@@ -215,6 +219,130 @@
     "editorialsTab": "Lời giải",
     "deleteLessonSub": "Xóa bài học này",
     "deleteLessonDescShort": "Xóa vĩnh viễn bài học này. Hành động này không thể hoàn tác."
+  },
+  "lessonForm": {
+    "types": {
+      "theory": {"label": "Bài học lý thuyết", "description": "Giải thích rõ một ý tưởng và củng cố bằng ví dụ."},
+      "quiz": {"label": "Bài kiểm tra", "description": "Thiết lập quy tắc chấm điểm. Câu hỏi được quản lý riêng."},
+      "coding": {"label": "Bài tập lập trình", "description": "Định nghĩa đề bài, ví dụ, giới hạn và mã khởi tạo."}
+    },
+    "details": {"title": "Thông tin bài học", "description": "Đặt tiêu đề rõ ràng và mức độ phù hợp."},
+    "fields": {"title": "Tiêu đề"},
+    "difficulty": {"label": "Mức độ", "easy": "Dễ", "medium": "Trung bình", "hard": "Khó"},
+    "actions": {
+      "saveChanges": "Lưu thay đổi",
+      "createLesson": "Tạo bài học",
+      "saving": "Đang lưu...",
+      "autosaveHint": "Thay đổi sẽ tự lưu sau một khoảng dừng. Lưu ngay với",
+      "createHint": "Bạn có thể bổ sung tài nguyên sau khi tạo bài học."
+    },
+    "status": {
+      "saving": "Đang lưu...",
+      "saved": "Đã lưu",
+      "failed": "Lưu thất bại",
+      "unsaved": "Có thay đổi chưa lưu",
+      "lastSaved": "Lưu lần cuối {time}",
+      "justNow": "vừa xong",
+      "secondsAgo": "{count} giây trước",
+      "minutesAgo": "{count} phút trước"
+    },
+    "markdown": {
+      "placeholder": "Viết nội dung Markdown...",
+      "emptyPreview": "Bản xem trước sẽ hiển thị tại đây.",
+      "editorOnly": "Chỉ soạn thảo",
+      "splitView": "Chia đôi",
+      "previewOnly": "Chỉ xem trước",
+      "imageUploadFailed": "Tải ảnh thất bại. Vui lòng thử lại.",
+      "toolbar": {
+        "bold": "In đậm",
+        "italic": "In nghiêng",
+        "inline-code": "Mã nội tuyến",
+        "code-block": "Khối mã",
+        "math-inline": "Công thức nội tuyến",
+        "math-block": "Khối công thức",
+        "table": "Bảng",
+        "link": "Liên kết",
+        "uploadImage": "Tải ảnh lên",
+        "sampleIo": "Mẫu dữ liệu vào và ra",
+        "sampleIoShort": "Mẫu vào/ra",
+        "constraints": "Mẫu ràng buộc",
+        "constraintsShort": "Ràng buộc"
+      }
+    },
+    "theory": {
+      "titlePlaceholder": "Giới thiệu về tìm kiếm nhị phân",
+      "contentTitle": "Nội dung bài học",
+      "contentDescription": "Soạn và xem trước trong cùng một nơi. Chỉ dùng mẫu khi thực sự hữu ích.",
+      "contentPlaceholder": "Viết nội dung bài học bằng Markdown...",
+      "replaceTemplateConfirm": "Thay nội dung hiện tại bằng mẫu này?",
+      "templates": {
+        "concept": {"label": "Khái niệm", "description": "Ý tưởng, ví dụ và kết luận"},
+        "step-by-step": {"label": "Từng bước", "description": "Hướng dẫn theo quy trình"},
+        "code-walkthrough": {"label": "Phân tích mã", "description": "Giải thích một cách triển khai"}
+      }
+    },
+    "quiz": {
+      "detailsDescription": "Đặt tên theo kiến thức mà bài kiểm tra đánh giá.",
+      "titlePlaceholder": "Kiểm tra kiến thức cơ bản về mảng",
+      "rulesTitle": "Điều kiện đạt",
+      "rulesDescription": "Đặt điểm đạt và chỉ thêm thời gian khi tốc độ thực sự quan trọng.",
+      "passingScore": "Điểm đạt",
+      "passingDescription": "Cần đạt {score}% để vượt qua",
+      "timeLimit": "Thời gian",
+      "timeDescription": "Để trống nếu không giới hạn thời gian",
+      "noLimit": "Không giới hạn"
+    },
+    "coding": {
+      "sections": {"basic": "Đề bài", "constraints": "Giới hạn và ràng buộc", "examples": "Ví dụ", "hints": "Gợi ý", "starterCode": "Mã khởi tạo"},
+      "problemTitle": "Tên bài toán",
+      "problemTitleDescription": "Dùng tên ngắn gọn và cụ thể.",
+      "problemTitlePlaceholder": "Tổng hai số",
+      "statement": "Nội dung đề bài",
+      "statementPlaceholder": "Mô tả dữ liệu vào, kết quả mong đợi và yêu cầu...",
+      "timeLimit": "Giới hạn thời gian",
+      "timeLimitDescription": "Thời gian chạy tối đa tính bằng mili giây",
+      "memoryLimit": "Giới hạn bộ nhớ",
+      "memoryLimitDescription": "Bộ nhớ tối đa tính bằng megabyte",
+      "constraints": "Ràng buộc",
+      "constraintsDescription": "Mỗi dòng là một giới hạn của dữ liệu vào.",
+      "noConstraints": "Chưa có ràng buộc.",
+      "constraintPlaceholder": "2 <= nums.length <= 10^4",
+      "addConstraint": "Thêm ràng buộc",
+      "examplesDescription": "Minh họa dữ liệu vào, kết quả và giải thích ngắn.",
+      "example": "Ví dụ {number}",
+      "input": "Dữ liệu vào",
+      "expectedOutput": "Kết quả mong đợi",
+      "explanationOptional": "Giải thích (không bắt buộc)",
+      "addExample": "Thêm ví dụ",
+      "hintsDescription": "Sắp xếp gợi ý từ nhẹ đến rõ ràng.",
+      "hintPlaceholder": "Gợi ý {number}",
+      "addHint": "Thêm gợi ý",
+      "starterCodeDescription": "Đoạn mã ban đầu hiển thị khi học viên bắt đầu làm bài.",
+      "starterCodeHint": "Giữ chữ ký hàm công khai đồng nhất với hệ thống chấm cho mọi ngôn ngữ.",
+      "languages": "ngôn ngữ",
+      "autosavedWithLesson": "lưu cùng bài học",
+      "lines": "dòng",
+      "characters": "ký tự",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "starterCodeCopyFailed": "Không thể sao chép mã khởi tạo.",
+      "resetTemplate": "Đặt lại mẫu",
+      "useTemplate": "Dùng mẫu",
+      "templateDialogTitle": "Mẫu bài toán",
+      "templateDialogDescription": "Chọn một cấu trúc khởi đầu. Bạn có thể sửa mọi trường sau khi áp dụng.",
+      "templateConstraints": "{count} ràng buộc",
+      "templateExamples": "{count} ví dụ",
+      "templateHints": "{count} gợi ý",
+      "templates": {
+        "array-search": {"label": "Tìm kiếm trên mảng", "category": "Mảng", "description": "Tìm các phần tử trong mảng thỏa điều kiện"},
+        "string-manipulation": {"label": "Xử lý chuỗi", "category": "Chuỗi", "description": "Biến đổi hoặc kiểm tra một chuỗi"},
+        "linked-list": {"label": "Danh sách liên kết", "category": "Danh sách liên kết", "description": "Thao tác trên danh sách liên kết đơn hoặc đôi"},
+        "tree-traversal": {"label": "Cây nhị phân", "category": "Cây", "description": "Duyệt hoặc biến đổi cây nhị phân"},
+        "dynamic-programming": {"label": "Quy hoạch động", "category": "QHĐ", "description": "Tối ưu bằng ghi nhớ hoặc lập bảng"},
+        "graph-traversal": {"label": "Đồ thị", "category": "Đồ thị", "description": "Áp dụng BFS hoặc DFS trên đồ thị"},
+        "sorting-searching": {"label": "Tìm kiếm nhị phân", "category": "Tìm kiếm", "description": "Tìm kiếm hiệu quả trên dữ liệu đã sắp xếp"}
+      }
+    }
   },
   "login": {
     "welcomeBack": "Chào mừng trở lại",

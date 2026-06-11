@@ -4,7 +4,8 @@ import {clearAuthenticated} from "@/store/authStore";
 import {ApiResponse, PageResponse} from "@/types/shared";
 
 const baseConfig: AxiosRequestConfig = {
-    baseURL: "http://localhost:8080",
+    // Keep browser requests same-origin; Next.js proxies /api through API_SERVER_URL.
+    baseURL: "/",
     timeout: 10000,
     headers: {Accept: "application/json"},
     withCredentials: true,

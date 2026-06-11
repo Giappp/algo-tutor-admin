@@ -1,16 +1,17 @@
 "use client";
 
-import React, {useImperativeHandle, useRef, useState} from "react";
+import React, {useCallback, useImperativeHandle, useRef, useState} from "react";
 import {useFieldArray, useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FileCode2, Loader2, Save} from "lucide-react";
-import {Button} from "@/components/ui/button";
+import {useTranslations} from "next-intl";
 import {TooltipProvider} from "@/components/ui/tooltip";
-import {CodingLessonDTO, CreateCodingLessonSchema} from "@/types/learning-path/schema";
+import {CodingLessonDTO, CreateCodingLessonSchema, EditCodingContentSchema} from "@/types/learning-path/schema";
 import {CodingTemplatePicker} from "@/components/learning-path/coding-template-picker";
 import {ProblemTemplate} from "@/components/learning-path/coding-problem-templates";
+import {LessonFormActions, LessonFormHeader} from "@/components/learning-path/lesson-form-ui";
+import {useLessonFormAutosave} from "@/hooks/use-lesson-form-autosave";
 import {SectionCard} from "./section-card";
-import {DEFAULT_STARTER_CODE} from "./constants";
+import {DEFAULT_STARTER_CODE, STARTER_CODE_LANGUAGES} from "./constants";
 import {
     BasicInfoSection,
     ConstraintsSection,
@@ -29,6 +30,7 @@ interface CodingLessonFormProps {
     onSubmit: (data: CodingLessonDTO) => Promise<void>;
     isPending?: boolean;
     submitLabel?: string;
+    enableAutosave?: boolean;
     formRef?: React.RefObject<CodingLessonFormHandle | null>;
 }
 
@@ -36,9 +38,11 @@ export function CodingLessonForm({
     defaultValues,
     onSubmit,
     isPending,
-    submitLabel = "Create Lesson",
+    submitLabel,
+    enableAutosave = false,
     formRef: externalFormRef,
 }: CodingLessonFormProps) {
+    const t = useTranslations("lessonForm");
     const internalFormRef = useRef<CodingLessonFormHandle | null>(null);
     const formRef = externalFormRef ?? internalFormRef;
 
@@ -49,9 +53,9 @@ export function CodingLessonForm({
         handleSubmit,
         setValue,
         control,
-        formState: {errors},
+        formState: {errors, isDirty},
     } = useForm<CodingLessonDTO>({
-        resolver: zodResolver(CreateCodingLessonSchema),
+        resolver: zodResolver(enableAutosave ? EditCodingContentSchema : CreateCodingLessonSchema),
         defaultValues: {
             type: "CODING",
             title: "",
@@ -69,6 +73,7 @@ export function CodingLessonForm({
     const watchedDifficulty = useWatch({control, name: "difficulty"});
     const constraints = useWatch({control, name: "constraints"}) || [];
     const hints = useWatch({control, name: "hints"}) || [];
+    const watchedData = useWatch({control});
 
     // --- Constraint handlers ---
     const handleAddConstraint = () => {
@@ -132,7 +137,21 @@ export function CodingLessonForm({
         starterCode: {
             java: data.starterCode?.java ?? DEFAULT_STARTER_CODE["java"],
             python: data.starterCode?.python ?? DEFAULT_STARTER_CODE["python"],
+            cpp: data.starterCode?.cpp ?? DEFAULT_STARTER_CODE["cpp"],
         },
+    });
+
+    const save = useCallback(async () => {
+        await handleSubmit(async (data) => {
+            await onSubmit(buildFinalData(data));
+        })();
+    }, [handleSubmit, onSubmit]);
+
+    const autosave = useLessonFormAutosave({
+        data: watchedData,
+        isDirty,
+        enabled: enableAutosave,
+        onSave: save,
     });
 
     useImperativeHandle(formRef, () => ({
@@ -141,12 +160,8 @@ export function CodingLessonForm({
             await handleSubmit(() => { valid = true; })();
             return valid;
         },
-        submit: async () => {
-            await handleSubmit(async (data) => {
-                await onSubmit(buildFinalData(data));
-            })();
-        },
-    }));
+        submit: save,
+    }), [handleSubmit, save]);
 
     // --- Section toggle ---
     const toggleSection = (section: string) => {
@@ -161,30 +176,21 @@ export function CodingLessonForm({
                 onSubmit={handleSubmit(async (data) => {
                     await onSubmit(buildFinalData(data));
                 })}
-                className="flex flex-col gap-8"
+                className="flex w-full flex-col gap-7"
             >
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center justify-center size-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/20">
-                            <FileCode2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400"/>
-                        </div>
-                        <div className="flex flex-col">
-                            <h2 className="text-xl font-bold tracking-tight">Coding Challenge</h2>
-                            <p className="text-sm text-muted-foreground">
-                                Build a programming problem with test cases, starter code, and examples
-                            </p>
-                        </div>
-                    </div>
-                    <CodingTemplatePicker onSelect={handleApplyTemplate} disabled={isPending}/>
-                </div>
+                <LessonFormHeader
+                    type="CODING"
+                    status={enableAutosave ? autosave.status : undefined}
+                    isDirty={isDirty}
+                    lastSavedAt={autosave.lastSavedAt}
+                    action={<CodingTemplatePicker onSelect={handleApplyTemplate} disabled={isPending}/>}
+                />
 
                 {/* Sections */}
                 <div className="flex flex-col gap-3">
                     <SectionCard
                         number="01"
-                        title="Basic Information"
-                        color="indigo"
+                        title={t("coding.sections.basic")}
                         badge={watchedDifficulty ? 1 : undefined}
                         isOpen={isOpen("basic")}
                         onToggle={() => toggleSection("basic")}
@@ -201,8 +207,7 @@ export function CodingLessonForm({
 
                     <SectionCard
                         number="02"
-                        title="Constraints &amp; Limits"
-                        color="amber"
+                        title={t("coding.sections.constraints")}
                         badge={constraints.length > 0 ? constraints.length : undefined}
                         isOpen={isOpen("constraints")}
                         onToggle={() => toggleSection("constraints")}
@@ -220,8 +225,7 @@ export function CodingLessonForm({
 
                     <SectionCard
                         number="03"
-                        title="Examples"
-                        color="cyan"
+                        title={t("coding.sections.examples")}
                         badge={exampleFields.length > 0 ? exampleFields.length : undefined}
                         isOpen={isOpen("examples")}
                         onToggle={() => toggleSection("examples")}
@@ -237,8 +241,7 @@ export function CodingLessonForm({
 
                     <SectionCard
                         number="04"
-                        title="Hints"
-                        color="violet"
+                        title={t("coding.sections.hints")}
                         badge={hints.length > 0 ? hints.length : undefined}
                         isOpen={isOpen("hints")}
                         onToggle={() => toggleSection("hints")}
@@ -254,8 +257,8 @@ export function CodingLessonForm({
 
                     <SectionCard
                         number="05"
-                        title="Starter Code"
-                        color="emerald"
+                        title={t("coding.sections.starterCode")}
+                        badge={STARTER_CODE_LANGUAGES.length}
                         isOpen={isOpen("starter")}
                         onToggle={() => toggleSection("starter")}
                     >
@@ -263,22 +266,11 @@ export function CodingLessonForm({
                     </SectionCard>
                 </div>
 
-                {/* Submit */}
-                <div className="flex justify-end pt-6 border-t">
-                    <Button type="submit" disabled={isPending} size="lg" className="px-8 gap-2">
-                        {isPending ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin"/>
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <Save className="w-4 h-4"/>
-                                {submitLabel}
-                            </>
-                        )}
-                    </Button>
-                </div>
+                <LessonFormActions
+                    isPending={isPending}
+                    submitLabel={submitLabel ?? t(enableAutosave ? "actions.saveChanges" : "actions.createLesson")}
+                    autosave={enableAutosave}
+                />
             </form>
         </TooltipProvider>
     );

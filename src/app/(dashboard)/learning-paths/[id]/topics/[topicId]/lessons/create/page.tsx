@@ -1,62 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import {useState} from "react";
+import {useParams, useRouter} from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, BookOpenIcon, CodeIcon, FileQuestionIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { TheoryForm } from "@/components/learning-path/theory-form";
-import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
-import { useCreateLesson } from "@/hooks/use-lessons";
-import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
-import { LessonType } from "@/types/learning-path";
-import { CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO } from "@/types/learning-path/schema";
-import { QuizForm } from "@/components/quiz/quiz-form";
+import {ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, CheckIcon, CodeIcon, FileQuestionIcon} from "lucide-react";
+import {useTranslations} from "next-intl";
+import {Button} from "@/components/ui/button";
+import {TheoryForm} from "@/components/learning-path/theory-form";
+import {CodingLessonForm} from "@/components/learning-path/coding-lesson-form";
+import {QuizForm} from "@/components/quiz/quiz-form";
+import {useCreateLesson} from "@/hooks/use-lessons";
+import {useUnsavedChanges} from "@/hooks/use-unsaved-changes";
+import {LessonType} from "@/types/learning-path";
+import {CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO} from "@/types/learning-path/schema";
+import {cn} from "@/lib/utils";
 
 const LESSON_TYPES = [
-    {
-        type: "THEORY" as const,
-        label: "Theory",
-        description: "Rich text content with templates",
-        icon: BookOpenIcon,
-        iconClass: "text-blue-600 dark:text-blue-400",
-        bgClass: "bg-blue-500/10",
-        borderClass: "border-blue-500/30",
-        activeClass: "ring-2 ring-blue-500/50 border-blue-500/50 bg-blue-500/5",
-    },
-    {
-        type: "QUIZ" as const,
-        label: "Quiz",
-        description: "Multiple choice questions",
-        icon: FileQuestionIcon,
-        iconClass: "text-amber-600 dark:text-amber-400",
-        bgClass: "bg-amber-500/10",
-        borderClass: "border-amber-500/30",
-        activeClass: "ring-2 ring-amber-500/50 border-amber-500/50 bg-amber-500/5",
-    },
-    {
-        type: "CODING" as const,
-        label: "Coding",
-        description: "Problem with test cases & starter code",
-        icon: CodeIcon,
-        iconClass: "text-emerald-600 dark:text-emerald-400",
-        bgClass: "bg-emerald-500/10",
-        borderClass: "border-emerald-500/30",
-        activeClass: "ring-2 ring-emerald-500/50 border-emerald-500/50 bg-emerald-500/5",
-    },
+    {type: "THEORY" as const, icon: BookOpenIcon},
+    {type: "QUIZ" as const, icon: FileQuestionIcon},
+    {type: "CODING" as const, icon: CodeIcon},
 ];
 
 export default function CreateLessonPage() {
+    const tLessonForm = useTranslations("lessonForm");
+    const t = useTranslations("learningPaths");
     const params = useParams();
     const router = useRouter();
     const learningPathId = Number(params.id);
     const topicId = Number(params.topicId);
-
     const createLessonMutation = useCreateLesson(topicId);
     const [selectedType, setSelectedType] = useState<LessonType | null>(null);
     const [hasStartedEditing, setHasStartedEditing] = useState(false);
 
-    // Warn user before leaving with unsaved form data
     useUnsavedChanges(hasStartedEditing && !createLessonMutation.isPending);
 
     const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
@@ -65,94 +40,126 @@ export default function CreateLessonPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 p-6">
-            {/* Header */}
-            <div className="flex items-center gap-3">
+        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-8 pb-10">
+            <header className="flex items-start gap-3 border-b border-border/60 pb-6">
                 <Button
                     variant="ghost"
                     size="icon-sm"
                     nativeButton={false}
-                    render={<Link href={`/learning-paths/${learningPathId}`} />}
+                    render={<Link href={`/learning-paths/${learningPathId}`}/>}
+                    className="mt-1"
                 >
-                    <ArrowLeftIcon className="size-4" />
+                    <ArrowLeftIcon className="size-4"/>
                 </Button>
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight">Create Lesson</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Choose a type and fill in the content
-                    </p>
+                    <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("createNewLesson")}</h1>
+                    <p className="mt-1 max-w-xl text-base text-muted-foreground">{t("chooseLessonType")}</p>
                 </div>
-            </div>
+            </header>
 
-            {/* Type Selector — always visible as tabs */}
-            <div className="flex items-center gap-2 flex-wrap">
-                {LESSON_TYPES.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = selectedType === item.type;
-                    return (
-                        <button
-                            key={item.type}
-                            type="button"
-                            onClick={() => {
-                                setSelectedType(item.type);
-                                setHasStartedEditing(true);
-                            }}
-                            className={`
-                                flex items-center gap-2.5 rounded-lg border px-4 py-3 text-left transition-all
-                                ${isActive
-                                    ? item.activeClass
-                                    : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
-                                }
-                            `}
-                        >
-                            <div className={`flex items-center justify-center size-8 rounded-md ${item.bgClass}`}>
-                                <Icon className={`size-4 ${item.iconClass}`} />
+            <div className="grid items-start gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
+                <aside className="lg:sticky lg:top-20">
+                    <div className="mb-3 flex items-center justify-between px-1">
+                        <p className="text-sm font-semibold text-foreground">{t("chooseLessonType")}</p>
+                        <span className="font-mono text-xs text-muted-foreground">01 / 02</span>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1" role="tablist" aria-label="Lesson type">
+                        {LESSON_TYPES.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = selectedType === item.type;
+                            const labelKey = item.type === "THEORY" ? "theory" : item.type === "QUIZ" ? "quiz" : "coding";
+
+                            return (
+                                <button
+                                    key={item.type}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isActive}
+                                    onClick={() => {
+                                        setSelectedType(item.type);
+                                        setHasStartedEditing(true);
+                                    }}
+                                    className={cn(
+                                        "group relative flex min-h-24 items-start gap-3 rounded-xl border px-4 py-4 text-left transition-all duration-200 active:scale-[0.99]",
+                                        isActive
+                                            ? "border-primary/35 bg-primary/[0.055] shadow-[0_10px_28px_-24px_var(--color-primary)]"
+                                            : "border-border/70 bg-card/40 hover:border-foreground/15 hover:bg-card",
+                                    )}
+                                >
+                                    <div className={cn(
+                                        "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background text-muted-foreground transition-colors",
+                                        isActive && "border-primary/25 text-primary",
+                                    )}>
+                                        <Icon className="size-4"/>
+                                    </div>
+                                    <div className="min-w-0 pr-4">
+                                        <span className="block text-base font-semibold">{t(labelKey)}</span>
+                                        <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{t(`${labelKey}Desc`)}</span>
+                                    </div>
+                                    <div className={cn(
+                                        "absolute right-3 top-3 flex size-5 items-center justify-center rounded-full border text-muted-foreground/40 transition-colors",
+                                        isActive && "border-primary bg-primary text-primary-foreground",
+                                    )}>
+                                        {isActive
+                                            ? <CheckIcon className="size-3"/>
+                                            : <ArrowRightIcon className="size-3 opacity-0 transition-opacity group-hover:opacity-100"/>
+                                        }
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </aside>
+
+                <main className="min-w-0">
+                    {!selectedType && (
+                        <div className="flex min-h-[32rem] flex-col items-center justify-center rounded-2xl border border-dashed border-border/80 bg-muted/[0.12] px-6 text-center">
+                            <div className="mb-4 flex size-12 items-center justify-center rounded-xl border bg-background text-muted-foreground shadow-sm">
+                                <ArrowRightIcon className="size-5"/>
                             </div>
-                            <div>
-                                <span className="text-sm font-semibold block">{item.label}</span>
-                                <span className="text-xs text-muted-foreground">{item.description}</span>
-                            </div>
-                        </button>
-                    );
-                })}
+                            <p className="max-w-sm text-base font-medium text-foreground">{t("selectLessonType")}</p>
+                        </div>
+                    )}
+
+                    {selectedType === "THEORY" && (
+                        <EditorSurface>
+                            <TheoryForm
+                                onSubmit={handleSubmit}
+                                isPending={createLessonMutation.isPending}
+                                submitLabel={tLessonForm("actions.createLesson")}
+                            />
+                        </EditorSurface>
+                    )}
+
+                    {selectedType === "QUIZ" && (
+                        <EditorSurface>
+                            <QuizForm
+                                onSubmit={handleSubmit}
+                                isPending={createLessonMutation.isPending}
+                                submitLabel={tLessonForm("actions.createLesson")}
+                            />
+                        </EditorSurface>
+                    )}
+
+                    {selectedType === "CODING" && (
+                        <EditorSurface>
+                            <CodingLessonForm
+                                onSubmit={handleSubmit}
+                                isPending={createLessonMutation.isPending}
+                                submitLabel={tLessonForm("actions.createLesson")}
+                            />
+                        </EditorSurface>
+                    )}
+                </main>
             </div>
+        </div>
+    );
+}
 
-            {/* Form */}
-            {!selectedType && (
-                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 gap-2">
-                    <p className="text-muted-foreground text-sm">Select a lesson type above to get started</p>
-                </div>
-            )}
-
-            {selectedType === "THEORY" && (
-                <div className="rounded-lg border bg-card p-6">
-                    <TheoryForm
-                        onSubmit={handleSubmit}
-                        isPending={createLessonMutation.isPending}
-                        submitLabel="Create Lesson"
-                    />
-                </div>
-            )}
-
-            {selectedType === "QUIZ" && (
-                <div className="rounded-lg border bg-card p-6">
-                    <QuizForm
-                        onSubmit={handleSubmit}
-                        isPending={createLessonMutation.isPending}
-                        submitLabel="Create Lesson"
-                    />
-                </div>
-            )}
-
-            {selectedType === "CODING" && (
-                <div className="rounded-lg border bg-card p-6">
-                    <CodingLessonForm
-                        onSubmit={handleSubmit}
-                        isPending={createLessonMutation.isPending}
-                        submitLabel="Create Lesson"
-                    />
-                </div>
-            )}
+function EditorSurface({children}: {children: React.ReactNode}) {
+    return (
+        <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-[0_18px_50px_-42px_rgba(0,0,0,0.45)] sm:p-6">
+            {children}
         </div>
     );
 }

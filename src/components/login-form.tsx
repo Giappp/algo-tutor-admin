@@ -113,7 +113,7 @@ export function LoginForm({
                                         id="userName"
                                         type="text"
                                         placeholder={t("usernamePlaceholder")}
-                                        className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                                        className="h-11 px-4"
                                         aria-invalid={!!errors.username}
                                         disabled={isSubmitting}
                                         {...register("username")}
@@ -145,7 +145,7 @@ export function LoginForm({
                                         id="password"
                                         type="password"
                                         placeholder={t("passwordPlaceholder")}
-                                        className="h-11 pl-4 pr-4 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-all duration-200 focus:bg-background focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                                        className="h-11 px-4"
                                         aria-invalid={!!errors.password}
                                         disabled={isSubmitting}
                                         {...register("password")}

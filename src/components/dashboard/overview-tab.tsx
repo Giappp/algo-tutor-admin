@@ -38,6 +38,32 @@ interface OverviewTabProps {
     overview: SystemOverview;
 }
 
+interface OverviewTooltipEntry {
+    name?: string;
+    value?: number;
+}
+
+function OverviewChartTooltip({
+    active,
+    payload,
+    countLabel,
+}: {
+    active?: boolean;
+    payload?: OverviewTooltipEntry[];
+    countLabel: string;
+}) {
+    if (!active || !payload?.length) return null;
+
+    return (
+        <div className="backdrop-blur-md bg-background/80 dark:bg-card/85 border border-border/40 px-3.5 py-2.5 rounded-xl shadow-lg flex flex-col gap-1 text-[11px] font-sans">
+            <span className="font-semibold text-foreground">{payload[0].name}</span>
+            <span className="font-mono text-muted-foreground mt-0.5">
+                {countLabel}: <strong className="text-foreground font-extrabold">{payload[0].value?.toLocaleString()}</strong>
+            </span>
+        </div>
+    );
+}
+
 export function OverviewTab({ overview }: OverviewTabProps) {
     const t = useTranslations("dashboard");
 
@@ -78,20 +104,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
                "oklch(0.7 0.14 70)"
     }));
 
-    // Custom Glassmorphism Tooltip for Recharts
-    const CustomTooltip = ({ active, payload }: any) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="backdrop-blur-md bg-background/80 dark:bg-card/85 border border-border/40 px-3.5 py-2.5 rounded-xl shadow-lg flex flex-col gap-1 text-[11px] font-sans">
-                    <span className="font-semibold text-foreground">{payload[0].name}</span>
-                    <span className="font-mono text-muted-foreground mt-0.5">
-                        {t("usage", { defaultValue: "Count" })}: <strong className="text-foreground font-extrabold">{payload[0].value.toLocaleString()}</strong>
-                    </span>
-                </div>
-            );
-        }
-        return null;
-    };
+    const countLabel = t("usage", { defaultValue: "Count" });
 
     return (
         <div className="flex flex-col gap-6 fadeInUp">
@@ -173,7 +186,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
                                                 <Cell key={`cell-${index}`} fill={entry.fill} className="hover:opacity-90 hover:scale-[1.02] origin-center transition-all duration-300 cursor-pointer" />
                                             ))}
                                         </Pie>
-                                        <Tooltip content={<CustomTooltip />} />
+                                        <Tooltip content={<OverviewChartTooltip countLabel={countLabel} />} />
                                     </PieChart>
                                 </ChartContainer>
                                 {/* Center total indicator */}
@@ -236,7 +249,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
                                         axisLine={false}
                                         tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                                     />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(var(--foreground), 0.02)" }} />
+                                    <Tooltip content={<OverviewChartTooltip countLabel={countLabel} />} cursor={{ fill: "rgba(var(--foreground), 0.02)" }} />
                                     <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={32}>
                                         {lessonData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.fill} className="hover:opacity-90 hover:brightness-105 transition-all duration-200 cursor-pointer" />
