@@ -1,507 +1,452 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Sparkles, Loader2, Check, RefreshCw, PlusCircle, AlertCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
-import { QuestionRequestDTO } from "@/types/learning-path/schema";
+import {useMemo, useState} from "react";
+import {useTranslations} from "next-intl";
+import {
+    AlertCircle,
+    BookOpen,
+    Check,
+    ChevronLeft,
+    FileText,
+    Loader2,
+    PlusCircle,
+    RefreshCw,
+    Search,
+    Sparkles,
+} from "lucide-react";
+import {toast} from "sonner";
+
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Field, FieldDescription, FieldGroup, FieldLabel} from "@/components/ui/field";
+import {Input} from "@/components/ui/input";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Skeleton} from "@/components/ui/skeleton";
+import {Switch} from "@/components/ui/switch";
+import {Textarea} from "@/components/ui/textarea";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
+import {useAiQuestionSources, useGenerateQuestionsFromSources} from "@/hooks/use-admin-ai-question";
+import {cn} from "@/lib/utils";
+import type {AiProvider} from "@/types/admin-ai-lesson";
+import type {AiQuestionSource} from "@/types/admin-ai-question";
+import type {Difficulty, QuestionType} from "@/types/learning-path";
+import type {QuestionRequestDTO} from "@/types/learning-path/schema";
 
 interface AIQuestionGeneratorDialogProps {
     open: boolean;
+    lessonId: number;
     onOpenChange: (open: boolean) => void;
     onAddQuestions: (questions: QuestionRequestDTO[]) => Promise<void>;
     isPending: boolean;
 }
 
-const PRESET_TOPICS = [
-    "Arrays & Hashing",
-    "Linked Lists",
-    "Trees & Graphs",
-    "Dynamic Programming",
-    "Recursion & Backtracking",
-    "Sorting & Searching",
-];
+type SupportedQuestionType = Extract<QuestionType, "SINGLE_CHOICE" | "MULTIPLE_CHOICE">;
+type GeneratedQuestion = QuestionRequestDTO & {selected: boolean};
 
-const MOCK_QUESTIONS_POOL: Record<string, Record<string, QuestionRequestDTO[]>> = {
-    "Arrays & Hashing": {
-        "EASY": [
-            {
-                question: "What is the time complexity of looking up an element in a Hash Map in the average case?",
-                type: "SINGLE_CHOICE",
-                points: 1,
-                explanation: "Hash maps use hashing to map keys to indexes. In the average case, with a good hash function, lookup is O(1). In the worst case, if all keys hash to the same bucket, it could become O(N).",
-                choices: [
-                    { text: "O(1)", isCorrect: true, explanation: "Correct. Average case hash table lookup is constant time." },
-                    { text: "O(log N)", isCorrect: false, explanation: "O(log N) is typically for balanced BST lookups." },
-                    { text: "O(N)", isCorrect: false, explanation: "O(N) is the worst-case lookup time if collision occurs frequently." },
-                    { text: "O(N log N)", isCorrect: false, explanation: "O(N log N) is standard sorting time complexity." },
-                ]
-            },
-            {
-                question: "Which of the following data structures has a fixed size upon initialization?",
-                type: "SINGLE_CHOICE",
-                points: 1,
-                explanation: "Standard arrays have a fixed size defined at the time of creation. Dynamic arrays (like ArrayList in Java) can grow dynamically.",
-                choices: [
-                    { text: "Static Array", isCorrect: true, explanation: "Correct. Static arrays cannot be resized after allocation." },
-                    { text: "Linked List", isCorrect: false, explanation: "Linked lists allocate memory dynamically for new nodes." },
-                    { text: "Hash Map", isCorrect: false, explanation: "Hash maps dynamically resize themselves when they exceed their load factor." },
-                    { text: "Queue", isCorrect: false, explanation: "Queues can grow dynamically based on the underlying structure." },
-                ]
-            }
-        ],
-        "MEDIUM": [
-            {
-                question: "What is the worst-case time complexity of inserting a key into a Hash Map when collisions are handled via Chaining?",
-                type: "SINGLE_CHOICE",
-                points: 2,
-                explanation: "In the absolute worst case, all N keys hash to the same index. We must traverse the chain of length N to insert, leading to O(N) complexity.",
-                choices: [
-                    { text: "O(1)", isCorrect: false, explanation: "O(1) is the average insertion time." },
-                    { text: "O(log N)", isCorrect: false, explanation: "Balanced trees achieve O(log N) insertion, not chaining." },
-                    { text: "O(N)", isCorrect: true, explanation: "Correct. Worst-case is O(N) if all elements hash to the same bucket." },
-                    { text: "O(N^2)", isCorrect: false, explanation: "Insertion does not require quadratic time." },
-                ]
-            }
-        ]
-    },
-    "Linked Lists": {
-        "EASY": [
-            {
-                question: "What is the time complexity to insert a new node at the head of a Singly Linked List?",
-                type: "SINGLE_CHOICE",
-                points: 1,
-                explanation: "Inserting at the head only requires creating the node, pointing its next pointer to the current head, and updating the head pointer. This takes constant time, O(1).",
-                choices: [
-                    { text: "O(1)", isCorrect: true, explanation: "Correct. Node insertion at the front of a linked list is a constant time operation." },
-                    { text: "O(N)", isCorrect: false, explanation: "No traversal is needed to insert at the head." },
-                    { text: "O(log N)", isCorrect: false, explanation: "O(log N) operations require hierarchical trees or binary search." },
-                    { text: "O(1) or O(N) depending on tail pointer", isCorrect: false, explanation: "Inserting at head never depends on the tail pointer." },
-                ]
-            }
-        ]
-    }
-};
-
-const DEFAULT_POOL: QuestionRequestDTO[] = [
-    {
-        question: "What is the primary benefit of dynamic programming compared to standard recursion?",
-        type: "SINGLE_CHOICE",
-        points: 2,
-        explanation: "Dynamic programming avoids redundant computations of overlapping subproblems by caching/memoizing intermediate results, saving time at the expense of memory.",
-        choices: [
-            { text: "It reduces time complexity by caching overlapping subproblem results", isCorrect: true, explanation: "Correct. This technique is called memoization or tabulation." },
-            { text: "It uses less memory than recursion", isCorrect: false, explanation: "DP usually uses MORE memory to store lookup tables." },
-            { text: "It is always easier to implement", isCorrect: false, explanation: "DP is often harder to model than simple recursion." },
-            { text: "It works on all recursive problems", isCorrect: false, explanation: "It only works if problems have optimal substructure and overlapping subproblems." },
-        ]
-    },
-    {
-        question: "Which of the following algorithms is used to find the shortest path in a weighted graph with non-negative edge weights?",
-        type: "SINGLE_CHOICE",
-        points: 2,
-        explanation: "Dijkstra's algorithm is specifically designed for single-source shortest path finding on graphs with non-negative weights.",
-        choices: [
-            { text: "Dijkstra's Algorithm", isCorrect: true, explanation: "Correct. Dijkstra finds the shortest path efficiently when edge weights are >= 0." },
-            { text: "Kruskal's Algorithm", isCorrect: false, explanation: "Kruskal's is used to find Minimum Spanning Trees (MST)." },
-            { text: "Prim's Algorithm", isCorrect: false, explanation: "Prim's is used to find Minimum Spanning Trees (MST)." },
-            { text: "Depth-First Search (DFS)", isCorrect: false, explanation: "DFS finds paths, but not necessarily shortest paths in weighted graphs." },
-        ]
-    }
+const PROVIDERS: Array<{value: AiProvider | "DEFAULT"; label: string}> = [
+    {value: "DEFAULT", label: "Default"},
+    {value: "GEMINI", label: "Gemini"},
+    {value: "OPENAI", label: "OpenAI"},
+    {value: "CLAUDE", label: "Claude"},
 ];
 
 export function AIQuestionGeneratorDialog({
     open,
+    lessonId,
     onOpenChange,
     onAddQuestions,
     isPending,
 }: AIQuestionGeneratorDialogProps) {
-    const [topic, setTopic] = useState("");
-    const [difficulty, setDifficulty] = useState<"EASY" | "MEDIUM" | "HARD">("EASY");
-    const [count, setCount] = useState<number>(3);
-    const [generating, setGenerating] = useState(false);
-    const [loadingStage, setLoadingStage] = useState(0);
-    const [generatedQuestions, setGeneratedQuestions] = useState<(QuestionRequestDTO & { selected: boolean })[]>([]);
+    const t = useTranslations("lessonForm.questions.aiGenerator");
+    const [selectedSourceIds, setSelectedSourceIds] = useState<number[]>([]);
+    const [search, setSearch] = useState("");
+    const [prompt, setPrompt] = useState("");
+    const [provider, setProvider] = useState<AiProvider | "DEFAULT">("DEFAULT");
+    const [difficulty, setDifficulty] = useState<Difficulty>("MEDIUM");
+    const [questionTypes, setQuestionTypes] = useState<SupportedQuestionType[]>(["SINGLE_CHOICE"]);
+    const [count, setCount] = useState(5);
+    const [choicesPerQuestion, setChoicesPerQuestion] = useState(4);
+    const [includeExplanations, setIncludeExplanations] = useState(true);
+    const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
+    const sourcesQuery = useAiQuestionSources(lessonId, open);
+    const generateMutation = useGenerateQuestionsFromSources(lessonId);
+    const isReviewing = generatedQuestions.length > 0;
+    const selectedQuestionCount = generatedQuestions.filter((question) => question.selected).length;
 
-    const loadingStages = [
-        "Connecting to AI Tutor model...",
-        "Analyzing topic guidelines and syllabus context...",
-        "Generating conceptual question stems...",
-        "Formulating realistic distractor options...",
-        "Drafting comprehensive feedback and explanations...",
-        "Finalizing questions structure..."
-    ];
+    const filteredSources = useMemo(() => {
+        const term = search.trim().toLocaleLowerCase();
+        if (!term) return sourcesQuery.data ?? [];
+        return (sourcesQuery.data ?? []).filter((source) =>
+            `${source.title} ${source.topicName}`.toLocaleLowerCase().includes(term),
+        );
+    }, [search, sourcesQuery.data]);
 
-    // Cycle through loading stages for realistic AI effect
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (generating) {
-            interval = setInterval(() => {
-                setLoadingStage((prev) => {
-                    if (prev < loadingStages.length - 1) {
-                        return prev + 1;
-                    }
-                    return prev;
-                });
-            }, 1200);
-        }
-        return () => clearInterval(interval);
-    }, [generating, loadingStages.length]);
+    const selectedSources = (sourcesQuery.data ?? []).filter((source) => selectedSourceIds.includes(source.lessonId));
+
+    const toggleSource = (lessonIdToToggle: number) => {
+        setSelectedSourceIds((current) =>
+            current.includes(lessonIdToToggle)
+                ? current.filter((id) => id !== lessonIdToToggle)
+                : [...current, lessonIdToToggle],
+        );
+    };
 
     const handleGenerate = async () => {
-        if (!topic.trim()) {
-            toast.error("Please enter a topic or select one from the presets");
+        if (selectedSourceIds.length === 0) {
+            toast.error(t("validation.sourceRequired"));
+            return;
+        }
+        if (questionTypes.length === 0) {
+            toast.error(t("validation.typeRequired"));
             return;
         }
 
-        setGenerating(true);
-        setLoadingStage(0);
-        setGeneratedQuestions([]);
-
-        // Simulate network delay for AI model generation
-        setTimeout(() => {
-            // Find in pool
-            let foundQuestions: QuestionRequestDTO[] = [];
-            const key = PRESET_TOPICS.find(t => t.toLowerCase() === topic.toLowerCase()) || "";
-            if (key && MOCK_QUESTIONS_POOL[key] && MOCK_QUESTIONS_POOL[key][difficulty]) {
-                foundQuestions = [...MOCK_QUESTIONS_POOL[key][difficulty]];
-            }
-
-            // Fallback or fill remaining questions count
-            const fallbackPool = DEFAULT_POOL;
-            while (foundQuestions.length < count) {
-                const randomQ = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
-                // Avoid duplicating exactly
-                if (!foundQuestions.some(q => q.question === randomQ.question)) {
-                    foundQuestions.push(randomQ);
-                } else {
-                    // Create dynamic copy if needed
-                    foundQuestions.push({
-                        ...randomQ,
-                        question: `${randomQ.question} (Variation regarding ${topic})`
-                    });
-                }
-            }
-
-            // Slice to exact count
-            foundQuestions = foundQuestions.slice(0, count);
-
-            // Adapt questions to selected topic and points
-            const pointsMap = { EASY: 1, MEDIUM: 2, HARD: 3 };
-            const adapted = foundQuestions.map(q => ({
-                ...q,
-                points: pointsMap[difficulty],
-                selected: true, // Default selected
-            }));
-
-            setGeneratedQuestions(adapted);
-            setGenerating(false);
-            toast.success("AI generated successfully! Review the questions below.");
-        }, 7000);
-    };
-
-    const handleToggleSelect = (index: number) => {
-        setGeneratedQuestions(prev => prev.map((q, i) => i === index ? { ...q, selected: !q.selected } : q));
+        try {
+            const response = await generateMutation.mutateAsync({
+                sourceLessonIds: selectedSourceIds,
+                prompt: prompt.trim(),
+                provider: provider === "DEFAULT" ? null : provider,
+                difficulty,
+                questionTypes,
+                count,
+                choicesPerQuestion,
+                includeExplanations,
+            });
+            setGeneratedQuestions(response.questions.map((question) => ({...question, selected: true})));
+        } catch {
+            // The mutation error stays visible so the admin can adjust the request and retry.
+        }
     };
 
     const handleAdd = async () => {
-        const selected = generatedQuestions.filter(q => q.selected);
-        if (selected.length === 0) {
-            toast.error("Please select at least one question to add.");
+        const questions = generatedQuestions
+            .filter((question) => question.selected)
+            .map((question) => ({
+                question: question.question,
+                type: question.type,
+                points: question.points,
+                orderIndex: question.orderIndex,
+                explanation: question.explanation,
+                choices: question.choices,
+            }));
+        if (questions.length === 0) {
+            toast.error(t("validation.questionRequired"));
             return;
         }
+        await onAddQuestions(questions);
+        reset();
+        onOpenChange(false);
+    };
 
-        // Strip the extra 'selected' parameter before submitting
-        const formatted = selected.map((q) => {
-            const newQ = { ...q };
-            delete (newQ as Partial<typeof q>).selected;
-            return newQ as QuestionRequestDTO;
-        });
-        
-        try {
-            await onAddQuestions(formatted);
-            onOpenChange(false);
-            // Reset state
-            setGeneratedQuestions([]);
-            setTopic("");
-        } catch {
-            toast.error("Failed to add questions");
-        }
+    const reset = () => {
+        setGeneratedQuestions([]);
+        generateMutation.reset();
     };
 
     return (
-        <Dialog open={open} onOpenChange={(val) => {
-            if (!generating) onOpenChange(val);
+        <Dialog open={open} onOpenChange={(nextOpen) => {
+            if (!generateMutation.isPending && !isPending) onOpenChange(nextOpen);
         }}>
-            <DialogContent className="max-w-3xl max-h-[92vh] flex flex-col p-6 overflow-hidden">
-                <DialogHeader className="border-b pb-4 shrink-0">
-                    <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                        <div className="flex items-center justify-center size-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30">
-                            <Sparkles className="size-4.5 text-amber-500 animate-pulse" />
+            <DialogContent className="flex max-h-[94dvh] w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:w-[calc(100vw-2rem)] sm:max-w-6xl">
+                <DialogHeader className="border-b border-border/70 bg-muted/20 px-5 py-4 pr-14 text-left sm:px-6 sm:py-5">
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                            <Sparkles />
                         </div>
-                        AI Quiz Question Generator
-                    </DialogTitle>
-                    <DialogDescription className="text-sm text-muted-foreground mt-1">
-                        Use our fine-tuned AI model to draft highly accurate, student-friendly multiple-choice questions instantly.
-                    </DialogDescription>
+                        <div>
+                            <DialogTitle className="text-lg font-semibold tracking-tight sm:text-xl">{t("title")}</DialogTitle>
+                            <DialogDescription className="mt-1 max-w-3xl leading-relaxed">{t("description")}</DialogDescription>
+                        </div>
+                    </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto py-4">
-                    {!generating && generatedQuestions.length === 0 ? (
-                        /* Step 1: Configuration Form */
-                        <div className="flex flex-col gap-6 max-w-2xl mx-auto py-4">
-                            {/* Preset Topics */}
-                            <div className="flex flex-col gap-2">
-                                <span className="text-sm font-semibold text-foreground">Select Preset Topic</span>
-                                <div className="flex flex-wrap gap-2">
-                                    {PRESET_TOPICS.map((t) => (
-                                        <button
-                                            key={t}
-                                            type="button"
-                                            onClick={() => setTopic(t)}
-                                            className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
-                                                topic === t
-                                                    ? "bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400"
-                                                    : "border-border/60 hover:bg-muted hover:border-muted-foreground/30 text-muted-foreground hover:text-foreground"
-                                            }`}
-                                        >
-                                            {t}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Custom Topic Input */}
-                            <div className="flex flex-col gap-2">
-                                <span className="text-sm font-semibold text-foreground">Or Enter Custom Topic / Syllabus Segment</span>
-                                <Input
-                                    placeholder="e.g. Balanced BST Rotations, Graph DFS recursion, Heap sort..."
-                                    value={topic}
-                                    onChange={(e) => setTopic(e.target.value)}
-                                    className="h-11 text-sm"
-                                />
-                            </div>
-
-                            {/* Configuration Options grid */}
-                            <div className="grid gap-6 sm:grid-cols-2">
-                                {/* Difficulty selection */}
-                                <div className="flex flex-col gap-2.5">
-                                    <span className="text-sm font-semibold text-foreground">Difficulty Level</span>
-                                    <div className="flex bg-muted/40 p-1 rounded-lg border gap-1">
-                                        {(["EASY", "MEDIUM", "HARD"] as const).map((d) => (
-                                            <button
-                                                key={d}
-                                                type="button"
-                                                onClick={() => setDifficulty(d)}
-                                                className={`flex-1 py-2 text-xs font-bold uppercase rounded-md transition-all ${
-                                                    difficulty === d
-                                                        ? "bg-background text-foreground shadow-sm border border-border/40"
-                                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
-                                                }`}
-                                            >
-                                                {d}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Count selection */}
-                                <div className="flex flex-col gap-2.5">
-                                    <span className="text-sm font-semibold text-foreground">Number of Questions</span>
-                                    <div className="flex bg-muted/40 p-1 rounded-lg border gap-1">
-                                        {[1, 2, 3, 5].map((c) => (
-                                            <button
-                                                key={c}
-                                                type="button"
-                                                onClick={() => setCount(c)}
-                                                className={`flex-1 py-2 text-xs font-bold rounded-md transition-all ${
-                                                    count === c
-                                                        ? "bg-background text-foreground shadow-sm border border-border/40"
-                                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
-                                                }`}
-                                            >
-                                                {c} Qs
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : generating ? (
-                        /* Step 2: Processing AI animation */
-                        <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
-                            <div className="relative flex items-center justify-center size-20 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
-                                <Loader2 className="size-10 text-amber-500 animate-spin" />
-                                <Sparkles className="absolute size-4 text-orange-400 -top-1 -right-1 animate-bounce" />
-                            </div>
-                            <h3 className="text-lg font-bold mb-2">Engaging Algorithmic AI Model...</h3>
-                            <p className="text-sm text-muted-foreground mb-6">
-                                Writing high-fidelity multiple-choice questions for <strong>{topic}</strong> ({difficulty}).
-                            </p>
-
-                            {/* Simulated stage ticker */}
-                            <div className="w-full bg-muted/60 p-4 rounded-xl border border-dashed text-left font-mono text-xs flex items-start gap-3 min-h-[70px]">
-                                <RefreshCw className="size-4.5 text-amber-500 animate-spin shrink-0 mt-0.5" />
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-foreground font-semibold">Current State:</span>
-                                    <span className="text-muted-foreground animate-pulse">{loadingStages[loadingStage]}</span>
-                                </div>
-                            </div>
-                            <div className="w-full mt-4 bg-muted h-1 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-1000"
-                                    style={{ width: `${((loadingStage + 1) / loadingStages.length) * 100}%` }}
-                                />
-                            </div>
-                        </div>
+                <div className="min-h-0 flex-1 overflow-y-auto bg-muted/10 p-3 sm:p-5">
+                    {isReviewing ? (
+                        <QuestionReview
+                            questions={generatedQuestions}
+                            onToggle={(index) => setGeneratedQuestions((current) =>
+                                current.map((question, currentIndex) =>
+                                    currentIndex === index ? {...question, selected: !question.selected} : question,
+                                ),
+                            )}
+                        />
                     ) : (
-                        /* Step 3: Question Reviews & Selection List */
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between bg-muted/20 border p-3 rounded-lg text-sm mb-2">
-                                <div className="flex items-center gap-2">
-                                    <AlertCircle className="size-4.5 text-amber-500 shrink-0" />
-                                    <span>AI has drafted <strong>{generatedQuestions.length}</strong> questions on <strong>{topic}</strong>.</span>
-                                </div>
-                                <span className="font-semibold text-xs text-muted-foreground">Select ones to import</span>
-                            </div>
-
-                            <div className="space-y-4">
-                                {generatedQuestions.map((q, idx) => (
-                                    <Card 
-                                        key={idx} 
-                                        className={`transition-all duration-200 border-l-4 ${
-                                            q.selected 
-                                                ? "border-l-emerald-500 bg-emerald-500/[0.01] border-emerald-500/20" 
-                                                : "border-l-muted-foreground/30 border-border/80 hover:bg-muted/5"
-                                        }`}
-                                    >
-                                        <CardContent className="p-4 flex gap-3.5 items-start">
-                                            {/* Checkbox button */}
-                                            <button
-                                                type="button"
-                                                onClick={() => handleToggleSelect(idx)}
-                                                className={`shrink-0 size-6 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
-                                                    q.selected
-                                                        ? "bg-emerald-500 border-emerald-500 text-white"
-                                                        : "border-muted-foreground/30 bg-background"
-                                                }`}
-                                            >
-                                                {q.selected && <Check className="size-4 stroke-[3]" />}
-                                            </button>
-
-                                            <div className="flex-1 flex flex-col gap-3 min-w-0">
-                                                <div className="flex items-center justify-between gap-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-xs text-muted-foreground font-mono">Q{idx + 1}</span>
-                                                        <Badge variant="outline" className="text-[10px] font-bold uppercase py-0 px-2 tracking-wide">
-                                                            {q.type.replace(/_/g, " ")}
-                                                        </Badge>
-                                                    </div>
-                                                    <Badge variant="secondary" className="text-xs font-semibold">
-                                                        {q.points} pt{q.points !== 1 ? "s" : ""}
-                                                    </Badge>
-                                                </div>
-
-                                                <p className="text-sm font-semibold text-foreground">{q.question}</p>
-
-                                                {/* Choices grid */}
-                                                <div className="grid gap-2 sm:grid-cols-2">
-                                                    {q.choices.map((c, cIdx) => (
-                                                        <div 
-                                                            key={cIdx} 
-                                                            className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs ${
-                                                                c.isCorrect 
-                                                                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium" 
-                                                                    : "bg-muted/30 border-transparent text-muted-foreground"
-                                                            }`}
-                                                        >
-                                                            <div className={`size-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
-                                                                c.isCorrect ? "bg-emerald-500 border-emerald-500 text-white" : "border-muted-foreground/30"
-                                                            }`}>
-                                                                {c.isCorrect && <Check className="size-2.5 text-white" />}
-                                                            </div>
-                                                            <span className="line-clamp-2">{c.text}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                {/* Explanation Box */}
-                                                {q.explanation && (
-                                                    <div className="bg-muted/40 p-2.5 rounded-lg border border-dashed text-xs text-muted-foreground">
-                                                        <span className="font-semibold text-foreground">Explanation:</span> {q.explanation}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
+                            <SourceSelector
+                                sources={filteredSources}
+                                selectedSourceIds={selectedSourceIds}
+                                search={search}
+                                onSearchChange={setSearch}
+                                onToggle={toggleSource}
+                                isLoading={sourcesQuery.isLoading}
+                                error={sourcesQuery.error}
+                                onRetry={() => sourcesQuery.refetch()}
+                            />
+                            <GenerationBrief
+                                selectedSources={selectedSources}
+                                prompt={prompt}
+                                onPromptChange={setPrompt}
+                                provider={provider}
+                                onProviderChange={setProvider}
+                                difficulty={difficulty}
+                                onDifficultyChange={setDifficulty}
+                                questionTypes={questionTypes}
+                                onQuestionTypesChange={setQuestionTypes}
+                                count={count}
+                                onCountChange={setCount}
+                                choicesPerQuestion={choicesPerQuestion}
+                                onChoicesPerQuestionChange={setChoicesPerQuestion}
+                                includeExplanations={includeExplanations}
+                                onIncludeExplanationsChange={setIncludeExplanations}
+                                error={generateMutation.error}
+                            />
                         </div>
                     )}
                 </div>
 
-                <DialogFooter className="border-t pt-4 shrink-0 flex items-center justify-between gap-3">
-                    {!generating && generatedQuestions.length === 0 ? (
+                <DialogFooter className="flex-col-reverse items-stretch justify-between gap-2 border-t border-border/70 bg-background px-4 py-3 sm:flex-row sm:items-center sm:px-6 sm:py-4">
+                    {isReviewing ? (
                         <>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => onOpenChange(false)}
-                                className="text-sm h-10 px-4"
-                            >
-                                Cancel
+                            <Button variant="outline" onClick={reset} disabled={isPending}>
+                                <ChevronLeft data-icon="inline-start" />
+                                {t("actions.backToBrief")}
                             </Button>
-                            <Button
-                                type="button"
-                                onClick={handleGenerate}
-                                className="text-sm h-10 px-5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold gap-1.5 shadow-sm"
-                            >
-                                <Sparkles className="size-4" />
-                                Generate Drafts
-                            </Button>
-                        </>
-                    ) : generatedQuestions.length > 0 ? (
-                        <>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setGeneratedQuestions([])}
-                                disabled={isPending}
-                                className="text-sm h-10 px-4 gap-1.5"
-                            >
-                                <RefreshCw className="size-3.5" />
-                                Start Over
-                            </Button>
-                            <Button
-                                type="button"
-                                onClick={handleAdd}
-                                disabled={isPending || generatedQuestions.filter(q => q.selected).length === 0}
-                                className="text-sm h-10 px-5 bg-amber-500 hover:bg-amber-600 text-white font-semibold gap-1.5 shadow-sm"
-                            >
-                                {isPending ? (
-                                    <>
-                                        <Loader2 className="size-4 animate-spin" />
-                                        Adding to Quiz...
-                                    </>
-                                ) : (
-                                    <>
-                                        <PlusCircle className="size-4" />
-                                        Add Selected ({generatedQuestions.filter(q => q.selected).length})
-                                    </>
-                                )}
+                            <Button onClick={handleAdd} disabled={isPending || selectedQuestionCount === 0}>
+                                {isPending ? <Loader2 data-icon="inline-start" className="animate-spin" /> : <PlusCircle data-icon="inline-start" />}
+                                {isPending ? t("actions.adding") : t("actions.addSelected", {count: selectedQuestionCount})}
                             </Button>
                         </>
                     ) : (
-                        <div className="w-full text-center text-xs text-muted-foreground animate-pulse py-1">
-                            Please do not close this modal while the AI completes its process...
-                        </div>
+                        <>
+                            <Button variant="outline" onClick={() => onOpenChange(false)}>{t("actions.cancel")}</Button>
+                            <Button variant="ai" onClick={handleGenerate} disabled={generateMutation.isPending || selectedSourceIds.length === 0}>
+                                {generateMutation.isPending ? <Loader2 data-icon="inline-start" className="animate-spin" /> : <Sparkles data-icon="inline-start" />}
+                                {generateMutation.isPending ? t("actions.generating") : t("actions.generate", {count})}
+                            </Button>
+                        </>
                     )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+    );
+}
+
+function SourceSelector({
+    sources,
+    selectedSourceIds,
+    search,
+    onSearchChange,
+    onToggle,
+    isLoading,
+    error,
+    onRetry,
+}: {
+    sources: AiQuestionSource[];
+    selectedSourceIds: number[];
+    search: string;
+    onSearchChange: (value: string) => void;
+    onToggle: (lessonId: number) => void;
+    isLoading: boolean;
+    error: Error | null;
+    onRetry: () => void;
+}) {
+    const t = useTranslations("lessonForm.questions.aiGenerator");
+
+    return (
+        <Card className="min-h-[520px] gap-0 py-0">
+            <CardHeader className="border-b border-border/70 py-4">
+                <CardTitle className="flex items-center gap-2"><BookOpen />{t("sources.title")}</CardTitle>
+                <CardDescription>{t("sources.description")}</CardDescription>
+                <div className="relative mt-2">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={t("sources.search")} className="pl-9" />
+                </div>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 p-3 sm:p-4">
+                {isLoading && [1, 2, 3, 4].map((item) => <Skeleton key={item} className="h-24" />)}
+                {error && (
+                    <div role="alert" className="flex min-h-48 flex-col items-center justify-center gap-3 text-center">
+                        <AlertCircle className="text-destructive" />
+                        <div>
+                            <p className="text-sm font-semibold">{t("sources.errorTitle")}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{error.message}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={onRetry}><RefreshCw data-icon="inline-start" />{t("sources.retry")}</Button>
+                    </div>
+                )}
+                {!isLoading && !error && sources.length === 0 && (
+                    <div className="flex min-h-48 flex-col items-center justify-center gap-2 text-center">
+                        <FileText className="text-muted-foreground" />
+                        <p className="text-sm font-semibold">{t("sources.emptyTitle")}</p>
+                        <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">{t("sources.emptyDescription")}</p>
+                    </div>
+                )}
+                {sources.map((source) => {
+                    const selected = selectedSourceIds.includes(source.lessonId);
+                    return (
+                        <label
+                            key={source.lessonId}
+                            className={cn(
+                                "flex w-full cursor-pointer items-start gap-3 rounded-xl p-3 text-left ring-1 transition-all",
+                                selected ? "bg-primary/6 ring-primary/25" : "bg-background ring-border/60 hover:ring-primary/20",
+                            )}
+                        >
+                            <Checkbox checked={selected} onCheckedChange={() => onToggle(source.lessonId)} aria-label={t("sources.select", {title: source.title})} className="mt-0.5" />
+                            <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    <p className="text-sm font-semibold">{source.title}</p>
+                                    {!source.isPublished && <Badge variant="outline">{t("sources.draft")}</Badge>}
+                                </div>
+                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{source.contentPreview}</p>
+                                <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                                    <span>{source.topicName}</span>
+                                    <span>·</span>
+                                    <span>{t("sources.characters", {count: source.contentCharacterCount})}</span>
+                                    {source.estimatedMinutes && <><span>·</span><span>{t("sources.minutes", {count: source.estimatedMinutes})}</span></>}
+                                </div>
+                            </div>
+                        </label>
+                    );
+                })}
+            </CardContent>
+        </Card>
+    );
+}
+
+function GenerationBrief({
+    selectedSources, prompt, onPromptChange, provider, onProviderChange, difficulty, onDifficultyChange,
+    questionTypes, onQuestionTypesChange, count, onCountChange, choicesPerQuestion, onChoicesPerQuestionChange,
+    includeExplanations, onIncludeExplanationsChange, error,
+}: {
+    selectedSources: AiQuestionSource[];
+    prompt: string;
+    onPromptChange: (value: string) => void;
+    provider: AiProvider | "DEFAULT";
+    onProviderChange: (value: AiProvider | "DEFAULT") => void;
+    difficulty: Difficulty;
+    onDifficultyChange: (value: Difficulty) => void;
+    questionTypes: SupportedQuestionType[];
+    onQuestionTypesChange: (value: SupportedQuestionType[]) => void;
+    count: number;
+    onCountChange: (value: number) => void;
+    choicesPerQuestion: number;
+    onChoicesPerQuestionChange: (value: number) => void;
+    includeExplanations: boolean;
+    onIncludeExplanationsChange: (value: boolean) => void;
+    error: Error | null;
+}) {
+    const t = useTranslations("lessonForm.questions.aiGenerator");
+    return (
+        <Card className="gap-0 py-0">
+            <CardHeader className="border-b border-border/70 py-4">
+                <CardTitle className="flex items-center gap-2"><Sparkles />{t("brief.title")}</CardTitle>
+                <CardDescription>{t("brief.description")}</CardDescription>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                    {selectedSources.length === 0
+                        ? <span className="text-xs text-muted-foreground">{t("brief.noSources")}</span>
+                        : selectedSources.map((source) => <Badge key={source.lessonId} variant="secondary">{source.title}</Badge>)}
+                </div>
+            </CardHeader>
+            <CardContent className="p-4">
+                <FieldGroup className="gap-5">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Field>
+                            <FieldLabel>{t("brief.provider")}</FieldLabel>
+                            <Select value={provider} onValueChange={(value) => onProviderChange(value as AiProvider | "DEFAULT")}>
+                                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                <SelectContent><SelectGroup>{PROVIDERS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectGroup></SelectContent>
+                            </Select>
+                        </Field>
+                        <Field>
+                            <FieldLabel>{t("brief.difficulty")}</FieldLabel>
+                            <ToggleGroup value={[difficulty]} onValueChange={(value) => value[0] && onDifficultyChange(value[0] as Difficulty)} variant="outline" className="w-full">
+                                {(["EASY", "MEDIUM", "HARD"] as Difficulty[]).map((item) => <ToggleGroupItem key={item} value={item} className="flex-1">{t(`difficulty.${item}`)}</ToggleGroupItem>)}
+                            </ToggleGroup>
+                        </Field>
+                    </div>
+                    <Field>
+                        <FieldLabel>{t("brief.questionTypes")}</FieldLabel>
+                        <ToggleGroup value={questionTypes} onValueChange={(value) => onQuestionTypesChange(value as SupportedQuestionType[])} variant="outline" className="w-full">
+                            <ToggleGroupItem value="SINGLE_CHOICE" className="flex-1">{t("types.SINGLE_CHOICE")}</ToggleGroupItem>
+                            <ToggleGroupItem value="MULTIPLE_CHOICE" className="flex-1">{t("types.MULTIPLE_CHOICE")}</ToggleGroupItem>
+                        </ToggleGroup>
+                    </Field>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Field>
+                            <FieldLabel>{t("brief.count")}</FieldLabel>
+                            <ToggleGroup value={[String(count)]} onValueChange={(value) => value[0] && onCountChange(Number(value[0]))} variant="outline" className="w-full">
+                                {[3, 5, 8, 10].map((item) => <ToggleGroupItem key={item} value={String(item)} className="flex-1">{item}</ToggleGroupItem>)}
+                            </ToggleGroup>
+                        </Field>
+                        <Field>
+                            <FieldLabel>{t("brief.choices")}</FieldLabel>
+                            <ToggleGroup value={[String(choicesPerQuestion)]} onValueChange={(value) => value[0] && onChoicesPerQuestionChange(Number(value[0]))} variant="outline" className="w-full">
+                                {[2, 3, 4, 5].map((item) => <ToggleGroupItem key={item} value={String(item)} className="flex-1">{item}</ToggleGroupItem>)}
+                            </ToggleGroup>
+                        </Field>
+                    </div>
+                    <Field>
+                        <div className="flex items-center justify-between gap-4 rounded-xl bg-muted/40 p-3">
+                            <div>
+                                <FieldLabel>{t("brief.explanations")}</FieldLabel>
+                                <FieldDescription>{t("brief.explanationsDescription")}</FieldDescription>
+                            </div>
+                            <Switch checked={includeExplanations} onCheckedChange={onIncludeExplanationsChange} />
+                        </div>
+                    </Field>
+                    <Field>
+                        <div className="flex items-center justify-between gap-3">
+                            <FieldLabel htmlFor="ai-question-prompt">{t("brief.prompt")}</FieldLabel>
+                            <span className="font-mono text-[11px] text-muted-foreground">{prompt.length.toLocaleString()} / 2,000</span>
+                        </div>
+                        <Textarea id="ai-question-prompt" value={prompt} onChange={(event) => onPromptChange(event.target.value)} maxLength={2000} rows={6} placeholder={t("brief.promptPlaceholder")} />
+                        <FieldDescription>{t("brief.promptHint")}</FieldDescription>
+                    </Field>
+                    {error && (
+                        <div role="alert" className="flex gap-2 rounded-xl bg-destructive/5 p-3 text-sm text-destructive ring-1 ring-destructive/20">
+                            <AlertCircle className="mt-0.5 shrink-0" />
+                            <span>{error.message}</span>
+                        </div>
+                    )}
+                </FieldGroup>
+            </CardContent>
+        </Card>
+    );
+}
+
+function QuestionReview({questions, onToggle}: {questions: GeneratedQuestion[]; onToggle: (index: number) => void}) {
+    const t = useTranslations("lessonForm.questions.aiGenerator");
+    return (
+        <div className="mx-auto flex max-w-4xl flex-col gap-3">
+            <div className="mb-1 flex flex-col gap-1">
+                <h3 className="font-heading text-lg font-semibold">{t("review.title")}</h3>
+                <p className="text-sm text-muted-foreground">{t("review.description", {count: questions.length})}</p>
+            </div>
+            {questions.map((question, index) => (
+                <Card key={index} size="sm" className={cn("transition-opacity", !question.selected && "opacity-55")}>
+                    <CardHeader className="grid-cols-[auto_1fr]">
+                        <Checkbox checked={question.selected} onCheckedChange={() => onToggle(index)} aria-label={t("review.select", {number: index + 1})} className="mt-1" />
+                        <div>
+                            <CardTitle className="text-sm leading-relaxed">{question.question}</CardTitle>
+                            <CardDescription className="mt-2 flex flex-wrap gap-1.5">
+                                <Badge variant="secondary">{t(`types.${question.type}`)}</Badge>
+                                <Badge variant="outline">{t("review.points", {count: question.points ?? 1})}</Badge>
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-2 sm:grid-cols-2">
+                        {question.choices.map((choice, choiceIndex) => (
+                            <div key={choiceIndex} className={cn("flex items-start gap-2 rounded-lg p-2.5 text-xs ring-1", choice.isCorrect ? "bg-primary/6 ring-primary/20" : "bg-muted/30 ring-border/50")}>
+                                <span className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full", choice.isCorrect ? "bg-primary text-primary-foreground" : "bg-background ring-1 ring-border")}>{choice.isCorrect && <Check />}</span>
+                                <span>{choice.text}</span>
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
     );
 }

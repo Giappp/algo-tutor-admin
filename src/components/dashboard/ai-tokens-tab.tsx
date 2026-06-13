@@ -209,8 +209,13 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                     </div>
                 </CardHeader>
                 <CardContent className="h-64 w-full pt-0">
+                    {aiTokens.dailyUsage.length === 0 ? (
+                        <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">
+                            {t("noResults")}
+                        </div>
+                    ) : (
                     <ChartContainer config={{}} className="h-64 w-full">
-                        <AreaChart data={aiTokens.dailyUsage} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                        <AreaChart accessibilityLayer data={aiTokens.dailyUsage} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorInput" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="oklch(var(--primary))" stopOpacity={0.2} />
@@ -254,6 +259,7 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                             />
                         </AreaChart>
                     </ChartContainer>
+                    )}
                 </CardContent>
             </Card>
 
@@ -269,7 +275,7 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                     <CardContent className="flex flex-col gap-6 pt-2">
                         <div className="flex justify-center h-36 w-full relative">
                             <ChartContainer config={{}} className="h-36 w-36">
-                                <PieChart>
+                                <PieChart accessibilityLayer>
                                     <Pie
                                         data={aiUsageModeData}
                                         cx="50%"
@@ -322,8 +328,8 @@ export function AITokensTab({ aiTokens, aiDays, setAiDays }: AITokensTabProps) {
                         <CardDescription className="text-xs">{t("topConsumersDesc")}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
-                        <div className="border border-border/30 rounded-xl overflow-hidden bg-card/50 backdrop-blur-md">
-                            <Table>
+                        <div className="overflow-x-auto rounded-xl border border-border/30 bg-card/50">
+                            <Table className="min-w-[560px]">
                                 <TableHeader className="bg-muted/50">
                                     <TableRow className="hover:bg-transparent border-b border-border/30">
                                         <TableHead className="w-16 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">{t("rank")}</TableHead>

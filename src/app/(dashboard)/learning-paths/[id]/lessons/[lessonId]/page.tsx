@@ -1,23 +1,35 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LessonHeader } from "@/components/learning-path/lesson-header";
 import { LessonPageSkeleton } from "@/components/learning-path/lesson-skeleton";
 import { CodingLessonPanels, QuizLessonDetail, TheoryLessonDetail } from "@/components/lesson-detail";
 import { useLesson, useTogglePublishLesson, useUpdateLesson } from "@/hooks/use-lessons";
 import { LessonRequestDTO } from "@/types/learning-path/schema";
+import { AiLessonDraftDialog } from "@/components/lesson-detail/ai-lesson-draft-dialog";
+import { mergeLessonDraft } from "@/lib/admin-ai-lesson";
+import type { LessonDraft, QuizQuestionDraft } from "@/types/admin-ai-lesson";
+import { useTranslations } from "next-intl";
 
 export default function LessonDetailPage() {
     const params = useParams();
+    const searchParams = useSearchParams();
+    const tAi = useTranslations("lessonForm.ai");
     const learningPathId = Number(params.id);
     const lessonId = Number(params.lessonId);
 
     const { data: lesson, isLoading } = useLesson(lessonId);
     const updateMutation = useUpdateLesson();
     const togglePublishMutation = useTogglePublishLesson();
+    const aiDestination = searchParams.get("openAi");
+    const [isAiOpen, setIsAiOpen] = useState(() => aiDestination === "lesson-draft" || aiDestination === "true");
+    const [isCodingAiOpen] = useState(() => aiDestination === "coding-studio");
+    const [draft, setDraft] = useState<LessonDraft | null>(null);
+    const [draftRevision, setDraftRevision] = useState(0);
 
     if (isLoading) {
         return <LessonPageSkeleton />;
@@ -34,6 +46,9 @@ export default function LessonDetailPage() {
             </div>
         );
     }
+
+    const editorLesson = draft ? mergeLessonDraft(lesson, draft) : lesson;
+    const quizDraftQuestions: QuizQuestionDraft[] = draft?.type === "QUIZ" ? draft.questions ?? [] : [];
 
     // Inline title save — constructs minimal update payload
     const handleTitleChange = (newTitle: string) => {
@@ -57,6 +72,7 @@ export default function LessonDetailPage() {
                     title: newTitle,
                     difficulty: lesson.difficulty,
                     content: lesson.content,
+                    estimatedMinutes: lesson.estimatedMinutes,
                 }
                 : {
                     type: "QUIZ" as const,
@@ -78,32 +94,56 @@ export default function LessonDetailPage() {
                 onTogglePublish={() => togglePublishMutation.mutate(lessonId)}
                 onTitleChange={handleTitleChange}
                 isEditPending={togglePublishMutation.isPending || updateMutation.isPending}
+                action={lesson.type !== "CODING" ? (
+                    <Button variant="ai" size="sm" onClick={() => setIsAiOpen(true)}>
+                        <Sparkles className="size-4"/>
+                        {tAi("trigger")}
+                    </Button>
+                ) : undefined}
             />
 
-            {lesson.type === "CODING" && (
+            {editorLesson.type === "CODING" && (
                 <CodingLessonPanels
-                    lesson={lesson}
+                    key={`coding-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
+                    initialAiOpen={isCodingAiOpen}
                 />
             )}
 
-            {lesson.type === "THEORY" && (
+            {editorLesson.type === "THEORY" && (
                 <TheoryLessonDetail
-                    lesson={lesson}
+                    key={`theory-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
                 />
             )}
 
-            {lesson.type === "QUIZ" && (
+            {editorLesson.type === "QUIZ" && (
                 <QuizLessonDetail
-                    lesson={lesson}
+                    key={`quiz-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
+                    draftQuestions={quizDraftQuestions}
+                />
+            )}
+
+            {lesson.type !== "CODING" && (
+                <AiLessonDraftDialog
+                    lessonId={lessonId}
+                    lessonType={lesson.type}
+                    open={isAiOpen}
+                    onOpenChange={setIsAiOpen}
+                    onApply={(nextDraft) => {
+                        setDraft(nextDraft);
+                        setDraftRevision((revision) => revision + 1);
+                    }}
                 />
             )}
         </div>

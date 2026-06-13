@@ -39,7 +39,7 @@ export function NavSecondary({
                                 size="sm"
                                 data-active={isActive(item.url) ? "true" : undefined}
                                 render={<Link href={item.url} />}
-                                className="h-9 text-[13px] hover:bg-white/70 dark:hover:bg-white/5 data-active:bg-indigo-100/80 data-active:text-indigo-800 dark:data-active:bg-indigo-400/15 dark:data-active:text-indigo-200"
+                                className="h-9 text-[13px] font-medium text-sidebar-foreground/72 hover:bg-white/75 hover:text-sidebar-accent-foreground dark:hover:bg-white/5 data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground"
                             >
                                 {item.icon}
                                 <span>{item.title}</span>

@@ -12,10 +12,13 @@ import {
     AlertTriangle,
     LayoutDashboard,
     Sparkles,
-    ShieldCheck
+    ShieldCheck,
+    Radio
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Import modular child components
 import { OverviewTab } from "@/components/dashboard/overview-tab";
@@ -33,21 +36,21 @@ export default function DashboardPage() {
         isLoading: isLoadingOverview,
         isError: isErrorOverview,
         refetch: refetchOverview
-    } = useDashboardOverview();
+    } = useDashboardOverview(activeTab === "overview");
 
     const {
         data: aiTokens,
         isLoading: isLoadingAI,
         isError: isErrorAI,
         refetch: refetchAI
-    } = useDashboardAITokens(aiDays);
+    } = useDashboardAITokens(aiDays, activeTab === "ai-tokens");
 
     const {
         data: apiQuotas,
         isLoading: isLoadingQuotas,
         isError: isErrorQuotas,
         refetch: refetchQuotas
-    } = useDashboardAPIQuotas();
+    } = useDashboardAPIQuotas(activeTab === "api-quotas");
 
     const isTabLoading =
         (activeTab === "overview" && isLoadingOverview) ||
@@ -66,97 +69,78 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto stagger-children">
-            {/* Ambient Background Radial Blobs */}
-            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.55_0.22_272/0.05)_0%,transparent_70%)] pointer-events-none -z-10 animate-gradient-shift" />
-            <div className="absolute top-[40%] left-[-10%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,oklch(0.65_0.2_290/0.04)_0%,transparent_70%)] pointer-events-none -z-10" />
-
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5">
+        <Tabs
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+            className="mx-auto flex w-full max-w-7xl flex-col gap-6"
+        >
+            <header className="flex flex-col gap-4 border-b border-border/60 pb-5 sm:flex-row sm:items-end sm:justify-between">
                 <div className="flex flex-col gap-1.5">
-                    <h1 className="text-3xl font-heading font-extrabold text-gradient tracking-tight select-none">
+                    <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground">
+                        <Radio className="size-3.5 text-emerald-600" aria-hidden="true" />
+                        <span>{t("autoRefreshStatus")}</span>
+                    </div>
+                    <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
                         {t("title")}
                     </h1>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
                         {t("welcome")}
                     </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                    <button
-                        onClick={handleRetry}
-                        disabled={isTabLoading}
-                        className="inline-flex items-center justify-center p-2.5 size-10 rounded-xl border border-border/50 bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50"
-                        title="Tải lại dữ liệu"
-                    >
-                        <RefreshCw className={`w-4 h-4 transition-transform duration-700 ${isTabLoading ? "animate-spin text-primary" : "hover:rotate-180"}`} />
-                    </button>
-                </div>
-            </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRetry}
+                    disabled={isTabLoading}
+                    aria-label={t("refreshData")}
+                >
+                    <RefreshCw className={isTabLoading ? "animate-spin" : ""} />
+                    {t("refreshData")}
+                </Button>
+            </header>
 
-            {/* Custom Premium Tab Bar */}
-            <div className="inline-flex items-center gap-1.5 rounded-2xl bg-muted/50 p-1 w-full md:w-fit border border-border/30 backdrop-blur-md">
-                <button
-                    onClick={() => setActiveTab("overview")}
-                    className={`flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${activeTab === "overview"
-                        ? "bg-background text-foreground shadow-sm font-extrabold border border-border/40"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
-                        }`}
-                >
-                    <LayoutDashboard className="w-3.5 h-3.5" />
+            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/40 p-1 sm:w-fit">
+                <TabsTrigger value="overview" className="h-9 flex-none px-4 text-xs">
+                    <LayoutDashboard aria-hidden="true" />
                     {t("systemOverview")}
-                </button>
-                <button
-                    onClick={() => setActiveTab("ai-tokens")}
-                    className={`flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${activeTab === "ai-tokens"
-                        ? "bg-background text-foreground shadow-sm font-extrabold border border-border/40"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
-                        }`}
-                >
-                    <Sparkles className="w-3.5 h-3.5" />
+                </TabsTrigger>
+                <TabsTrigger value="ai-tokens" className="h-9 flex-none px-4 text-xs">
+                    <Sparkles aria-hidden="true" />
                     {t("aiTokenUsage")}
-                </button>
-                <button
-                    onClick={() => setActiveTab("api-quotas")}
-                    className={`flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${activeTab === "api-quotas"
-                        ? "bg-background text-foreground shadow-sm font-extrabold border border-border/40"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
-                        }`}
-                >
-                    <ShieldCheck className="w-3.5 h-3.5" />
+                </TabsTrigger>
+                <TabsTrigger value="api-quotas" className="h-9 flex-none px-4 text-xs">
+                    <ShieldCheck aria-hidden="true" />
                     {t("apiQuotas")}
                     {apiQuotas && apiQuotas.length > 0 && (
-                        <span className="flex size-2 rounded-full bg-destructive animate-pulse ml-0.5" />
+                        <span className="ml-1 rounded-md bg-foreground px-1.5 py-0.5 font-mono text-[9px] text-background">
+                            {apiQuotas.length}
+                        </span>
                     )}
-                </button>
-            </div>
+                </TabsTrigger>
+            </TabsList>
 
-            {/* ERROR STATE */}
             {isTabError && (
-                <Card className="border-destructive/30 bg-destructive/[0.02] overflow-hidden rounded-2xl shadow-sm">
+                <Card role="alert" className="overflow-hidden rounded-xl border-destructive/30 bg-destructive/[0.02] shadow-none">
                     <CardContent className="flex flex-col items-center justify-center text-center p-10 gap-4">
-                        <div className="p-3.5 bg-destructive/10 text-destructive rounded-2xl border border-destructive/20 shadow-sm animate-bounce">
+                        <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-3.5 text-destructive">
                             <AlertTriangle className="w-8 h-8" />
                         </div>
                         <div className="flex flex-col gap-1 max-w-md">
                             <h3 className="text-base font-bold text-foreground">{t("failedToLoad")}</h3>
                             <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                                {t("apiQuotasDesc") ? "An error occurred while connecting to the API server. Please check the backend service status or try again." : "Đã xảy ra lỗi khi kết nối với máy chủ API. Vui lòng kiểm tra trạng thái hoạt động của Backend hoặc thử lại."}
+                                {t("loadErrorDescription")}
                             </p>
                         </div>
-                        <button
-                            onClick={handleRetry}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl border bg-background hover:bg-muted transition-all duration-300 hover:scale-105 active:scale-95"
-                        >
+                        <Button variant="outline" size="sm" onClick={handleRetry}>
                             <RefreshCw className="w-3.5 h-3.5" />
                             {t("retryNow")}
-                        </button>
+                        </Button>
                     </CardContent>
                 </Card>
             )}
 
-            {/* SKELETON LOADER */}
             {isTabLoading && !isTabError && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6" aria-busy="true" aria-label={t("loadingData")}>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
                             <Card key={i} className="p-6 border border-border/40 bg-gradient-to-b from-card to-card/95 relative overflow-hidden rounded-2xl">
@@ -178,27 +162,32 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* RENDER MODULARIZED CONTENT */}
             {!isTabLoading && !isTabError && (
-                <div className="flex flex-col gap-6">
-                    {activeTab === "overview" && overview && (
+                <>
+                    <TabsContent value="overview">
+                    {overview && (
                         <OverviewTab overview={overview} />
                     )}
-                    {activeTab === "ai-tokens" && aiTokens && (
+                    </TabsContent>
+                    <TabsContent value="ai-tokens">
+                    {aiTokens && (
                         <AITokensTab
                             aiTokens={aiTokens}
                             aiDays={aiDays}
                             setAiDays={setAiDays}
                         />
                     )}
-                    {activeTab === "api-quotas" && apiQuotas && (
+                    </TabsContent>
+                    <TabsContent value="api-quotas">
+                    {apiQuotas && (
                         <APIQuotasTab
                             apiQuotas={apiQuotas}
                             refetchQuotas={refetchQuotas}
                         />
                     )}
-                </div>
+                    </TabsContent>
+                </>
             )}
-        </div>
+        </Tabs>
     );
 }

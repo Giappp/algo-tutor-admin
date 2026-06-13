@@ -23,17 +23,17 @@ export function SiteHeader({hideSidebarToggle = false}: {hideSidebarToggle?: boo
     const breadcrumbs = getBreadcrumbs(pathname)
 
     return (
-        <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex h-14 w-full items-center gap-4 px-4">
+        <header className="sticky top-0 z-50 flex w-full items-center border-b border-border/70 bg-background/88 shadow-[0_1px_0_oklch(1_0_0/0.7)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/78">
+            <div className="flex h-14 w-full items-center gap-3 px-4 lg:px-6">
                 {!hideSidebarToggle && (
                     <>
                         <Button
-                            className="size-9 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            className="size-9 text-muted-foreground hover:text-primary"
                             variant="ghost"
                             size="icon"
                             onClick={toggleSidebar}
                         >
-                            <PanelLeftIcon className="size-[18px]" />
+                            <PanelLeftIcon />
                         </Button>
                         <Separator orientation="vertical" className="h-5"/>
                     </>
@@ -47,12 +47,12 @@ export function SiteHeader({hideSidebarToggle = false}: {hideSidebarToggle?: boo
                                     {item.href ? (
                                         <BreadcrumbLink
                                             href={item.href}
-                                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                            className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
                                         >
                                             {item.label}
                                         </BreadcrumbLink>
                                     ) : (
-                                        <BreadcrumbPage className="text-sm font-medium text-foreground">
+                                        <BreadcrumbPage className="text-xs font-semibold text-foreground">
                                             {item.label}
                                         </BreadcrumbPage>
                                     )}
@@ -61,7 +61,7 @@ export function SiteHeader({hideSidebarToggle = false}: {hideSidebarToggle?: boo
                         ))}
                     </BreadcrumbList>
                 </Breadcrumb>
-                <div className="ml-auto flex items-center gap-3">
+                <div className="ml-auto flex items-center gap-2">
                     <LocaleSwitcher />
                     <SearchForm className="w-full sm:w-auto" />
                 </div>

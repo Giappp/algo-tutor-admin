@@ -2,6 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
+import {useTranslations} from "next-intl";
 import {testCaseService} from "@/api/services/testcase-services";
 import {CreateTestCaseRequest, UpdateTestCaseRequest} from "@/types/learning-path";
 
@@ -20,12 +21,13 @@ export function useTestCasesByLesson(lessonId: number) {
 
 export function useCreateTestCase(lessonId: number) {
     const queryClient = useQueryClient();
+    const t = useTranslations("codingResources.testCases");
 
     return useMutation({
         mutationFn: (data: CreateTestCaseRequest) =>
             testCaseService.create(lessonId, data),
         onSuccess: () => {
-            toast.success("Test case created successfully");
+            toast.success(t("toast.created"));
             queryClient.invalidateQueries({queryKey: QUERY_KEYS.testCases(lessonId)});
         },
     });
@@ -33,12 +35,13 @@ export function useCreateTestCase(lessonId: number) {
 
 export function useUpdateTestCase(testCaseId: number) {
     const queryClient = useQueryClient();
+    const t = useTranslations("codingResources.testCases");
 
     return useMutation({
         mutationFn: (data: UpdateTestCaseRequest) =>
             testCaseService.update(testCaseId, data),
         onSuccess: () => {
-            toast.success("Test case updated successfully");
+            toast.success(t("toast.updated"));
             queryClient.invalidateQueries({queryKey: ["test-cases"]});
         },
     });
@@ -46,11 +49,12 @@ export function useUpdateTestCase(testCaseId: number) {
 
 export function useDeleteTestCase() {
     const queryClient = useQueryClient();
+    const t = useTranslations("codingResources.testCases");
 
     return useMutation({
         mutationFn: (testCaseId: number) => testCaseService.delete(testCaseId),
         onSuccess: () => {
-            toast.success("Test case deleted successfully");
+            toast.success(t("toast.deleted"));
             queryClient.invalidateQueries({queryKey: ["test-cases"]});
         },
     });

@@ -170,7 +170,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
                         <div className="md:col-span-2 flex justify-center">
                             <div className="h-44 w-44 relative">
                                 <ChartContainer config={{}} className="h-44 w-44">
-                                    <PieChart>
+                                    <PieChart accessibilityLayer>
                                         <Pie
                                             data={verdictData}
                                             cx="50%"
@@ -236,7 +236,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
                     <CardContent className="flex flex-col pt-4 h-full justify-between gap-6">
                         <div className="h-40 w-full relative">
                             <ChartContainer config={{}} className="h-40 w-full">
-                                <BarChart data={lessonData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                                <BarChart accessibilityLayer data={lessonData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                                     <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted/40" />
                                     <XAxis
                                         dataKey="name"

@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
+import {useTranslations} from "next-intl";
 import {
     AtSignIcon,
     CheckIcon,
@@ -43,12 +44,6 @@ import {Textarea} from "@/components/ui/textarea";
 import {cn} from "@/lib/utils";
 
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{8,16}$/;
-const ROLE_DETAILS: Record<AdminUserRole, {label: string; description: string}> = {
-    USER: {label: "User", description: "Standard learning access"},
-    EDITOR: {label: "Editor", description: "Can manage learning content"},
-    ADMIN: {label: "Admin", description: "Full administrative access"},
-};
-
 function getValidationMessage(error: unknown, field: string) {
     const value = toAppError(error).validationErrors?.[field];
     return Array.isArray(value) ? value[0] : value;
@@ -60,6 +55,7 @@ interface DialogProps {
 }
 
 export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
+    const t = useTranslations("users");
     const mutation = useCreateAdminUser();
     const [showPassword, setShowPassword] = useState(false);
     const {
@@ -77,10 +73,10 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
     const selectedRole = watch("role");
     const enabled = watch("enabled");
     const passwordChecks = [
-        {label: "8-16 characters", valid: password.length >= 8 && password.length <= 16},
-        {label: "Upper and lowercase", valid: /[A-Z]/.test(password) && /[a-z]/.test(password)},
-        {label: "Number and special character", valid: /\d/.test(password) && /[^A-Za-z0-9]/.test(password)},
-        {label: "No spaces", valid: password.length > 0 && !/\s/.test(password)},
+        {label: t("dialog.passwordChecks.length"), valid: password.length >= 8 && password.length <= 16},
+        {label: t("dialog.passwordChecks.case"), valid: /[A-Z]/.test(password) && /[a-z]/.test(password)},
+        {label: t("dialog.passwordChecks.numberSpecial"), valid: /\d/.test(password) && /[^A-Za-z0-9]/.test(password)},
+        {label: t("dialog.passwordChecks.noSpaces"), valid: password.length > 0 && !/\s/.test(password)},
     ];
 
     useEffect(() => {
@@ -120,8 +116,8 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                     <div className="mb-1 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
                         <UsersIcon className="size-5" />
                     </div>
-                    <DialogTitle className="text-lg">Create a new user</DialogTitle>
-                    <DialogDescription>Set up sign-in credentials and choose what this account can access.</DialogDescription>
+                    <DialogTitle className="text-lg">{t("dialog.createTitle")}</DialogTitle>
+                    <DialogDescription>{t("dialog.createDescription")}</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={submit}>
                     <div className="grid gap-7 px-6 py-6 md:grid-cols-[1.15fr_0.85fr]">
@@ -131,29 +127,29 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                     <KeyRoundIcon className="size-4" />
                                 </div>
                                 <div>
-                                    <h3 id="credentials-title" className="text-sm font-semibold">Sign-in credentials</h3>
-                                    <p className="text-xs text-muted-foreground">Identity and initial password</p>
+                                    <h3 id="credentials-title" className="text-sm font-semibold">{t("dialog.credentialsTitle")}</h3>
+                                    <p className="text-xs text-muted-foreground">{t("dialog.credentialsDescription")}</p>
                                 </div>
                             </div>
 
                             <Field data-invalid={!!errors.username}>
-                                <FieldLabel htmlFor="create-username">Username</FieldLabel>
+                                <FieldLabel htmlFor="create-username">{t("dialog.username")}</FieldLabel>
                                 <div className="relative">
                                     <UserIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                                     <Input
                                         id="create-username"
                                         autoComplete="off"
                                         aria-invalid={!!errors.username}
-                                        placeholder="e.g. minh.nguyen"
+                                        placeholder={t("dialog.usernamePlaceholder")}
                                         className="pl-10"
-                                        {...register("username", {required: "Username is required"})}
+                                        {...register("username", {required: t("validation.usernameRequired")})}
                                     />
                                 </div>
                                 <FieldError errors={[errors.username]} />
                             </Field>
 
                             <Field data-invalid={!!errors.email}>
-                                <FieldLabel htmlFor="create-email">Email address</FieldLabel>
+                                <FieldLabel htmlFor="create-email">{t("dialog.email")}</FieldLabel>
                                 <div className="relative">
                                     <AtSignIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                                     <Input
@@ -164,8 +160,8 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                         placeholder="name@example.com"
                                         className="pl-10"
                                         {...register("email", {
-                                            required: "Email is required",
-                                            pattern: {value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address"},
+                                            required: t("validation.emailRequired"),
+                                            pattern: {value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t("validation.emailInvalid")},
                                         })}
                                     />
                                 </div>
@@ -174,7 +170,7 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <Field data-invalid={!!errors.password}>
-                                    <FieldLabel htmlFor="create-password">Password</FieldLabel>
+                                    <FieldLabel htmlFor="create-password">{t("dialog.password")}</FieldLabel>
                                     <div className="relative">
                                         <LockKeyholeIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
@@ -184,16 +180,16 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                             aria-invalid={!!errors.password}
                                             className="px-10"
                                             {...register("password", {
-                                                required: "Password is required",
+                                                required: t("validation.passwordRequired"),
                                                 pattern: {
                                                     value: PASSWORD_PATTERN,
-                                                    message: "Password does not meet all requirements",
+                                                    message: t("validation.passwordRequirements"),
                                                 },
                                             })}
                                         />
                                         <button
                                             type="button"
-                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                            aria-label={showPassword ? t("dialog.hidePassword") : t("dialog.showPassword")}
                                             onClick={() => setShowPassword((value) => !value)}
                                             className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                         >
@@ -203,15 +199,15 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                     <FieldError errors={[errors.password]} />
                                 </Field>
                                 <Field data-invalid={!!errors.confirmPassword}>
-                                    <FieldLabel htmlFor="create-confirm-password">Confirm password</FieldLabel>
+                                    <FieldLabel htmlFor="create-confirm-password">{t("dialog.confirmPassword")}</FieldLabel>
                                     <Input
                                         id="create-confirm-password"
                                         type={showPassword ? "text" : "password"}
                                         autoComplete="new-password"
                                         aria-invalid={!!errors.confirmPassword}
                                         {...register("confirmPassword", {
-                                            required: "Confirm the password",
-                                            validate: (value, values) => value === values.password || "Passwords do not match",
+                                            required: t("validation.confirmPasswordRequired"),
+                                            validate: (value, values) => value === values.password || t("validation.passwordsMismatch"),
                                         })}
                                     />
                                     <FieldError errors={[errors.confirmPassword]} />
@@ -236,13 +232,13 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                     <ShieldCheckIcon className="size-4" />
                                 </div>
                                 <div>
-                                    <h3 id="access-title" className="text-sm font-semibold">Access and status</h3>
-                                    <p className="text-xs text-muted-foreground">Choose the account permission level</p>
+                                    <h3 id="access-title" className="text-sm font-semibold">{t("dialog.accessTitle")}</h3>
+                                    <p className="text-xs text-muted-foreground">{t("dialog.accessDescription")}</p>
                                 </div>
                             </div>
 
                             <Field>
-                                <FieldLabel>Role</FieldLabel>
+                                <FieldLabel>{t("dialog.role")}</FieldLabel>
                                 <div className="grid gap-2">
                                     {ADMIN_USER_ROLES.map((role) => {
                                         const active = selectedRole === role;
@@ -263,8 +259,8 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                                                     <ShieldCheckIcon className="size-4" />
                                                 </span>
                                                 <span className="min-w-0 flex-1">
-                                                    <span className="block text-xs font-semibold">{ROLE_DETAILS[role].label}</span>
-                                                    <span className="block truncate text-[11px] text-muted-foreground">{ROLE_DETAILS[role].description}</span>
+                                                    <span className="block text-xs font-semibold">{t(`roles.${role}.label`)}</span>
+                                                    <span className="block truncate text-[11px] text-muted-foreground">{t(`roles.${role}.description`)}</span>
                                                 </span>
                                                 <span className={cn("flex size-4 items-center justify-center rounded-full border", active ? "border-primary bg-primary text-primary-foreground" : "border-border")}>
                                                     {active && <CheckIcon className="size-2.5" />}
@@ -278,9 +274,9 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                             <div className={cn("rounded-xl border p-4 transition-colors", enabled ? "border-emerald-500/25 bg-emerald-500/5" : "border-border/60 bg-muted/25")}>
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
-                                        <FieldLabel htmlFor="create-enabled">Enable account</FieldLabel>
+                                        <FieldLabel htmlFor="create-enabled">{t("dialog.enableAccount")}</FieldLabel>
                                         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                            {enabled ? "This user can sign in as soon as the account is created." : "Create the account without allowing sign-in yet."}
+                                            {enabled ? t("dialog.enabledDescription") : t("dialog.disabledDescription")}
                                         </p>
                                     </div>
                                     <Switch
@@ -293,9 +289,9 @@ export function CreateAdminUserDialog({open, onOpenChange}: DialogProps) {
                         </section>
                     </div>
                     <DialogFooter className="border-t border-border/50 bg-muted/20 px-6 py-4">
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("cancel")}</Button>
                         <Button type="submit" disabled={mutation.isPending}>
-                            {mutation.isPending ? "Creating..." : "Create user"}
+                            {mutation.isPending ? t("dialog.creating") : t("createUser")}
                         </Button>
                     </DialogFooter>
                 </form>
@@ -309,6 +305,7 @@ interface UserDialogProps extends DialogProps {
 }
 
 export function ChangeAdminUserRoleDialog({open, onOpenChange, user}: UserDialogProps) {
+    const t = useTranslations("users");
     const mutation = useChangeAdminUserRole();
     const [selectedRole, setSelectedRole] = useState<AdminUserRole | null>(null);
     const role = selectedRole ?? user?.role ?? "USER";
@@ -332,24 +329,24 @@ export function ChangeAdminUserRoleDialog({open, onOpenChange, user}: UserDialog
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Change role</DialogTitle>
-                    <DialogDescription>Update the access level for {user?.username}.</DialogDescription>
+                    <DialogTitle>{t("dialog.changeRoleTitle")}</DialogTitle>
+                    <DialogDescription>{t("dialog.changeRoleDescription", {username: user?.username ?? ""})}</DialogDescription>
                 </DialogHeader>
                 <Field>
-                    <FieldLabel>Role</FieldLabel>
+                    <FieldLabel>{t("dialog.role")}</FieldLabel>
                     <Select value={role} onValueChange={(value) => setSelectedRole(value as AdminUserRole)}>
                         <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                         <SelectContent>
                             {ADMIN_USER_ROLES.map((item) => (
-                                <SelectItem key={item} value={item}>{item}</SelectItem>
+                                <SelectItem key={item} value={item}>{t(`roles.${item}.label`)}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </Field>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => handleOpenChange(false)}>{t("cancel")}</Button>
                     <Button onClick={submit} disabled={mutation.isPending || role === user?.role}>
-                        {mutation.isPending ? "Updating..." : "Update role"}
+                        {mutation.isPending ? t("dialog.updating") : t("dialog.updateRole")}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -358,6 +355,7 @@ export function ChangeAdminUserRoleDialog({open, onOpenChange, user}: UserDialog
 }
 
 export function BlockAdminUserDialog({open, onOpenChange, user}: UserDialogProps) {
+    const t = useTranslations("users");
     const mutation = useBlockAdminUser();
     const [reason, setReason] = useState("");
     const [error, setError] = useState("");
@@ -373,7 +371,7 @@ export function BlockAdminUserDialog({open, onOpenChange, user}: UserDialogProps
     const submit = async () => {
         if (!user) return;
         if (!reason.trim()) {
-            setError("A block reason is required");
+            setError(t("validation.blockReasonRequired"));
             return;
         }
 
@@ -389,13 +387,13 @@ export function BlockAdminUserDialog({open, onOpenChange, user}: UserDialogProps
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Block user</DialogTitle>
+                    <DialogTitle>{t("dialog.blockTitle")}</DialogTitle>
                     <DialogDescription>
-                        {user?.username} will no longer be able to access the platform.
+                        {t("dialog.blockDescription", {username: user?.username ?? ""})}
                     </DialogDescription>
                 </DialogHeader>
                 <Field data-invalid={!!error}>
-                    <FieldLabel htmlFor="block-reason">Reason</FieldLabel>
+                    <FieldLabel htmlFor="block-reason">{t("dialog.reason")}</FieldLabel>
                     <Textarea
                         id="block-reason"
                         value={reason}
@@ -404,14 +402,14 @@ export function BlockAdminUserDialog({open, onOpenChange, user}: UserDialogProps
                             setError("");
                         }}
                         aria-invalid={!!error}
-                        placeholder="Describe why this account is being blocked..."
+                        placeholder={t("dialog.reasonPlaceholder")}
                     />
                     <FieldError>{error}</FieldError>
                 </Field>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => handleOpenChange(false)}>{t("cancel")}</Button>
                     <Button variant="destructive" onClick={submit} disabled={mutation.isPending}>
-                        {mutation.isPending ? "Blocking..." : "Block user"}
+                        {mutation.isPending ? t("dialog.blocking") : t("blockUser")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -53,6 +53,7 @@ export function TheoryLessonDetail({ lesson, lessonId, learningPathId, updateMut
                                     title: lesson.title,
                                     displayOrder: lesson.displayOrder,
                                     content: lesson.content,
+                                    estimatedMinutes: lesson.estimatedMinutes,
                                     difficulty: lesson.difficulty,
                                 }}
                                 onSubmit={async (data) => {

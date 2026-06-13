@@ -2,6 +2,7 @@
 
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Check, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export function QuestionForm({
     defaultValues,
     onSubmit,
 }: QuestionFormProps) {
+    const t = useTranslations("lessonForm.questions.form");
     const {
         register,
         handleSubmit,
@@ -96,32 +98,32 @@ export function QuestionForm({
         <form
             id="question-form"
             onSubmit={handleSubmit(onSubmit)}
-            className="mx-auto w-full max-w-4xl"
+            className="mx-auto w-full px-4"
         >
             <FieldGroup className="gap-5">
-                <section className="rounded-2xl border bg-card shadow-sm">
-                    <div className="border-b px-5 py-4">
+                <section className="rounded-xl bg-card ring-1 ring-border/70">
+                    <div className="border-b border-border/70 px-4 py-4 sm:px-5">
                         <h3 className="text-base font-semibold text-foreground">
-                            Thông tin câu hỏi
+                            {t("contentTitle")}
                         </h3>
                         <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                            Nhập nội dung chính và phần giải thích hiển thị sau khi người học trả lời.
+                            {t("contentDescription")}
                         </p>
                     </div>
 
-                    <div className="grid gap-5 p-5 lg:grid-cols-2">
-                        <Field>
+                    <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-2">
+                        <Field data-invalid={Boolean(errors.question)}>
                             <FieldLabel
                                 htmlFor="question"
                                 className="text-sm font-semibold text-foreground"
                             >
-                                Nội dung câu hỏi
+                                {t("questionLabel")}
                             </FieldLabel>
 
                             <FieldContent>
                                 <Textarea
                                     id="question"
-                                    placeholder="Ví dụ: Độ phức tạp thời gian của Binary Search là gì?"
+                                    placeholder={t("questionPlaceholder")}
                                     className="min-h-[132px] resize-none text-base leading-7"
                                     aria-invalid={!!errors.question}
                                     {...register("question")}
@@ -140,37 +142,35 @@ export function QuestionForm({
                                 htmlFor="explanation"
                                 className="flex items-center justify-between gap-3 text-sm font-semibold text-foreground"
                             >
-                                <span>Giải thích chung</span>
-                                <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                                    Tùy chọn
-                                </span>
+                                <span>{t("explanationLabel")}</span>
+                                <span className="text-xs font-medium text-muted-foreground">{t("optional")}</span>
                             </FieldLabel>
 
                             <FieldContent>
                                 <Textarea
                                     id="explanation"
-                                    placeholder="Giải thích vì sao đáp án đúng là chính xác..."
+                                    placeholder={t("explanationPlaceholder")}
                                     className="min-h-[132px] resize-none text-base leading-7"
                                     {...register("explanation")}
                                 />
 
                                 <FieldDescription className="text-sm leading-6 text-muted-foreground">
-                                    Nên viết ngắn gọn, tập trung vào bản chất của đáp án đúng.
+                                    {t("explanationHint")}
                                 </FieldDescription>
                             </FieldContent>
                         </Field>
                     </div>
                 </section>
 
-                <section className="rounded-2xl border bg-card p-5 shadow-sm">
+                <section className="rounded-2xl bg-card p-4 ring-1 ring-border/70 sm:p-5">
                     <div className="grid gap-5 md:grid-cols-[1fr_160px] md:items-end">
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-2">
                             <div>
                                 <p className="text-sm font-semibold text-foreground">
-                                    Loại câu hỏi
+                                    {t("typeLabel")}
                                 </p>
                                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                                    Chọn một đáp án đúng hoặc nhiều đáp án đúng.
+                                    {t("typeDescription")}
                                 </p>
                             </div>
 
@@ -186,7 +186,7 @@ export function QuestionForm({
                                             : "text-muted-foreground hover:bg-accent hover:text-foreground"
                                     )}
                                 >
-                                    Một đáp án đúng
+                                    {t("singleChoice")}
                                 </button>
 
                                 <button
@@ -200,17 +200,17 @@ export function QuestionForm({
                                             : "text-muted-foreground hover:bg-accent hover:text-foreground"
                                     )}
                                 >
-                                    Nhiều đáp án đúng
+                                    {t("multipleChoice")}
                                 </button>
                             </div>
                         </div>
 
-                        <Field>
+                        <Field data-invalid={Boolean(errors.points)}>
                             <FieldLabel
                                 htmlFor="points"
                                 className="text-sm font-semibold text-foreground"
                             >
-                                Điểm
+                                {t("pointsLabel")}
                             </FieldLabel>
 
                             <FieldContent>
@@ -233,22 +233,22 @@ export function QuestionForm({
                     </div>
                 </section>
 
-                <section className="rounded-2xl border bg-card shadow-sm">
-                    <div className="flex flex-col gap-2 border-b px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                <section className="rounded-2xl bg-card ring-1 ring-border/70">
+                    <div className="flex flex-col gap-2 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
                         <div>
                             <h3 className="text-base font-semibold text-foreground">
-                                Đáp án
+                                {t("answersTitle")}
                             </h3>
                             <p className="mt-1 text-sm leading-6 text-muted-foreground">
                                 {watchedType === "MULTIPLE_CHOICE"
-                                    ? "Đánh dấu tất cả đáp án đúng."
-                                    : "Đánh dấu một đáp án đúng duy nhất."}
+                                    ? t("multipleChoiceHint")
+                                    : t("singleChoiceHint")}
                             </p>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-                                {fields.length} lựa chọn
+                            <span className="rounded-lg bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                                {t("choiceCount", {count: fields.length})}
                             </span>
                         </div>
                     </div>
@@ -264,9 +264,9 @@ export function QuestionForm({
                                         <div
                                             key={field.id}
                                             className={cn(
-                                                "p-5 transition-colors",
+                                                "p-4 transition-colors sm:p-5",
                                                 isSelected
-                                                    ? "bg-emerald-500/[0.07]"
+                                                    ? "bg-primary/[0.06]"
                                                     : "bg-background"
                                             )}
                                         >
@@ -274,12 +274,12 @@ export function QuestionForm({
                                                 <button
                                                     type="button"
                                                     onClick={() => handleCorrectChange(index)}
-                                                    aria-label={`Đánh dấu đáp án ${index + 1} là đáp án đúng`}
+                                                    aria-label={t("markCorrect", {number: index + 1})}
                                                     className={cn(
                                                         "flex size-9 items-center justify-center rounded-full border transition-all",
                                                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                                         isSelected
-                                                            ? "border-emerald-600 bg-emerald-600 text-white shadow-sm"
+                                                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
                                                             : "border-muted-foreground/30 bg-background hover:border-foreground"
                                                     )}
                                                 >
@@ -291,38 +291,41 @@ export function QuestionForm({
                                                 <div className="min-w-0 space-y-3">
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <p className="text-sm font-semibold text-foreground">
-                                                            Đáp án {index + 1}
+                                                            {t("answerNumber", {number: index + 1})}
                                                         </p>
 
                                                         {isSelected && (
-                                                            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white">
-                                                                Đúng
+                                                            <span className="rounded-lg bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                                                                {t("correct")}
                                                             </span>
                                                         )}
                                                     </div>
 
                                                     <div className="grid gap-3 xl:grid-cols-2">
-                                                        <div className="space-y-1.5">
-                                                            <label className="text-xs font-medium text-muted-foreground">
-                                                                Nội dung đáp án
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <label htmlFor={`choice-${index}`} className="text-xs font-medium text-muted-foreground">
+                                                                {t("answerContent")}
                                                             </label>
 
                                                             <Input
-                                                                placeholder={`Nhập đáp án ${index + 1}`}
+                                                                id={`choice-${index}`}
+                                                                placeholder={t("answerPlaceholder", {number: index + 1})}
                                                                 className="h-11 text-base"
+                                                                aria-invalid={Boolean(errors.choices?.[index]?.text)}
                                                                 {...register(
                                                                     `choices.${index}.text` as const
                                                                 )}
                                                             />
                                                         </div>
 
-                                                        <div className="space-y-1.5">
-                                                            <label className="text-xs font-medium text-muted-foreground">
-                                                                Giải thích riêng
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <label htmlFor={`choice-explanation-${index}`} className="text-xs font-medium text-muted-foreground">
+                                                                {t("answerExplanation")}
                                                             </label>
 
                                                             <Input
-                                                                placeholder="Giải thích ngắn cho lựa chọn này"
+                                                                id={`choice-explanation-${index}`}
+                                                                placeholder={t("answerExplanationPlaceholder")}
                                                                 className="h-11 border-dashed text-base"
                                                                 {...register(
                                                                     `choices.${index}.explanation` as const
@@ -339,9 +342,9 @@ export function QuestionForm({
                                                         size="icon"
                                                         onClick={() => remove(index)}
                                                         className="justify-self-start text-muted-foreground hover:bg-destructive/10 hover:text-destructive md:justify-self-end"
-                                                        aria-label={`Xóa đáp án ${index + 1}`}
+                                                        aria-label={t("removeAnswer", {number: index + 1})}
                                                     >
-                                                        <Trash2 className="size-4" />
+                                                        <Trash2 />
                                                     </Button>
                                                 )}
                                             </div>
@@ -358,7 +361,7 @@ export function QuestionForm({
                                 </div>
                             )}
 
-                            <div className="border-t bg-muted/20 p-5">
+                            <div className="border-t border-border/70 bg-muted/20 p-4 sm:p-5">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -371,8 +374,8 @@ export function QuestionForm({
                                     }
                                     className="h-12 w-full rounded-xl border-2 border-dashed text-sm font-semibold hover:border-primary hover:text-primary"
                                 >
-                                    <Plus className="mr-2 size-4" />
-                                    Thêm đáp án
+                                    <Plus data-icon="inline-start" />
+                                    {t("addAnswer")}
                                 </Button>
                             </div>
                         </FieldContent>

@@ -55,6 +55,7 @@ export interface LessonExample {
     input: string;
     output: string;
     explanation?: string;
+    imageUrl?: string | null;
 }
 
 export interface Lesson {
@@ -63,6 +64,7 @@ export interface Lesson {
     slug: string;
     type: LessonType;
     content?: string;
+    estimatedMinutes?: number;
     displayOrder: number;
     isPublished: boolean;
     difficulty?: Difficulty;
@@ -161,6 +163,7 @@ export interface CreateLessonRequest {
     displayOrder?: number;
     // Theory
     content?: string;
+    estimatedMinutes?: number;
     // Coding
     statement?: string;
     baseTimeLimitMs?: number;

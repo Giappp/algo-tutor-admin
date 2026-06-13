@@ -6,7 +6,12 @@ import {LessonPageSkeleton} from "@/components/learning-path/lesson-skeleton";
 import {CodingLessonPanels, QuizLessonDetail, TheoryLessonDetail} from "@/components/lesson-detail";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 import {Button} from "@/components/ui/button";
-import {AlertCircle, ArrowLeft} from "lucide-react";
+import {AlertCircle, ArrowLeft, Sparkles} from "lucide-react";
+import {useEffect, useState} from "react";
+import {AiLessonDraftDialog} from "@/components/lesson-detail/ai-lesson-draft-dialog";
+import {mergeLessonDraft} from "@/lib/admin-ai-lesson";
+import type {LessonDraft, QuizQuestionDraft} from "@/types/admin-ai-lesson";
+import {useTranslations} from "next-intl";
 
 interface LessonEditCanvasProps {
     lessonId: number;
@@ -20,8 +25,26 @@ export function LessonEditCanvas({
                                      onReset,
                                  }: LessonEditCanvasProps) {
     const {data: lesson, isLoading, error} = useLesson(lessonId);
+    const tAi = useTranslations("lessonForm.ai");
     const updateMutation = useUpdateLesson();
     const togglePublishMutation = useTogglePublishLesson();
+    const [isAiOpen, setIsAiOpen] = useState(false);
+    const [isCodingAiOpen, setIsCodingAiOpen] = useState(false);
+    const [draft, setDraft] = useState<LessonDraft | null>(null);
+    const [draftRevision, setDraftRevision] = useState(0);
+
+    useEffect(() => {
+        const shouldOpen = sessionStorage.getItem(`open-ai-draft:${lessonId}`);
+        const shouldOpenCodingStudio = sessionStorage.getItem(`open-coding-ai-studio:${lessonId}`);
+        if (shouldOpen) {
+            sessionStorage.removeItem(`open-ai-draft:${lessonId}`);
+            queueMicrotask(() => setIsAiOpen(true));
+        }
+        if (shouldOpenCodingStudio) {
+            sessionStorage.removeItem(`open-coding-ai-studio:${lessonId}`);
+            queueMicrotask(() => setIsCodingAiOpen(true));
+        }
+    }, [lessonId]);
 
     if (isLoading) {
         return (
@@ -51,6 +74,9 @@ export function LessonEditCanvas({
         );
     }
 
+    const editorLesson = draft ? mergeLessonDraft(lesson, draft) : lesson;
+    const quizDraftQuestions: QuizQuestionDraft[] = draft?.type === "QUIZ" ? draft.questions ?? [] : [];
+
     const handleTitleChange = (newTitle: string) => {
         const baseData = lesson.type === "CODING"
             ? {
@@ -72,6 +98,7 @@ export function LessonEditCanvas({
                     title: newTitle,
                     difficulty: lesson.difficulty,
                     content: lesson.content,
+                    estimatedMinutes: lesson.estimatedMinutes,
                 }
                 : {
                     type: "QUIZ" as const,
@@ -94,33 +121,57 @@ export function LessonEditCanvas({
                 onTogglePublish={() => togglePublishMutation.mutate(lessonId)}
                 onTitleChange={handleTitleChange}
                 isEditPending={togglePublishMutation.isPending || updateMutation.isPending}
+                action={lesson.type !== "CODING" ? (
+                    <Button variant="ai" size="sm" onClick={() => setIsAiOpen(true)}>
+                        <Sparkles className="size-4"/>
+                        {tAi("trigger")}
+                    </Button>
+                ) : undefined}
             />
 
             {/* Switch dynamically based on lesson type */}
-            {lesson.type === "THEORY" && (
+            {editorLesson.type === "THEORY" && (
                 <TheoryLessonDetail
-                    lesson={lesson}
+                    key={`theory-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
                 />
             )}
 
-            {lesson.type === "CODING" && (
+            {editorLesson.type === "CODING" && (
                 <CodingLessonPanels
-                    lesson={lesson}
+                    key={`coding-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
+                    initialAiOpen={isCodingAiOpen}
                 />
             )}
 
-            {lesson.type === "QUIZ" && (
+            {editorLesson.type === "QUIZ" && (
                 <QuizLessonDetail
-                    lesson={lesson}
+                    key={`quiz-${draftRevision}`}
+                    lesson={editorLesson}
                     lessonId={lessonId}
                     learningPathId={learningPathId}
                     updateMutation={updateMutation}
+                    draftQuestions={quizDraftQuestions}
+                />
+            )}
+
+            {lesson.type !== "CODING" && (
+                <AiLessonDraftDialog
+                    lessonId={lessonId}
+                    lessonType={lesson.type}
+                    open={isAiOpen}
+                    onOpenChange={setIsAiOpen}
+                    onApply={(nextDraft) => {
+                        setDraft(nextDraft);
+                        setDraftRevision((revision) => revision + 1);
+                    }}
                 />
             )}
         </div>

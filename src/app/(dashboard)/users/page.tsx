@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect, useMemo, useState} from "react";
+import {useTranslations} from "next-intl";
 import {
     BanIcon,
     CheckCircleIcon,
@@ -53,11 +54,11 @@ import {AdminUser, AdminUserRole} from "@/types/admin-user";
 
 const PAGE_SIZE = 10;
 const SORT_OPTIONS = [
-    {value: "username,asc", label: "Username A-Z"},
-    {value: "username,desc", label: "Username Z-A"},
-    {value: "email,asc", label: "Email A-Z"},
-    {value: "enabled,desc", label: "Active first"},
-    {value: "enabled,asc", label: "Blocked first"},
+    {value: "username,asc", labelKey: "sort.usernameAsc"},
+    {value: "username,desc", labelKey: "sort.usernameDesc"},
+    {value: "email,asc", labelKey: "sort.emailAsc"},
+    {value: "enabled,desc", labelKey: "sort.activeFirst"},
+    {value: "enabled,asc", labelKey: "sort.blockedFirst"},
 ] as const;
 
 const ROLE_STYLES: Record<AdminUserRole, string> = {
@@ -79,6 +80,7 @@ function UserTableSkeleton() {
 }
 
 export default function UsersPage() {
+    const t = useTranslations("users");
     const currentUsername = useAuthStore((state) => state.username);
     const currentEmail = useAuthStore((state) => state.email);
     const [searchInput, setSearchInput] = useState("");
@@ -110,7 +112,8 @@ export default function UsersPage() {
         active: users.filter((user) => user.enabled).length,
         privileged: users.filter((user) => user.role !== "USER").length,
     };
-    const activeSortLabel = SORT_OPTIONS.find((option) => option.value === sort)?.label ?? sort;
+    const activeSortKey = SORT_OPTIONS.find((option) => option.value === sort)?.labelKey;
+    const activeSortLabel = activeSortKey ? t(activeSortKey) : sort;
 
     const isCurrentUser = (user: AdminUser) =>
         user.username === currentUsername || user.email === currentEmail;
@@ -131,11 +134,11 @@ export default function UsersPage() {
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-primary">
                         <ShieldCheckIcon className="size-3.5" />
-                        Administration
+                        {t("administration")}
                     </div>
-                    <h1 className="font-heading text-3xl font-extrabold tracking-tight">User directory</h1>
+                    <h1 className="font-heading text-3xl font-extrabold tracking-tight">{t("title")}</h1>
                     <p className="max-w-xl text-sm text-muted-foreground">
-                        Manage account access, assign roles and review sign-in status.
+                        {t("subtitle")}
                     </p>
                 </div>
                 <Button
@@ -143,18 +146,18 @@ export default function UsersPage() {
                     className="shrink-0 rounded-xl transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
                 >
                     <PlusIcon data-icon="inline-start" />
-                    Create user
+                    {t("createUser")}
                 </Button>
             </header>
 
             {!usersQuery.isLoading && !usersQuery.isError && (
-                <section className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 px-5 py-4 shadow-sm backdrop-blur-md" aria-label="User summary">
+                <section className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 px-5 py-4 shadow-sm backdrop-blur-md" aria-label={t("summary")}>
                     <div className="grid grid-cols-2 gap-5 sm:grid-cols-4 sm:divide-x sm:divide-border/50">
                         {[
-                            {label: "Total accounts", value: stats.total, icon: UsersIcon, color: "text-primary bg-primary/10"},
-                            {label: "On this page", value: stats.visible, icon: UserRoundIcon, color: "text-sky-600 bg-sky-500/10 dark:text-sky-400"},
-                            {label: "Active in view", value: stats.active, icon: UserCheckIcon, color: "text-emerald-600 bg-emerald-500/10 dark:text-emerald-400"},
-                            {label: "Privileged in view", value: stats.privileged, icon: ShieldIcon, color: "text-amber-600 bg-amber-500/10 dark:text-amber-400"},
+                            {label: t("stats.total"), value: stats.total, icon: UsersIcon, color: "text-primary bg-primary/10"},
+                            {label: t("stats.visible"), value: stats.visible, icon: UserRoundIcon, color: "text-sky-600 bg-sky-500/10 dark:text-sky-400"},
+                            {label: t("stats.active"), value: stats.active, icon: UserCheckIcon, color: "text-emerald-600 bg-emerald-500/10 dark:text-emerald-400"},
+                            {label: t("stats.privileged"), value: stats.privileged, icon: ShieldIcon, color: "text-amber-600 bg-amber-500/10 dark:text-amber-400"},
                         ].map((item) => (
                             <div key={item.label} className="flex items-center gap-3 sm:px-4 first:pl-0">
                                 <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${item.color}`}>
@@ -175,8 +178,8 @@ export default function UsersPage() {
                     <InputGroup className="w-full sm:max-w-md">
                         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                         <InputGroupInput
-                            aria-label="Search users"
-                            placeholder="Search username or email..."
+                            aria-label={t("searchLabel")}
+                            placeholder={t("searchPlaceholder")}
                             value={searchInput}
                             onChange={(event) => setSearchInput(event.target.value)}
                             className="pl-9"
@@ -184,7 +187,7 @@ export default function UsersPage() {
                         {searchInput && (
                             <button
                                 type="button"
-                                aria-label="Clear search"
+                                aria-label={t("clearSearch")}
                                 onClick={() => setSearchInput("")}
                                 className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
@@ -199,19 +202,19 @@ export default function UsersPage() {
                             setPage(0);
                         }}
                     >
-                        <SelectTrigger aria-label="Sort users" className="w-full sm:ml-auto sm:w-44">
+                        <SelectTrigger aria-label={t("sortUsers")} className="w-full sm:ml-auto sm:w-44">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             {SORT_OPTIONS.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                <SelectItem key={option.value} value={option.value}>{t(option.labelKey)}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                     <Button
                         variant="outline"
                         size="icon"
-                        aria-label="Refresh users"
+                        aria-label={t("refreshUsers")}
                         onClick={() => usersQuery.refetch()}
                         disabled={usersQuery.isFetching}
                         className="shrink-0"
@@ -222,14 +225,14 @@ export default function UsersPage() {
 
                 {(search || sort !== "username,asc") && (
                     <div className="flex flex-wrap items-center gap-2 border-b border-border/30 px-4 py-2.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Active view</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("activeView")}</span>
                         {search && (
                             <button
                                 type="button"
                                 onClick={() => setSearchInput("")}
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/7 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/12"
                             >
-                                Search: {search}
+                                {t("searchFilter", {search})}
                                 <XIcon className="size-3" />
                             </button>
                         )}
@@ -239,7 +242,7 @@ export default function UsersPage() {
                                 onClick={() => setSort("username,asc")}
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
-                                Sort: {activeSortLabel}
+                                {t("sortFilter", {sort: activeSortLabel})}
                                 <XIcon className="size-3" />
                             </button>
                         )}
@@ -253,7 +256,7 @@ export default function UsersPage() {
                             }}
                         >
                             <FilterXIcon data-icon="inline-start" />
-                            Reset
+                            {t("reset")}
                         </Button>
                     </div>
                 )}
@@ -262,11 +265,11 @@ export default function UsersPage() {
                     <Table>
                         <TableHeader className="bg-muted/25">
                             <TableRow className="hover:bg-transparent">
-                                <TableHead className="pl-5">Account</TableHead>
-                                <TableHead>Access role</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Account note</TableHead>
-                                <TableHead className="w-12"><span className="sr-only">Actions</span></TableHead>
+                                <TableHead className="pl-5">{t("table.account")}</TableHead>
+                                <TableHead>{t("table.role")}</TableHead>
+                                <TableHead>{t("table.status")}</TableHead>
+                                <TableHead>{t("table.note")}</TableHead>
+                                <TableHead className="w-12"><span className="sr-only">{t("actions")}</span></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -278,9 +281,9 @@ export default function UsersPage() {
                                         <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
                                             <UserXIcon className="size-5" />
                                         </div>
-                                        <p className="font-medium">Could not load users</p>
+                                        <p className="font-medium">{t("loadError")}</p>
                                         <p className="mt-1 text-sm text-muted-foreground">{toAppError(usersQuery.error).message}</p>
-                                        <Button className="mt-4" variant="outline" onClick={() => usersQuery.refetch()}>Try again</Button>
+                                        <Button className="mt-4" variant="outline" onClick={() => usersQuery.refetch()}>{t("tryAgain")}</Button>
                                     </TableCell>
                                 </TableRow>
                             ) : users.length === 0 ? (
@@ -289,11 +292,11 @@ export default function UsersPage() {
                                         <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground ring-1 ring-border/50">
                                             <UserRoundIcon className="size-5" />
                                         </div>
-                                        <p className="font-medium">{search ? "No matching users" : "No users yet"}</p>
+                                        <p className="font-medium">{search ? t("empty.noMatches") : t("empty.noUsers")}</p>
                                         <p className="mt-1 text-sm text-muted-foreground">
-                                            {search ? "Try a different username or email." : "Create the first user to get started."}
+                                            {search ? t("empty.noMatchesDescription") : t("empty.noUsersDescription")}
                                         </p>
-                                        {!search && <Button className="mt-4" onClick={() => setCreateOpen(true)}>Create user</Button>}
+                                        {!search && <Button className="mt-4" onClick={() => setCreateOpen(true)}>{t("createUser")}</Button>}
                                     </TableCell>
                                 </TableRow>
                             ) : users.map((user) => {
@@ -303,13 +306,13 @@ export default function UsersPage() {
                                         <TableCell className="py-3 pl-5">
                                             <div className="flex items-center gap-3">
                                                 <Avatar size="sm" className="rounded-xl ring-1 ring-border/60">
-                                                    <AvatarImage src={user.avatar ?? undefined} alt={`${user.username}'s avatar`} />
+                                                    <AvatarImage src={user.avatar ?? undefined} alt={t("avatarAlt", {username: user.username})} />
                                                     <AvatarFallback className="rounded-xl bg-primary/8 text-xs font-bold text-primary">{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0">
                                                     <div className="flex items-center gap-2">
                                                         <span className="truncate text-sm font-semibold transition-colors group-hover:text-primary">{user.username}</span>
-                                                        {currentUser && <Badge variant="outline" className="h-4 rounded-md px-1.5 text-[9px] font-bold uppercase tracking-wider">You</Badge>}
+                                                        {currentUser && <Badge variant="outline" className="h-4 rounded-md px-1.5 text-[9px] font-bold uppercase tracking-wider">{t("you")}</Badge>}
                                                     </div>
                                                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{user.email}</p>
                                                 </div>
@@ -317,30 +320,30 @@ export default function UsersPage() {
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className={`rounded-lg text-[10px] font-bold tracking-wide ${ROLE_STYLES[user.role]}`}>
-                                                {user.role}
+                                                {t(`roles.${user.role}.label`)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <span className="inline-flex items-center gap-2 text-xs font-semibold">
                                                 <span className={`size-1.5 rounded-full ${user.enabled ? "bg-emerald-500 shadow-[0_0_0_3px_oklch(0.7_0.17_155/0.12)]" : "bg-destructive shadow-[0_0_0_3px_oklch(0.55_0.22_27/0.12)]"}`} />
-                                                {user.enabled ? "Active" : "Blocked"}
+                                                {user.enabled ? t("status.active") : t("status.blocked")}
                                             </span>
                                         </TableCell>
                                         <TableCell className="max-w-64 truncate text-xs text-muted-foreground" title={user.blockReason ?? undefined}>
-                                            {user.blockReason || <span className="text-muted-foreground/45">No account restrictions</span>}
+                                            {user.blockReason || <span className="text-muted-foreground/45">{t("noRestrictions")}</span>}
                                         </TableCell>
                                         <TableCell className="pr-4">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger render={<Button variant="ghost" className="size-8 rounded-lg p-0 text-muted-foreground opacity-70 transition-opacity group-hover:opacity-100" />}>
                                                     <MoreHorizontalIcon />
-                                                    <span className="sr-only">Actions for {user.username}</span>
+                                                    <span className="sr-only">{t("actionsFor", {username: user.username})}</span>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl border-border/50">
                                                     <DropdownMenuGroup>
-                                                        <DropdownMenuLabel className="text-xs">Manage {user.username}</DropdownMenuLabel>
+                                                        <DropdownMenuLabel className="text-xs">{t("manageUser", {username: user.username})}</DropdownMenuLabel>
                                                         <DropdownMenuItem disabled={currentUser} onClick={() => setRoleUser(user)}>
                                                             <ShieldIcon data-icon="inline-start" />
-                                                            Change role
+                                                            {t("changeRole")}
                                                         </DropdownMenuItem>
                                                         {user.enabled ? (
                                                             <DropdownMenuItem
@@ -349,12 +352,12 @@ export default function UsersPage() {
                                                                 onClick={() => setBlockUser(user)}
                                                             >
                                                                 <BanIcon data-icon="inline-start" />
-                                                                Block user
+                                                                {t("blockUser")}
                                                             </DropdownMenuItem>
                                                         ) : (
                                                             <DropdownMenuItem onClick={() => unblock(user)}>
                                                                 <CheckCircleIcon data-icon="inline-start" />
-                                                                Unblock user
+                                                                {t("unblockUser")}
                                                             </DropdownMenuItem>
                                                         )}
                                                     </DropdownMenuGroup>

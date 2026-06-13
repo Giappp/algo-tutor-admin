@@ -44,9 +44,9 @@
     "totalUsers": "Người dùng đăng ký",
     "totalUsersDesc": "Người dùng đăng ký hợp lệ",
     "activeSessions": "Phiên hoạt động",
-    "activeSessionsDesc": "Đang trực tuyến hiện tại",
+    "activeSessionsDesc": "Phiên đăng nhập còn hiệu lực",
     "totalLessons": "Tổng số bài học",
-    "totalLessonsDesc": "Tổng lý thuyết & thực hành",
+    "totalLessonsDesc": "Lý thuyết, lập trình và trắc nghiệm",
     "totalEnrollments": "Lượt học ghi danh",
     "totalEnrollmentsDesc": "Lượt tham gia học lộ trình",
     "totalSubmissions": "Nộp bài lập trình",
@@ -71,8 +71,12 @@
     "apiQuotas": "Giám sát API Quota & Rate Limit",
     "apiQuotasDesc": "Trạng thái in-memory sliding window rate limiter trong thời gian thực",
     "apiQuotasTitle": "Hệ thống Hạn ngạch API (Sliding Window Limiters)",
-    "apiQuotasSubtitle": "Theo dõi in-memory rate-limiter lưu trên Redis. Khi người dùng thực hiện yêu cầu mới, hệ thống tự động cập nhật cửa sổ trượt. Bảng hiển thị thông tin các cửa sổ hiện thời kèm bộ đếm ngược tự động làm mới ngay khi thời gian trượt hết hạn.",
-    "noActiveQuotasDesc": "Hiện tại không có địa chỉ IP hay tài khoản nào nằm trong danh sách rate limit sliding window.",
+    "apiQuotasSubtitle": "Theo dõi trực tiếp trạng thái in-memory sliding window rate limiter. Bảng hiển thị mức sử dụng hiện tại và tự động làm mới khi cửa sổ hết hạn.",
+    "noActiveQuotasDesc": "Hiện tại không có tài khoản nào nằm trong cửa sổ rate limit đang hoạt động.",
+    "quotaSummary": "Tóm tắt hạn ngạch API",
+    "activeWindows": "Cửa sổ đang hoạt động",
+    "nearLimit": "Gần chạm giới hạn",
+    "activeUsers": "Người dùng hoạt động",
     "action": "Hành động",
     "user": "Người dùng",
     "usage": "Tỉ lệ sử dụng",
@@ -99,9 +103,14 @@
     "days": "{days} ngày",
     "seconds": "{seconds} giây",
     "guest": "Khách",
-    "redisKey": "Khóa Redis",
+    "redisKey": "Khóa rate limit",
     "retryNow": "Thử lại ngay",
+    "refreshData": "Làm mới dữ liệu",
+    "autoRefreshStatus": "Dữ liệu tự động cập nhật theo thời gian thực",
+    "loadingData": "Đang tải dữ liệu bảng điều khiển",
+    "loadErrorDescription": "Không thể kết nối với API quản trị. Vui lòng kiểm tra dịch vụ backend hoặc thử lại.",
     "failedToLoad": "Không thể tải dữ liệu",
+    "noResults": "Chưa có dữ liệu",
     "lessonsCount": "{count} bài học"
   },
   "learningPaths": {
@@ -274,6 +283,9 @@
       "contentTitle": "Nội dung bài học",
       "contentDescription": "Soạn và xem trước trong cùng một nơi. Chỉ dùng mẫu khi thực sự hữu ích.",
       "contentPlaceholder": "Viết nội dung bài học bằng Markdown...",
+      "estimatedMinutes": "Thời lượng dự kiến",
+      "estimatedMinutesDescription": "Số phút học viên cần để đọc và thực hành nội dung.",
+      "estimatedMinutesPlaceholder": "12",
       "replaceTemplateConfirm": "Thay nội dung hiện tại bằng mẫu này?",
       "templates": {
         "concept": {"label": "Khái niệm", "description": "Ý tưởng, ví dụ và kết luận"},
@@ -281,23 +293,193 @@
         "code-walkthrough": {"label": "Phân tích mã", "description": "Giải thích một cách triển khai"}
       }
     },
-    "quiz": {
-      "detailsDescription": "Đặt tên theo kiến thức mà bài kiểm tra đánh giá.",
-      "titlePlaceholder": "Kiểm tra kiến thức cơ bản về mảng",
-      "rulesTitle": "Điều kiện đạt",
-      "rulesDescription": "Đặt điểm đạt và chỉ thêm thời gian khi tốc độ thực sự quan trọng.",
-      "passingScore": "Điểm đạt",
-      "passingDescription": "Cần đạt {score}% để vượt qua",
-      "timeLimit": "Thời gian",
-      "timeDescription": "Để trống nếu không giới hạn thời gian",
-      "noLimit": "Không giới hạn"
+      "quiz": {
+        "detailsDescription": "Đặt tên theo kiến thức mà bài kiểm tra đánh giá.",
+        "titlePlaceholder": "Kiểm tra kiến thức cơ bản về mảng",
+        "rulesTitle": "Điều kiện đạt",
+        "rulesDescription": "Đặt điểm đạt và chỉ thêm thời gian khi tốc độ thực sự quan trọng.",
+        "passingScore": "Điểm đạt",
+        "passingDescription": "Cần đạt {score}% để vượt qua",
+        "timeLimit": "Thời gian",
+        "timeDescription": "Để trống nếu không giới hạn thời gian",
+        "noLimit": "Không giới hạn"
+      },
+      "questions": {
+        "title": "Ngân hàng câu hỏi",
+        "description": "Xây dựng bài kiểm tra tập trung và xem nhanh đáp án đúng.",
+        "generateWithAi": "Tạo bằng AI",
+        "addQuestion": "Thêm câu hỏi",
+        "summary": {
+          "questionLabel": "câu hỏi",
+          "pointLabel": "tổng điểm"
+        },
+        "empty": {
+          "title": "Chưa có câu hỏi",
+          "description": "Thêm câu hỏi đầu tiên để bắt đầu xây dựng bài kiểm tra. Mỗi câu có thể gồm nhiều lựa chọn và phần giải thích đáp án.",
+          "action": "Thêm câu hỏi đầu tiên"
+        },
+        "types": {
+          "SINGLE_CHOICE": "Chọn một đáp án",
+          "MULTIPLE_CHOICE": "Chọn nhiều đáp án",
+          "TRUE_FALSE": "Đúng / sai"
+        },
+        "card": {
+          "points": "{count} điểm",
+          "correctCount": "{correct}/{total} đáp án đúng",
+          "edit": "Sửa câu hỏi",
+          "delete": "Xóa câu hỏi",
+          "explanation": "Giải thích:"
+        },
+        "delete": {
+          "title": "Xóa câu hỏi này?",
+          "description": "Câu hỏi và toàn bộ lựa chọn sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+          "cancel": "Giữ câu hỏi",
+          "confirm": "Xóa câu hỏi",
+          "deleting": "Đang xóa..."
+        },
+        "dialog": {
+          "createTitle": "Thêm câu hỏi mới",
+          "createDescription": "Viết nội dung, chọn cách chấm điểm và đánh dấu đáp án đúng.",
+          "editTitle": "Chỉnh sửa câu hỏi",
+          "editDescription": "Cập nhật nội dung, điểm số, lựa chọn hoặc phần giải thích.",
+          "cancel": "Hủy",
+          "saving": "Đang lưu...",
+          "saveChanges": "Lưu thay đổi",
+          "addQuestion": "Thêm câu hỏi"
+        },
+        "form": {
+          "contentTitle": "Nội dung câu hỏi",
+          "contentDescription": "Nhập nội dung chính và phần giải thích tùy chọn hiển thị sau khi trả lời.",
+          "questionLabel": "Câu hỏi",
+          "questionPlaceholder": "Ví dụ: Độ phức tạp thời gian của tìm kiếm nhị phân là gì?",
+          "explanationLabel": "Giải thích chung",
+          "optional": "Tùy chọn",
+          "explanationPlaceholder": "Giải thích vì sao đáp án đúng là chính xác...",
+          "explanationHint": "Viết ngắn gọn và tập trung vào ý chính.",
+          "typeLabel": "Loại câu hỏi",
+          "typeDescription": "Chọn một hoặc nhiều đáp án đúng.",
+          "singleChoice": "Một đáp án đúng",
+          "multipleChoice": "Nhiều đáp án đúng",
+          "pointsLabel": "Điểm",
+          "answersTitle": "Các lựa chọn",
+          "multipleChoiceHint": "Đánh dấu tất cả đáp án đúng.",
+          "singleChoiceHint": "Đánh dấu một đáp án đúng.",
+          "choiceCount": "{count} lựa chọn",
+          "markCorrect": "Đánh dấu đáp án {number} là đáp án đúng",
+          "answerNumber": "Đáp án {number}",
+          "correct": "Đúng",
+          "answerContent": "Nội dung đáp án",
+          "answerPlaceholder": "Nhập đáp án {number}",
+          "answerExplanation": "Giải thích riêng",
+          "answerExplanationPlaceholder": "Thêm giải thích ngắn cho lựa chọn này",
+          "removeAnswer": "Xóa đáp án {number}",
+          "addAnswer": "Thêm đáp án"
+        },
+        "toast": {
+          "created": "Đã thêm câu hỏi",
+          "updated": "Đã cập nhật câu hỏi",
+          "deleted": "Đã xóa câu hỏi",
+          "aiAdded": "Đã thêm {count} câu hỏi do AI tạo",
+          "aiAddFailed": "Không thể thêm một số câu hỏi"
+        },
+        "aiGenerator": {
+          "title": "Tạo câu hỏi từ bài học",
+          "description": "Cho AI đọc các bài lý thuyết đã chọn, viết yêu cầu cụ thể và duyệt từng câu trước khi thêm.",
+          "sources": {
+            "title": "1. Chọn bài học nguồn",
+            "description": "Chọn một hoặc nhiều bài lý thuyết trong cùng lộ trình.",
+            "search": "Tìm bài học hoặc chủ đề...",
+            "select": "Chọn {title}",
+            "draft": "Bản nháp",
+            "characters": "{count} ký tự",
+            "minutes": "{count} phút",
+            "errorTitle": "Không thể tải bài học lý thuyết",
+            "retry": "Thử lại",
+            "emptyTitle": "Chưa có bài lý thuyết phù hợp",
+            "emptyDescription": "Hãy tạo nội dung lý thuyết trong lộ trình trước khi sinh câu hỏi có nguồn."
+          },
+          "brief": {
+            "title": "2. Viết yêu cầu tạo câu hỏi",
+            "description": "Kiểm soát độ sâu bài kiểm tra và điều học viên cần thể hiện.",
+            "noSources": "Chọn bài học nguồn để xác định phạm vi kiến thức.",
+            "provider": "Nhà cung cấp AI",
+            "difficulty": "Độ khó",
+            "questionTypes": "Loại câu hỏi",
+            "count": "Số câu hỏi",
+            "choices": "Số lựa chọn mỗi câu",
+            "explanations": "Tạo phần giải thích",
+            "explanationsDescription": "Giải thích đáp án đúng và các lựa chọn gây nhiễu hữu ích.",
+            "prompt": "Yêu cầu bổ sung",
+            "promptPlaceholder": "Ví dụ: Tập trung kiểm tra hiểu bản chất, có một câu theo tình huống và tránh hỏi thuộc lòng...",
+            "promptHint": "AI phải bám sát nội dung bài đã chọn. Dùng trường này để nhấn mạnh mục tiêu hoặc phần cần tránh."
+          },
+          "difficulty": {
+            "EASY": "Dễ",
+            "MEDIUM": "Trung bình",
+            "HARD": "Khó"
+          },
+          "types": {
+            "SINGLE_CHOICE": "Chọn một đáp án",
+            "MULTIPLE_CHOICE": "Chọn nhiều đáp án"
+          },
+          "review": {
+            "title": "3. Duyệt câu hỏi được tạo",
+            "description": "AI đã tạo {count} câu hỏi. Bỏ chọn những câu bạn không muốn thêm.",
+            "select": "Chọn câu hỏi được tạo số {number}",
+            "points": "{count} điểm"
+          },
+          "actions": {
+            "cancel": "Hủy",
+            "generate": "Tạo {count} câu hỏi",
+            "generating": "Đang đọc bài học và soạn câu hỏi...",
+            "backToBrief": "Quay lại yêu cầu",
+            "addSelected": "Thêm câu đã chọn ({count})",
+            "adding": "Đang thêm câu hỏi..."
+          },
+          "validation": {
+            "sourceRequired": "Chọn ít nhất một bài học lý thuyết.",
+            "typeRequired": "Chọn ít nhất một loại câu hỏi.",
+            "questionRequired": "Chọn ít nhất một câu hỏi được tạo."
+          }
+        }
+      },
+      "ai": {
+      "trigger": "Tạo nháp bằng AI",
+      "createTitle": "Bắt đầu nội dung với AI",
+      "createDescription": "Điền các trường bắt buộc, sau đó tạo lesson và mở AI composer ngay.",
+      "createAction": "Tạo và viết bằng AI",
+      "title": "Tạo bản nháp bài học với AI",
+      "description": "AI dùng ngữ cảnh lộ trình và chủ đề hiện tại để tạo nội dung nháp. Nội dung chưa được lưu cho đến khi bạn xác nhận trong editor.",
+      "provider": "Nhà cung cấp AI",
+      "prompt": "Yêu cầu nội dung",
+      "promptPlaceholder": "Ví dụ: Viết lại dễ hiểu cho người mới, bổ sung ví dụ thực tế và tránh giải thích quá dài...",
+      "promptHint": "Mô tả mục tiêu, đối tượng học và những phần cần bổ sung. AI không thể thay đổi loại hoặc thứ tự bài học.",
+      "generating": "Đang tạo bản nháp...",
+      "generatingHint": "Yêu cầu có thể mất vài giây. Nội dung hiện tại vẫn được giữ nguyên.",
+      "generate": "Tạo bản nháp",
+      "generateAgain": "Tạo lại",
+      "applyDraft": "Đưa vào editor",
+      "contextUsed": "Ngữ cảnh đã sử dụng",
+      "tokenUsage": "Token sử dụng",
+      "providerMayOmitTokens": "Provider có thể không báo cáo token",
+      "siblingLessons": "Các bài học cùng chủ đề",
+      "theoryStats": "{characters} ký tự Markdown",
+      "codingStats": "{constraints} ràng buộc · {examples} ví dụ · {hints} gợi ý",
+      "quizStats": "{questions} câu hỏi nháp",
+      "quizQuestionNotice": "Metadata quiz sẽ được đưa vào editor. Các câu hỏi nháp chỉ được thêm sau khi bạn xác nhận riêng trong tab Câu hỏi.",
+      "questionsReady": "Câu hỏi AI đã sẵn sàng để review",
+      "questionsReadyDescription": "Kiểm tra bản nháp trước khi thêm {count} câu hỏi.",
+      "addingQuestions": "Đang thêm...",
+      "addQuestions": "Thêm {count} câu hỏi"
     },
-    "coding": {
+      "coding": {
       "sections": {"basic": "Đề bài", "constraints": "Giới hạn và ràng buộc", "examples": "Ví dụ", "hints": "Gợi ý", "starterCode": "Mã khởi tạo"},
       "problemTitle": "Tên bài toán",
       "problemTitleDescription": "Dùng tên ngắn gọn và cụ thể.",
-      "problemTitlePlaceholder": "Tổng hai số",
-      "statement": "Nội dung đề bài",
+        "problemTitlePlaceholder": "Tổng hai số",
+        "aiDraftTitle": "Bài tập lập trình chưa đặt tên",
+        "aiDraftStatement": "Nội dung đề bài tạm thời. Hãy dùng AI Coding Studio để tạo đề bài hoàn chỉnh.",
+        "statement": "Nội dung đề bài",
       "statementPlaceholder": "Mô tả dữ liệu vào, kết quả mong đợi và yêu cầu...",
       "timeLimit": "Giới hạn thời gian",
       "timeLimitDescription": "Thời gian chạy tối đa tính bằng mili giây",
@@ -341,7 +523,288 @@
         "dynamic-programming": {"label": "Quy hoạch động", "category": "QHĐ", "description": "Tối ưu bằng ghi nhớ hoặc lập bảng"},
         "graph-traversal": {"label": "Đồ thị", "category": "Đồ thị", "description": "Áp dụng BFS hoặc DFS trên đồ thị"},
         "sorting-searching": {"label": "Tìm kiếm nhị phân", "category": "Tìm kiếm", "description": "Tìm kiếm hiệu quả trên dữ liệu đã sắp xếp"}
+        }
+      },
+      "codingAi": {
+        "trigger": "AI coding studio",
+        "createTitle": "Tiếp tục trong AI coding studio",
+        "createDescription": "Tạo coding lesson trước, sau đó mở studio để soạn đề bài, lời giải hoặc starter code.",
+        "createAction": "Tạo và mở AI studio",
+        "title": "AI coding studio",
+        "description": "Tạo và duyệt nội dung đề bài, lời giải tham khảo hoặc starter code. Tạm thời không tạo test case.",
+        "sources": {
+          "title": "Chọn nguồn kiến thức",
+          "description": "Dùng bài lý thuyết để AI bám sát thuật ngữ và kiến thức mong đợi.",
+          "empty": "Chưa có bài lý thuyết phù hợp. AI vẫn có thể dùng coding lesson hiện tại và prompt.",
+          "error": "Không thể tải nguồn bài học lý thuyết.",
+          "retry": "Thử lại"
+        },
+        "brief": {
+          "title": "Yêu cầu tạo nội dung",
+          "description": "Chọn một loại tài nguyên và cung cấp ràng buộc cụ thể cho AI."
+        },
+        "asset": {
+          "label": "Tài nguyên cần tạo",
+          "PROBLEM": {
+            "label": "Nội dung đề bài",
+            "description": "Statement, ràng buộc, ví dụ và gợi ý",
+            "prompt": "Ví dụ: Tạo bài tập mảng cho người mới. Quy tắc dữ liệu vào/ra rõ ràng và tránh toán nâng cao..."
+          },
+          "EDITORIAL": {
+            "label": "Lời giải tham khảo",
+            "description": "Cách triển khai và độ phức tạp",
+            "prompt": "Ví dụ: Ưu tiên lời giải O(n) và viết mã dễ đọc cho học viên..."
+          },
+          "STARTER_CODE": {
+            "label": "Starter code",
+            "description": "Chữ ký hàm đồng nhất giữa các ngôn ngữ",
+            "prompt": "Ví dụ: Dùng hàm solve và chỉ thêm những import học viên thực sự cần..."
+          }
+        },
+        "provider": "Nhà cung cấp AI",
+        "difficulty": "Độ khó",
+        "difficultyValue": {"EASY": "Dễ", "MEDIUM": "Trung bình", "HARD": "Khó"},
+        "languages": "Ngôn ngữ",
+        "exampleCount": "Số ví dụ",
+        "hintCount": "Số gợi ý",
+        "prompt": "Yêu cầu bổ sung",
+        "promptHint": "AI cũng nhận coding lesson hiện tại làm ngữ cảnh. Nội dung chỉ là bản nháp cho đến khi bạn áp dụng.",
+        "actions": {
+          "cancel": "Hủy",
+          "generate": "Tạo bản nháp",
+          "generating": "Đang tạo...",
+          "back": "Quay lại yêu cầu",
+          "apply": "Áp dụng bản nháp"
+        },
+        "review": {
+          "problem": "Duyệt nội dung đề bài",
+          "editorial": "Duyệt lời giải tham khảo",
+          "starter": "Duyệt starter code",
+          "constraints": "Ràng buộc",
+          "hints": "Gợi ý",
+          "example": "Ví dụ {number}"
+        }
       }
+  },
+  "codingResources": {
+    "testCases": {
+      "title": "Bộ kiểm thử",
+      "description": "Tải lên các cặp dữ liệu vào và kết quả mong đợi để hệ thống chấm bài kiểm tra lời giải.",
+      "add": "Thêm bộ kiểm thử",
+      "addFirst": "Thêm bộ kiểm thử đầu tiên",
+      "emptyTitle": "Chưa có bộ kiểm thử",
+      "emptyDescription": "Thêm ít nhất một cặp dữ liệu vào và kết quả mong đợi trước khi xuất bản bài học.",
+      "loadError": "Không thể tải bộ kiểm thử",
+      "loadErrorDescription": "Không thể truy xuất tài nguyên của hệ thống chấm bài.",
+      "retry": "Thử lại",
+      "deleteConfirm": "Xóa bộ kiểm thử này? Hành động này không thể hoàn tác.",
+      "sample": "Mẫu hiển thị",
+      "hidden": "Bộ test ẩn",
+      "weight": "{count} điểm",
+      "order": "Thứ tự {count}",
+      "edit": "Sửa bộ kiểm thử",
+      "delete": "Xóa bộ kiểm thử",
+      "moveUp": "Di chuyển bộ kiểm thử lên",
+      "moveDown": "Di chuyển bộ kiểm thử xuống",
+      "inputFile": "Tệp dữ liệu vào (.in)",
+      "outputFile": "Kết quả mong đợi (.out)",
+      "viewInput": "Mở dữ liệu vào",
+      "viewOutput": "Mở kết quả mong đợi",
+      "summary": {
+        "total": "Tổng {count}",
+        "samples": "{count} mẫu hiển thị",
+        "hidden": "{count} bộ test ẩn",
+        "weight": "Tổng {count} điểm"
+      },
+      "dialog": {
+        "addTitle": "Thêm bộ kiểm thử",
+        "editTitle": "Sửa bộ kiểm thử",
+        "description": "Tải lên một tệp dữ liệu vào .in và tệp kết quả mong đợi .out tương ứng.",
+        "selectBothFiles": "Hãy chọn cả tệp .in và .out trước.",
+        "requestingUpload": "Đang yêu cầu thông tin tải lên bảo mật...",
+        "uploadingInput": "Đang tải tệp dữ liệu vào ({name})...",
+        "uploadingOutput": "Đang tải tệp kết quả ({name})...",
+        "uploadComplete": "Đã tải lên hoàn tất",
+        "uploadSuccess": "Đã tải tệp lên thành công",
+        "uploadBothFirst": "Hãy tải lên cả tệp dữ liệu vào và kết quả trước khi lưu.",
+        "validationFailed": "Kiểm tra cấu hình bộ test và thử lại.",
+        "stored": "Đã tải lên và lưu trữ bảo mật",
+        "ready": "{size} · Sẵn sàng tải lên",
+        "invalidInputExtension": "Tệp dữ liệu vào phải có phần mở rộng .in.",
+        "invalidOutputExtension": "Tệp kết quả phải có phần mở rộng .out.",
+        "selectInput": "Chọn hoặc kéo tệp dữ liệu vào (.in)",
+        "selectOutput": "Chọn hoặc kéo tệp kết quả (.out)",
+        "uploadFailed": "Tải lên thất bại",
+        "uploadFiles": "Tải tệp cho hệ thống chấm",
+        "configuration": "Cấu hình chấm bài",
+        "scoreWeight": "Trọng số điểm",
+        "scoreWeightDescription": "Số điểm bộ test này đóng góp.",
+        "sortOrder": "Thứ tự",
+        "sortOrderDescription": "Độ ưu tiên khi chạy và hiển thị.",
+        "sample": "Bộ test mẫu hiển thị",
+        "sampleDescription": "Học viên có thể xem dữ liệu vào và kết quả này làm ví dụ.",
+        "cancel": "Hủy",
+        "saving": "Đang lưu...",
+        "saveChanges": "Lưu thay đổi"
+      },
+      "toast": {
+        "created": "Đã tạo bộ kiểm thử",
+        "updated": "Đã cập nhật bộ kiểm thử",
+        "deleted": "Đã xóa bộ kiểm thử"
+      }
+    },
+    "editorials": {
+      "title": "Lời giải tham khảo",
+      "description": "Quản lý các cách triển khai tham khảo hợp lệ cho từng ngôn ngữ được hỗ trợ.",
+      "add": "Thêm lời giải",
+      "addFirst": "Thêm lời giải đầu tiên",
+      "emptyTitle": "Chưa có lời giải tham khảo",
+      "emptyDescription": "Thêm một cách triển khai rõ ràng để học viên có thể xem lại hướng giải sau khi hoàn thành bài.",
+      "loadError": "Không thể tải lời giải tham khảo",
+      "loadErrorDescription": "Không thể truy xuất các cách triển khai tham khảo.",
+      "retry": "Thử lại",
+      "deleteConfirm": "Xóa lời giải tham khảo này? Hành động này không thể hoàn tác.",
+      "solutionTitle": "Lời giải {language}",
+      "lines": "{count} dòng",
+      "characters": "{count} ký tự",
+      "expand": "Mở rộng mã",
+      "collapse": "Thu gọn mã",
+      "copy": "Sao chép mã",
+      "copied": "Đã sao chép",
+      "edit": "Sửa lời giải",
+      "delete": "Xóa lời giải",
+      "addTitle": "Thêm lời giải tham khảo",
+      "editTitle": "Sửa lời giải tham khảo",
+      "dialogDescription": "Viết cách triển khai tham khảo với tô màu cú pháp và gợi ý mã.",
+      "language": "Ngôn ngữ",
+      "languageDescription": "Chọn môi trường chạy cho cách triển khai tham khảo này.",
+      "sourceCode": "Cách triển khai tham khảo",
+      "sourceCodeDescription": "Giữ lời giải rõ ràng, đầy đủ và phù hợp để học viên tham khảo.",
+      "ready": "Sẵn sàng",
+      "unsavedChanges": "Có thay đổi chưa lưu",
+      "resetCode": "Đặt lại mã",
+      "copyFailed": "Không thể sao chép mã nguồn.",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "saveChanges": "Lưu thay đổi",
+      "toast": {
+        "created": "Đã tạo lời giải tham khảo",
+        "updated": "Đã cập nhật lời giải tham khảo",
+        "deleted": "Đã xóa lời giải tham khảo"
+      }
+    }
+  },
+  "users": {
+    "administration": "Quản trị",
+    "title": "Danh sách người dùng",
+    "subtitle": "Quản lý quyền truy cập, phân vai trò và kiểm tra trạng thái đăng nhập.",
+    "createUser": "Tạo người dùng",
+    "cancel": "Hủy",
+    "summary": "Tóm tắt người dùng",
+    "stats": {
+      "total": "Tổng tài khoản",
+      "visible": "Trên trang này",
+      "active": "Đang hoạt động",
+      "privileged": "Có đặc quyền"
+    },
+    "searchLabel": "Tìm kiếm người dùng",
+    "searchPlaceholder": "Tìm theo tên đăng nhập hoặc email...",
+    "clearSearch": "Xóa tìm kiếm",
+    "sortUsers": "Sắp xếp người dùng",
+    "refreshUsers": "Làm mới người dùng",
+    "activeView": "Bộ lọc hiện tại",
+    "searchFilter": "Tìm kiếm: {search}",
+    "sortFilter": "Sắp xếp: {sort}",
+    "reset": "Đặt lại",
+    "sort": {
+      "usernameAsc": "Tên đăng nhập A-Z",
+      "usernameDesc": "Tên đăng nhập Z-A",
+      "emailAsc": "Email A-Z",
+      "activeFirst": "Đang hoạt động trước",
+      "blockedFirst": "Đã khóa trước"
+    },
+    "table": {
+      "account": "Tài khoản",
+      "role": "Vai trò truy cập",
+      "status": "Trạng thái",
+      "note": "Ghi chú tài khoản"
+    },
+    "actions": "Hành động",
+    "loadError": "Không thể tải danh sách người dùng",
+    "tryAgain": "Thử lại",
+    "empty": {
+      "noMatches": "Không tìm thấy người dùng phù hợp",
+      "noUsers": "Chưa có người dùng",
+      "noMatchesDescription": "Hãy thử tên đăng nhập hoặc email khác.",
+      "noUsersDescription": "Tạo người dùng đầu tiên để bắt đầu."
+    },
+    "avatarAlt": "Ảnh đại diện của {username}",
+    "you": "Bạn",
+    "status": {
+      "active": "Hoạt động",
+      "blocked": "Đã khóa"
+    },
+    "noRestrictions": "Không có hạn chế tài khoản",
+    "actionsFor": "Hành động cho {username}",
+    "manageUser": "Quản lý {username}",
+    "changeRole": "Đổi vai trò",
+    "blockUser": "Khóa người dùng",
+    "unblockUser": "Mở khóa người dùng",
+    "roles": {
+      "USER": {"label": "Người dùng", "description": "Quyền học tập tiêu chuẩn"},
+      "EDITOR": {"label": "Biên tập viên", "description": "Có thể quản lý nội dung học tập"},
+      "ADMIN": {"label": "Quản trị viên", "description": "Toàn quyền quản trị hệ thống"}
+    },
+    "validation": {
+      "usernameRequired": "Tên đăng nhập là bắt buộc",
+      "emailRequired": "Email là bắt buộc",
+      "emailInvalid": "Nhập địa chỉ email hợp lệ",
+      "passwordRequired": "Mật khẩu là bắt buộc",
+      "passwordRequirements": "Mật khẩu chưa đáp ứng đầy đủ yêu cầu",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "passwordsMismatch": "Mật khẩu xác nhận không khớp",
+      "blockReasonRequired": "Lý do khóa tài khoản là bắt buộc"
+    },
+    "dialog": {
+      "createTitle": "Tạo người dùng mới",
+      "createDescription": "Thiết lập thông tin đăng nhập và quyền truy cập cho tài khoản.",
+      "credentialsTitle": "Thông tin đăng nhập",
+      "credentialsDescription": "Danh tính và mật khẩu ban đầu",
+      "username": "Tên đăng nhập",
+      "usernamePlaceholder": "Ví dụ: minh.nguyen",
+      "email": "Địa chỉ email",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu",
+      "passwordChecks": {
+        "length": "Từ 8-16 ký tự",
+        "case": "Có chữ hoa và chữ thường",
+        "numberSpecial": "Có số và ký tự đặc biệt",
+        "noSpaces": "Không chứa khoảng trắng"
+      },
+      "accessTitle": "Quyền truy cập và trạng thái",
+      "accessDescription": "Chọn cấp độ quyền cho tài khoản",
+      "role": "Vai trò",
+      "enableAccount": "Kích hoạt tài khoản",
+      "enabledDescription": "Người dùng có thể đăng nhập ngay sau khi tài khoản được tạo.",
+      "disabledDescription": "Tạo tài khoản nhưng chưa cho phép đăng nhập.",
+      "creating": "Đang tạo...",
+      "changeRoleTitle": "Đổi vai trò",
+      "changeRoleDescription": "Cập nhật cấp độ truy cập cho {username}.",
+      "updating": "Đang cập nhật...",
+      "updateRole": "Cập nhật vai trò",
+      "blockTitle": "Khóa người dùng",
+      "blockDescription": "{username} sẽ không thể tiếp tục truy cập nền tảng.",
+      "reason": "Lý do",
+      "reasonPlaceholder": "Mô tả lý do khóa tài khoản này...",
+      "blocking": "Đang khóa..."
+    },
+    "toast": {
+      "created": "Đã tạo người dùng thành công",
+      "blocked": "Đã khóa tài khoản {username}",
+      "unblocked": "Đã mở khóa tài khoản {username}",
+      "roleChanged": "Vai trò của {username} hiện là {role}"
     }
   },
   "login": {

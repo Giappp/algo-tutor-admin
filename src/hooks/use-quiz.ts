@@ -4,6 +4,7 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {QuestionRequestDTO} from "@/types/learning-path/schema";
 import {quizService} from "@/api/services/quiz-services";
+import {useTranslations} from "next-intl";
 
 export const QUERY_KEYS = {
     questions: (lessonId: number) => ["questions", lessonId] as const,
@@ -18,13 +19,14 @@ export function useQuestionsByLesson(lessonId: number) {
     });
 }
 
-export function useCreateQuestion(lessonId: number) {
+export function useCreateQuestion(lessonId: number, options: {silent?: boolean} = {}) {
     const queryClient = useQueryClient();
+    const t = useTranslations("lessonForm.questions.toast");
     return useMutation({
         mutationFn: (data: QuestionRequestDTO) =>
             quizService.create(lessonId, data as Parameters<typeof quizService.create>[1]),
         onSuccess: () => {
-            toast.success("Question added successfully");
+            if (!options.silent) toast.success(t("created"));
             queryClient.invalidateQueries({queryKey: QUERY_KEYS.questions(lessonId)});
         },
     });
@@ -32,22 +34,24 @@ export function useCreateQuestion(lessonId: number) {
 
 export function useUpdateQuestion(questionId: number) {
     const queryClient = useQueryClient();
+    const t = useTranslations("lessonForm.questions.toast");
     return useMutation({
         mutationFn: (data: QuestionRequestDTO) =>
             quizService.update(questionId, data as Parameters<typeof quizService.update>[1]),
         onSuccess: () => {
-            toast.success("Question updated successfully");
-            queryClient.invalidateQueries({queryKey: QUERY_KEYS.question(questionId)});
+            toast.success(t("updated"));
+            queryClient.invalidateQueries({queryKey: ["questions"]});
         },
     });
 }
 
 export function useDeleteQuestion() {
     const queryClient = useQueryClient();
+    const t = useTranslations("lessonForm.questions.toast");
     return useMutation({
         mutationFn: (questionId: number) => quizService.delete(questionId),
         onSuccess: () => {
-            toast.success("Question deleted successfully");
+            toast.success(t("deleted"));
             queryClient.invalidateQueries({queryKey: ["questions"]});
         },
     });

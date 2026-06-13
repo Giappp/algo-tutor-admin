@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowDown, ArrowUp, Code2, Pencil, Plus, Trash2, FileText, ExternalLink, Upload, Loader2, AlertCircle, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ArrowDown, ArrowUp, Beaker, Pencil, Plus, Trash2, FileText, ExternalLink, Upload, Loader2, AlertCircle, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import {
     Dialog,
     DialogContent,
@@ -30,10 +33,12 @@ interface TestCasesTabProps {
 }
 
 export function TestCasesTab({ lessonId }: TestCasesTabProps) {
+    const t = useTranslations("codingResources.testCases");
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editing, setEditing] = useState<TestCase | null>(null);
 
-    const { data: testCases = [], isLoading } = useTestCasesByLesson(lessonId);
+    const testCasesQuery = useTestCasesByLesson(lessonId);
+    const { data: testCases = [], isLoading } = testCasesQuery;
     const createMutation = useCreateTestCase(lessonId);
     const updateMutation = useUpdateTestCase(editing?.id ?? 0);
     const deleteMutation = useDeleteTestCase();
@@ -54,7 +59,7 @@ export function TestCasesTab({ lessonId }: TestCasesTabProps) {
     };
 
     const handleDelete = async (id: number) => {
-        if (confirm("Are you sure you want to delete this test case?")) {
+        if (confirm(t("deleteConfirm"))) {
             await deleteMutation.mutateAsync(id);
         }
     };
@@ -72,58 +77,70 @@ export function TestCasesTab({ lessonId }: TestCasesTabProps) {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-lg font-semibold tracking-tight">Test Cases</h2>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                        Define inputs and expected outputs to validate solutions via S3 S3 .in/.out files
+        <div className="flex flex-col gap-5">
+            <header className="flex flex-col gap-4 border-b border-border/55 pb-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
+                        <Badge variant="secondary" className="rounded-md font-mono text-[10px] tabular-nums">{testCases.length}</Badge>
+                    </div>
+                    <p className="max-w-lg text-xs leading-relaxed text-muted-foreground">
+                        {t("description")}
                     </p>
                 </div>
-                <Button onClick={() => {
+                <Button size="sm" onClick={() => {
                     setEditing(null);
                     setIsFormOpen(true);
                 }}>
-                    <Plus className="size-4 mr-2" />
-                    Add Test Case
+                    <Plus data-icon="inline-start" />
+                    {t("add")}
                 </Button>
-            </div>
+            </header>
 
             {/* Loading state */}
             {isLoading && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3" aria-busy="true">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />
+                        <div key={i} className="rounded-xl border border-border/60 bg-card p-4">
+                            <div className="flex items-center gap-3"><Skeleton className="size-8 rounded-lg" /><Skeleton className="h-4 w-28" /><Skeleton className="ml-auto h-7 w-16" /></div>
+                            <div className="mt-4 grid gap-3 sm:grid-cols-2"><Skeleton className="h-14" /><Skeleton className="h-14" /></div>
+                        </div>
                     ))}
                 </div>
             )}
 
-            {/* Empty state */}
-            {!isLoading && testCases.length === 0 && (
-                <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center justify-center py-16">
-                        <div className="size-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                            <Code2 className="size-8 text-muted-foreground" />
+            {testCasesQuery.isError && (
+                <div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-destructive/20 bg-destructive/[0.025] p-8 text-center">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive"><AlertCircle /></div>
+                    <div><h3 className="text-sm font-semibold">{t("loadError")}</h3><p className="mt-1 text-xs text-muted-foreground">{t("loadErrorDescription")}</p></div>
+                    <Button variant="outline" size="sm" onClick={() => testCasesQuery.refetch()}><RefreshCw data-icon="inline-start" />{t("retry")}</Button>
+                </div>
+            )}
+
+            {!isLoading && !testCasesQuery.isError && testCases.length === 0 && (
+                <Card className="border-dashed bg-muted/10 shadow-none">
+                    <CardContent className="flex flex-col items-center justify-center px-6 py-14 text-center">
+                        <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/12">
+                            <Beaker />
                         </div>
-                        <h3 className="text-lg font-medium mb-2">No test cases yet</h3>
-                        <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
-                            Create test cases to validate student solutions. Upload an input and expected output file to start.
+                        <h3 className="text-sm font-semibold">{t("emptyTitle")}</h3>
+                        <p className="mb-5 mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                            {t("emptyDescription")}
                         </p>
                         <Button onClick={() => {
                             setEditing(null);
                             setIsFormOpen(true);
                         }}>
-                            <Plus className="size-4 mr-2" />
-                            Add First Test Case
+                            <Plus data-icon="inline-start" />
+                            {t("addFirst")}
                         </Button>
                     </CardContent>
                 </Card>
             )}
 
             {/* Test cases list */}
-            {!isLoading && testCases.length > 0 && (
-                <div className="space-y-3">
+            {!isLoading && !testCasesQuery.isError && testCases.length > 0 && (
+                <div className="flex flex-col gap-3">
                     {testCases.map((tc: TestCase, index: number) => (
                         <TestCaseCard
                             key={tc.id}
@@ -142,14 +159,12 @@ export function TestCasesTab({ lessonId }: TestCasesTabProps) {
                 </div>
             )}
 
-            {/* Summary stats */}
-            {!isLoading && testCases.length > 0 && (
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{testCases.length} test case{testCases.length !== 1 ? "s" : ""}</span>
-                    <span className="text-muted-foreground/50">|</span>
-                    <span>{testCases.filter((tc) => tc.isSample).length} sample cases</span>
-                    <span className="text-muted-foreground/50">|</span>
-                    <span>{testCases.filter((tc) => !tc.isSample).length} standard cases</span>
+            {!isLoading && !testCasesQuery.isError && testCases.length > 0 && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/50 pt-3 text-[11px] font-medium text-muted-foreground">
+                    <span>{t("summary.total", {count: testCases.length})}</span>
+                    <span>{t("summary.samples", {count: testCases.filter((tc) => tc.isSample).length})}</span>
+                    <span>{t("summary.hidden", {count: testCases.filter((tc) => !tc.isSample).length})}</span>
+                    <span className="ml-auto font-mono text-foreground">{t("summary.weight", {count: testCases.reduce((sum, tc) => sum + tc.scoreWeight, 0)})}</span>
                 </div>
             )}
 
@@ -186,6 +201,7 @@ interface TestCaseCardProps {
 }
 
 function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, onMoveDown }: TestCaseCardProps) {
+    const t = useTranslations("codingResources.testCases");
     const getInputFileName = (url: string) => {
         try {
             const parts = url.split("/");
@@ -205,8 +221,8 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
     };
 
     return (
-        <Card className={`border-l-4 ${tc.isSample ? "border-l-emerald-500 bg-emerald-500/5" : "border-l-indigo-500 bg-card"}`}>
-            <CardContent className="p-5">
+        <Card className="rounded-xl bg-card shadow-sm ring-border/70">
+            <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                     {/* Left: Index & Status */}
                     <div className="flex items-center gap-3">
@@ -218,7 +234,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                 onClick={onMoveUp}
                                 disabled={index === 0}
                                 className="size-5 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                title="Move up"
+                                title={t("moveUp")}
                             >
                                 <ArrowUp className="size-3" />
                             </Button>
@@ -228,14 +244,12 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                 onClick={onMoveDown}
                                 disabled={index === total - 1}
                                 className="size-5 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                title="Move down"
+                                title={t("moveDown")}
                             >
                                 <ArrowDown className="size-3" />
                             </Button>
                         </div>
-                        <div
-                            className={`flex items-center justify-center size-8 rounded-lg font-mono text-sm font-semibold ${tc.isSample ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                                }`}>
+                        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 font-mono text-xs font-bold text-primary ring-1 ring-primary/10">
                             {index + 1}
                         </div>
                         <div className="flex flex-col gap-1">
@@ -243,19 +257,19 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                 {tc.isSample ? (
                                     <Badge variant="outline"
                                         className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
-                                        Sample Case
+                                        {t("sample")}
                                     </Badge>
                                 ) : (
                                     <Badge variant="outline"
                                         className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20">
-                                        Standard Case
+                                        {t("hidden")}
                                     </Badge>
                                 )}
                                 <Badge variant="secondary" className="text-[10px] tabular-nums font-medium">
-                                    Weight: {tc.scoreWeight}
+                                    {t("weight", {count: tc.scoreWeight})}
                                 </Badge>
                                 <Badge variant="outline" className="text-[10px] tabular-nums">
-                                    Sort Order: {tc.sortOrder}
+                                    {t("order", {count: tc.sortOrder})}
                                 </Badge>
                             </div>
                         </div>
@@ -263,10 +277,10 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon-xs" onClick={onEdit}>
+                        <Button variant="ghost" size="icon-xs" onClick={onEdit} title={t("edit")}>
                             <Pencil className="size-4" />
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={onDelete}
+                        <Button variant="ghost" size="icon-xs" onClick={onDelete} title={t("delete")}
                             className="text-destructive hover:text-destructive">
                             <Trash2 className="size-4" />
                         </Button>
@@ -277,7 +291,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Input File (.in)
+                            {t("inputFile")}
                         </Label>
                         <a
                             href={tc.inputFileUrl}
@@ -291,7 +305,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                     {getInputFileName(tc.inputFileUrl)}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate">
-                                    Click to view standard input
+                                    {t("viewInput")}
                                 </p>
                             </div>
                             <ExternalLink className="size-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -299,7 +313,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                     </div>
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Output File (.out)
+                            {t("outputFile")}
                         </Label>
                         <a
                             href={tc.outputFileUrl}
@@ -313,7 +327,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                     {getOutputFileName(tc.outputFileUrl)}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate">
-                                    Click to view expected output
+                                    {t("viewOutput")}
                                 </p>
                             </div>
                             <ExternalLink className="size-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -339,6 +353,7 @@ interface TestCaseDialogProps {
 }
 
 function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, lessonId, nextSortOrder }: TestCaseDialogProps) {
+    const t = useTranslations("codingResources.testCases");
     const [inputFile, setInputFile] = useState<File | null>(null);
     const [outputFile, setOutputFile] = useState<File | null>(null);
 
@@ -417,13 +432,13 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
 
     const handleUploadFiles = async () => {
         if (!inputFile || !outputFile) {
-            setUploadError("Please select both .in and .out files first.");
+            setUploadError(t("dialog.selectBothFiles"));
             return;
         }
 
         setUploadStatus("uploading");
         setUploadProgress(10);
-        setUploadStep("Requesting secure S3 upload credentials...");
+        setUploadStep(t("dialog.requestingUpload"));
         setUploadError(null);
 
         try {
@@ -444,7 +459,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
             }
 
             setUploadProgress(30);
-            setUploadStep(`Uploading input file (${inputFile.name})...`);
+            setUploadStep(t("dialog.uploadingInput", {name: inputFile.name}));
 
             await axios.put(inputPresigned.uploadUrl, inputFile, {
                 headers: {
@@ -459,7 +474,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
             });
 
             setUploadProgress(65);
-            setUploadStep(`Uploading output file (${outputFile.name})...`);
+            setUploadStep(t("dialog.uploadingOutput", {name: outputFile.name}));
 
             await axios.put(outputPresigned.uploadUrl, outputFile, {
                 headers: {
@@ -474,14 +489,14 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
             });
 
             setUploadProgress(100);
-            setUploadStep("Uploads completed successfully!");
+            setUploadStep(t("dialog.uploadComplete"));
 
             setValue("inputFileUrl", inputPresigned.downloadUrl, { shouldValidate: true, shouldDirty: true });
             setValue("inputFileKey", inputPresigned.fileKey, { shouldValidate: true, shouldDirty: true });
             setValue("outputFileUrl", outputPresigned.downloadUrl, { shouldValidate: true, shouldDirty: true });
             setValue("outputFileKey", outputPresigned.fileKey, { shouldValidate: true, shouldDirty: true });
             setUploadStatus("success");
-            toast.success("Files uploaded successfully to S3!");
+            toast.success(t("dialog.uploadSuccess"));
         } catch (err) {
             console.error("Upload failed:", err);
             let errorMessage = "File upload failed.";
@@ -499,14 +514,14 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
     const handleFormSubmit = handleSubmit(
         async (data) => {
             if (!data.inputFileUrl || !data.outputFileUrl) {
-                toast.error("Both input and output files must be successfully uploaded first.");
+                toast.error(t("dialog.uploadBothFirst"));
                 return;
             }
             await onSubmit(data);
         },
         (validationErrors) => {
             console.error("Test Case Form Validation Errors:", validationErrors);
-            toast.error("Form validation failed. Please check all fields.");
+            toast.error(t("dialog.validationFailed"));
         }
     );
 
@@ -514,21 +529,21 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
+            <DialogContent className="max-h-[calc(100svh-2rem)] max-w-xl overflow-y-auto p-0">
+                <DialogHeader className="border-b border-border/50 bg-muted/20 px-6 py-5 pr-14">
                     <DialogTitle>
-                        {testCase ? "Edit Test Case" : "Add Test Case"}
+                        {testCase ? t("dialog.editTitle") : t("dialog.addTitle")}
                     </DialogTitle>
                     <DialogDescription>
-                        Upload the `.in` input file and `.out` expected output file for this testcase.
+                        {t("dialog.description")}
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleFormSubmit} className="space-y-5">
+                <form onSubmit={handleFormSubmit} className="flex flex-col gap-5 px-6 py-5">
                     {/* Input file upload */}
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-muted-foreground uppercase">
-                            Input File (.in) <span className="text-destructive">*</span>
+                            {t("inputFile")} <span className="text-destructive">*</span>
                         </Label>
                         {inputFileUrl ? (
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
@@ -536,7 +551,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                     <FileText className="size-4 shrink-0 text-emerald-500" />
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-xs font-semibold font-mono truncate">{inputFile ? inputFile.name : getFileNameFromUrl(inputFileUrl)}</span>
-                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400">Uploaded & Securely Stored</span>
+                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400">{t("dialog.stored")}</span>
                                     </div>
                                 </div>
                                 <Button
@@ -560,7 +575,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                     <FileText className="size-4 shrink-0 text-amber-500" />
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-xs font-semibold font-mono truncate">{inputFile.name}</span>
-                                        <span className="text-[10px] text-amber-600 dark:text-amber-400">{formatFileSize(inputFile.size)} • Ready to upload</span>
+                                        <span className="text-[10px] text-amber-600 dark:text-amber-400">{t("dialog.ready", {size: formatFileSize(inputFile.size)})}</span>
                                     </div>
                                 </div>
                                 <Button
@@ -584,7 +599,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                         const file = e.target.files?.[0];
                                         if (file) {
                                             if (!file.name.endsWith(".in")) {
-                                                toast.error("Input file must have a .in extension.");
+                                                toast.error(t("dialog.invalidInputExtension"));
                                                 return;
                                             }
                                             setInputFile(file);
@@ -596,7 +611,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                 <div className="flex flex-col items-center gap-1.5 text-center pointer-events-none">
                                     <Upload className="size-5 text-muted-foreground" />
                                     <span className="text-xs font-semibold text-muted-foreground">
-                                        Select or drag input file (.in)
+                                        {t("dialog.selectInput")}
                                     </span>
                                 </div>
                             </div>
@@ -606,7 +621,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                     {/* Output file upload */}
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-muted-foreground uppercase">
-                            Expected Output File (.out) <span className="text-destructive">*</span>
+                            {t("outputFile")} <span className="text-destructive">*</span>
                         </Label>
                         {outputFileUrl ? (
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
@@ -614,7 +629,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                     <FileText className="size-4 shrink-0 text-emerald-500" />
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-xs font-semibold font-mono truncate">{outputFile ? outputFile.name : getFileNameFromUrl(outputFileUrl)}</span>
-                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400">Uploaded & Securely Stored</span>
+                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400">{t("dialog.stored")}</span>
                                     </div>
                                 </div>
                                 <Button
@@ -638,7 +653,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                     <FileText className="size-4 shrink-0 text-amber-500" />
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-xs font-semibold font-mono truncate">{outputFile.name}</span>
-                                        <span className="text-[10px] text-amber-600 dark:text-amber-400">{formatFileSize(outputFile.size)} • Ready to upload</span>
+                                        <span className="text-[10px] text-amber-600 dark:text-amber-400">{t("dialog.ready", {size: formatFileSize(outputFile.size)})}</span>
                                     </div>
                                 </div>
                                 <Button
@@ -662,7 +677,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                         const file = e.target.files?.[0];
                                         if (file) {
                                             if (!file.name.endsWith(".out")) {
-                                                toast.error("Output file must have a .out extension.");
+                                                toast.error(t("dialog.invalidOutputExtension"));
                                                 return;
                                             }
                                             setOutputFile(file);
@@ -674,7 +689,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                 <div className="flex flex-col items-center gap-1.5 text-center pointer-events-none">
                                     <Upload className="size-5 text-muted-foreground" />
                                     <span className="text-xs font-semibold text-muted-foreground">
-                                        Select or drag output file (.out)
+                                        {t("dialog.selectOutput")}
                                     </span>
                                 </div>
                             </div>
@@ -691,12 +706,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                 </span>
                                 <span className="text-muted-foreground tabular-nums">{uploadProgress}%</span>
                             </div>
-                            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-indigo-600 rounded-full transition-all duration-300"
-                                    style={{ width: `${uploadProgress}%` }}
-                                />
-                            </div>
+                            <Progress value={uploadProgress} />
                         </div>
                     )}
 
@@ -705,7 +715,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                         <div className="flex items-start gap-2.5 p-3 rounded-lg border bg-destructive/5 border-destructive/20 text-destructive text-xs">
                             <AlertCircle className="size-4 shrink-0 mt-0.5" />
                             <div className="flex-1">
-                                <p className="font-semibold">Upload failed</p>
+                                <p className="font-semibold">{t("dialog.uploadFailed")}</p>
                                 <p className="text-muted-foreground mt-0.5">{uploadError}</p>
                             </div>
                         </div>
@@ -720,7 +730,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                             className="w-full gap-2 shadow-sm h-10 font-semibold"
                         >
                             <Upload className="size-4" />
-                            Upload Files to S3
+                            {t("dialog.uploadFiles")}
                         </Button>
                     )}
 
@@ -728,12 +738,12 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                     {hasUrls && (
                         <div className="space-y-4 pt-2 border-t border-dashed animate-in fade-in slide-in-from-top-2 duration-300">
                             <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                                Configuration Settings
+                                {t("dialog.configuration")}
                             </h4>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="scoreWeight" className="text-xs font-semibold text-muted-foreground uppercase">
-                                        Score Weight <span className="text-destructive">*</span>
+                                        {t("dialog.scoreWeight")} <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         id="scoreWeight"
@@ -746,13 +756,13 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                         <p className="text-xs text-destructive mt-0.5">{errors.scoreWeight.message}</p>
                                     )}
                                     <p className="text-[10px] text-muted-foreground">
-                                        Weight of this testcase in total lesson score.
+                                        {t("dialog.scoreWeightDescription")}
                                     </p>
                                 </div>
 
                                 <div className="space-y-2">
                                     <Label htmlFor="sortOrder" className="text-xs font-semibold text-muted-foreground uppercase">
-                                        Sort Order <span className="text-destructive">*</span>
+                                        {t("dialog.sortOrder")} <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         id="sortOrder"
@@ -765,7 +775,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                         <p className="text-xs text-destructive mt-0.5">{errors.sortOrder.message}</p>
                                     )}
                                     <p className="text-[10px] text-muted-foreground">
-                                        Execution and presentation priority order.
+                                        {t("dialog.sortOrderDescription")}
                                     </p>
                                 </div>
                             </div>
@@ -773,10 +783,10 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                             <div className="flex items-center justify-between rounded-xl border p-4 bg-muted/10">
                                 <div className="space-y-0.5 pr-4">
                                     <Label htmlFor="isSample" className="text-sm font-semibold cursor-pointer">
-                                        Sample Test Case
+                                        {t("dialog.sample")}
                                     </Label>
                                     <p className="text-[11px] text-muted-foreground">
-                                        Sample cases are visible to students and show input/output examples.
+                                        {t("dialog.sampleDescription")}
                                     </p>
                                 </div>
                                 <Switch
@@ -794,10 +804,10 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                             variant="outline"
                             onClick={() => handleOpenChange(false)}
                         >
-                            Cancel
+                            {t("dialog.cancel")}
                         </Button>
                         <Button type="submit" disabled={isPending || !hasUrls}>
-                            {isPending ? "Saving..." : testCase ? "Save Changes" : "Add Test Case"}
+                            {isPending ? t("dialog.saving") : testCase ? t("dialog.saveChanges") : t("add")}
                         </Button>
                     </DialogFooter>
                 </form>

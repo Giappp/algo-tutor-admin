@@ -39,6 +39,7 @@ export const LessonExampleSchema = z.object({
     input: z.string().min(1),
     output: z.string().min(1),
     explanation: z.string().optional(),
+    imageUrl: z.string().url().nullable().optional(),
 });
 
 export const CreateTestCaseSchema = z.object({
@@ -58,6 +59,7 @@ export const CreateTestCaseSchema = z.object({
 export const CreateQuestionSchema = z.object({
     question: z.string().min(1, "Question text is required"),
     type: QuestionTypeSchema,
+    orderIndex: z.number().int().optional(),
     points: z.number().int().min(1).optional(),
     explanation: z.string().optional(),
     choices: z
@@ -98,6 +100,7 @@ const BaseLessonFields = {
 // Theory-specific fields
 const TheoryLessonFields = {
     content: z.string().optional(),
+    estimatedMinutes: z.number().int().min(1).max(1440).optional(),
 };
 
 // Quiz-specific fields

@@ -23,6 +23,8 @@ import {
 export type CodingLessonFormHandle = {
     trigger: () => Promise<boolean>;
     submit: () => Promise<void>;
+    submitForAi: () => Promise<void>;
+    applyDraft: (draft: Partial<Pick<CodingLessonDTO, "statement" | "constraints" | "examples" | "hints" | "starterCode">>) => void;
 };
 
 interface CodingLessonFormProps {
@@ -52,6 +54,7 @@ export function CodingLessonForm({
         register,
         handleSubmit,
         setValue,
+        getValues,
         control,
         formState: {errors, isDirty},
     } = useForm<CodingLessonDTO>({
@@ -161,7 +164,22 @@ export function CodingLessonForm({
             return valid;
         },
         submit: save,
-    }), [handleSubmit, save]);
+        submitForAi: async () => {
+            const current = getValues();
+            await onSubmit(buildFinalData({
+                ...current,
+                title: current.title.trim() || t("coding.aiDraftTitle"),
+                statement: current.statement.trim() || t("coding.aiDraftStatement"),
+            }));
+        },
+        applyDraft: (draft) => {
+            if (draft.statement !== undefined) setValue("statement", draft.statement, {shouldValidate: true, shouldDirty: true});
+            if (draft.constraints !== undefined) setValue("constraints", draft.constraints, {shouldValidate: true, shouldDirty: true});
+            if (draft.examples !== undefined) setValue("examples", draft.examples, {shouldValidate: true, shouldDirty: true});
+            if (draft.hints !== undefined) setValue("hints", draft.hints, {shouldValidate: true, shouldDirty: true});
+            if (draft.starterCode !== undefined) setValue("starterCode", draft.starterCode, {shouldValidate: true, shouldDirty: true});
+        },
+    }), [getValues, handleSubmit, onSubmit, save, setValue, t]);
 
     // --- Section toggle ---
     const toggleSection = (section: string) => {

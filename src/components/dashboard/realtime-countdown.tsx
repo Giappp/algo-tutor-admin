@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
 
@@ -16,29 +16,32 @@ export function RealtimeCountdown({
     windowSeconds: number;
     onExpire?: () => void;
 }) {
-    const [timeLeft, setTimeLeft] = useState(() =>
-        calculateRemainingTime(oldestTimestampMs, windowSeconds)
-    );
+    const hasExpiredRef = useRef(false);
+    const [, forceTick] = useState(0);
+    const timeLeft = calculateRemainingTime(oldestTimestampMs, windowSeconds);
 
     useEffect(() => {
+        hasExpiredRef.current = false;
+
         const interval = setInterval(() => {
             const rem = calculateRemainingTime(oldestTimestampMs, windowSeconds);
-            setTimeLeft(rem);
-            if (rem <= 0) {
+            forceTick((tick) => tick + 1);
+            if (rem <= 0 && !hasExpiredRef.current) {
+                hasExpiredRef.current = true;
                 clearInterval(interval);
-                if (onExpire) onExpire();
+                onExpire?.();
             }
-        }, 200);
+        }, 1000);
 
         return () => clearInterval(interval);
     }, [oldestTimestampMs, windowSeconds, onExpire]);
 
-    const seconds = (timeLeft / 1000).toFixed(1);
+    const seconds = Math.ceil(timeLeft / 1000);
 
     if (timeLeft <= 0) {
         return (
-            <Badge variant="outline" className="bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700 animate-pulse gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-ping" />
+            <Badge variant="outline" className="gap-1 bg-muted text-muted-foreground">
+                <span className="size-1.5 rounded-full bg-muted-foreground" />
                 Expiring...
             </Badge>
         );
@@ -46,7 +49,7 @@ export function RealtimeCountdown({
 
     return (
         <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50 font-mono">
-            <Clock className="w-3 h-3 mr-1 animate-spin" style={{ animationDuration: "3s" }} />
+            <Clock className="mr-1 size-3" />
             {seconds}s
         </Badge>
     );

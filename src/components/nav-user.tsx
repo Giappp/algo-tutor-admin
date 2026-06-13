@@ -17,7 +17,7 @@ export function NavUser() {
     return (
         <SidebarMenu className="gap-1">
             <li className="mb-1 flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2 group-data-[collapsible=icon]:hidden">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-xs font-bold uppercase text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent text-xs font-bold uppercase text-sidebar-accent-foreground ring-1 ring-sidebar-primary/10">
                     {username.slice(0, 2) || "AT"}
                 </div>
                 <div className="min-w-0 flex-1 leading-tight">
@@ -30,9 +30,9 @@ export function NavUser() {
                     tooltip={t("account")}
                     data-active={pathname === "/account" ? "true" : undefined}
                     render={<Link href="/account" />}
-                    className="h-9 text-[13px] hover:bg-indigo-100/75 hover:text-indigo-700 data-active:bg-indigo-100/80 data-active:text-indigo-800 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-300 dark:data-active:bg-indigo-400/15 dark:data-active:text-indigo-200"
+                    className="h-9 text-[13px] font-medium text-sidebar-foreground/72 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground"
                 >
-                    <CircleUserRoundIcon className="text-indigo-600 dark:text-indigo-400"/>
+                    <CircleUserRoundIcon/>
                     <span>{t("account")}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>

@@ -1,18 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
-import { Check, Code2, Copy, FileCode, Maximize2, Minimize2, Pencil, Plus, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { AlertCircle, Check, Code2, Copy, FileCode, Maximize2, Minimize2, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -24,38 +22,32 @@ import {
     useEditorialsByLesson,
     useUpdateEditorial
 } from "@/hooks/use-editorials";
+import {EditorialForm} from "@/components/learning-path/editorial-form";
 
-const MonacoEditor = dynamic(
-    () => import("@monaco-editor/react").then((mod) => mod.default),
-    {
-        ssr: false,
-        loading: () => (
-            <div className="h-64 rounded-lg border border-input bg-muted animate-pulse" />
-        ),
-    }
-);
+import dynamic from "next/dynamic";
+
+const MonacoEditor = dynamic(() => import("@monaco-editor/react").then((mod) => mod.default), {
+    ssr: false,
+    loading: () => <Skeleton className="h-44 rounded-none"/>,
+});
 
 interface EditorialsTabProps {
     lessonId: number;
 }
 
-const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string; icon: string; monacoLang: string }[] = [
-    { value: "JAVA", label: "Java", icon: "☕", monacoLang: "java" },
-    { value: "PYTHON", label: "Python", icon: "🐍", monacoLang: "python" },
-    { value: "CPP", label: "C++", icon: "C++", monacoLang: "cpp" },
+const LANGUAGE_OPTIONS: { value: ProgrammingLanguage; label: string; monacoLang: string }[] = [
+    { value: "JAVA", label: "Java", monacoLang: "java" },
+    { value: "PYTHON", label: "Python", monacoLang: "python" },
+    { value: "CPP", label: "C++", monacoLang: "cpp" },
 ];
 
-const LANGUAGE_COLORS: Record<ProgrammingLanguage, { bg: string; text: string; border: string }> = {
-    JAVA: { bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400", border: "border-l-orange-500" },
-    PYTHON: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-l-blue-500" },
-    CPP: { bg: "bg-sky-500/10", text: "text-sky-600 dark:text-sky-400", border: "border-l-sky-500" },
-};
-
 export function EditorialsTab({ lessonId }: EditorialsTabProps) {
+    const t = useTranslations("codingResources.editorials");
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editing, setEditing] = useState<Editorial | null>(null);
 
-    const { data: editorials = [], isLoading } = useEditorialsByLesson(lessonId);
+    const editorialsQuery = useEditorialsByLesson(lessonId);
+    const { data: editorials = [], isLoading } = editorialsQuery;
     const createMutation = useCreateEditorial(lessonId);
     const updateMutation = useUpdateEditorial(editing?.id ?? 0);
     const deleteMutation = useDeleteEditorial();
@@ -71,63 +63,74 @@ export function EditorialsTab({ lessonId }: EditorialsTabProps) {
     };
 
     const handleDelete = async (id: number) => {
-        if (confirm("Are you sure you want to delete this editorial?")) {
+        if (confirm(t("deleteConfirm"))) {
             await deleteMutation.mutateAsync(id);
         }
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-lg font-semibold tracking-tight">Editorials</h2>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                        Solution code to help students learn different approaches
+        <div className="flex flex-col gap-5">
+            <header className="flex flex-col gap-4 border-b border-border/55 pb-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
+                        <Badge variant="secondary" className="rounded-md font-mono text-[10px] tabular-nums">{editorials.length}</Badge>
+                    </div>
+                    <p className="max-w-lg text-xs leading-relaxed text-muted-foreground">
+                        {t("description")}
                     </p>
                 </div>
-                <Button onClick={() => {
+                <Button size="sm" onClick={() => {
                     setEditing(null);
                     setIsFormOpen(true);
                 }}>
-                    <Plus className="size-4 mr-2" />
-                    Add Editorial
+                    <Plus data-icon="inline-start" />
+                    {t("add")}
                 </Button>
-            </div>
+            </header>
 
-            {/* Loading state */}
             {isLoading && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3" aria-busy="true">
                     {[1, 2].map((i) => (
-                        <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
+                        <div key={i} className="overflow-hidden rounded-xl border border-border/60 bg-card">
+                            <div className="flex items-center gap-3 border-b border-border/50 p-3"><Skeleton className="size-8 rounded-lg" /><Skeleton className="h-4 w-28" /></div>
+                            <Skeleton className="h-44 w-full rounded-none" />
+                        </div>
                     ))}
                 </div>
             )}
 
-            {/* Empty state */}
-            {!isLoading && editorials.length === 0 && (
-                <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center justify-center py-16">
-                        <div className="size-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                            <FileCode className="size-8 text-muted-foreground" />
+            {editorialsQuery.isError && (
+                <div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-destructive/20 bg-destructive/[0.025] p-8 text-center">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive"><AlertCircle /></div>
+                    <div><h3 className="text-sm font-semibold">{t("loadError")}</h3><p className="mt-1 text-xs text-muted-foreground">{t("loadErrorDescription")}</p></div>
+                    <Button variant="outline" size="sm" onClick={() => editorialsQuery.refetch()}><RefreshCw data-icon="inline-start" />{t("retry")}</Button>
+                </div>
+            )}
+
+            {!isLoading && !editorialsQuery.isError && editorials.length === 0 && (
+                <Card className="border-dashed bg-muted/10 shadow-none">
+                    <CardContent className="flex flex-col items-center justify-center px-6 py-14 text-center">
+                        <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/12">
+                            <FileCode />
                         </div>
-                        <h3 className="text-lg font-medium mb-2">No editorials yet</h3>
-                        <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
-                            Add solution code in multiple programming languages to help students understand different approaches.
+                        <h3 className="text-sm font-semibold">{t("emptyTitle")}</h3>
+                        <p className="mb-5 mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                            {t("emptyDescription")}
                         </p>
                         <Button onClick={() => {
                             setEditing(null);
                             setIsFormOpen(true);
                         }}>
-                            <Plus className="size-4 mr-2" />
-                            Add First Editorial
+                            <Plus data-icon="inline-start" />
+                            {t("addFirst")}
                         </Button>
                     </CardContent>
                 </Card>
             )}
 
             {/* Editorials list */}
-            {!isLoading && editorials.length > 0 && (
+            {!isLoading && !editorialsQuery.isError && editorials.length > 0 && (
                 <div className="space-y-4">
                     {editorials.map((ed: Editorial) => (
                         <EditorialCard
@@ -174,8 +177,8 @@ function EditorialCard({ editorial: ed, onEdit, onDelete }: EditorialCardProps) 
     const [isExpanded, setIsExpanded] = useState(false);
 
     const langConfig = LANGUAGE_OPTIONS.find((l) => l.value === ed.language);
-    const colors = LANGUAGE_COLORS[ed.language];
     const lineCount = ed.sourceCode.split("\n").length;
+    const t = useTranslations("codingResources.editorials");
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(ed.sourceCode);
@@ -184,36 +187,36 @@ function EditorialCard({ editorial: ed, onEdit, onDelete }: EditorialCardProps) 
     };
 
     return (
-        <Card className={cn("border-l-4 overflow-hidden", colors.border)}>
+        <Card className="overflow-hidden rounded-xl bg-card shadow-sm ring-border/70">
             <CardContent className="p-0">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-3 border-b bg-muted/20">
+                <div className="flex items-center justify-between gap-3 border-b border-border/55 bg-muted/15 px-3 py-2.5">
                     <div className="flex items-center gap-3">
-                        <div className={cn("flex items-center justify-center size-8 rounded-lg", colors.bg)}>
-                            <Code2 className={cn("size-4", colors.text)} />
+                        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/10">
+                            <Code2 />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
                                 <h3 className="font-semibold text-sm">
-                                    {langConfig?.label ?? ed.language} Solution
+                                    {t("solutionTitle", {language: langConfig?.label ?? ed.language})}
                                 </h3>
                                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                    {lineCount} lines
+                                    {t("lines", {count: lineCount})}
                                 </Badge>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon-xs" onClick={() => setIsExpanded(!isExpanded)} title={isExpanded ? "Collapse" : "Expand"}>
+                        <Button variant="ghost" size="icon-xs" onClick={() => setIsExpanded(!isExpanded)} title={isExpanded ? t("collapse") : t("expand")}>
                             {isExpanded ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={handleCopy} title="Copy code">
+                        <Button variant="ghost" size="icon-xs" onClick={handleCopy} title={copied ? t("copied") : t("copy")}>
                             {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={onEdit} title="Edit">
+                        <Button variant="ghost" size="icon-xs" onClick={onEdit} title={t("edit")}>
                             <Pencil className="size-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon-xs" onClick={onDelete} className="text-destructive hover:text-destructive" title="Delete">
+                        <Button variant="ghost" size="icon-xs" onClick={onDelete} className="text-destructive hover:text-destructive" title={t("delete")}>
                             <Trash2 className="size-3.5" />
                         </Button>
                     </div>
@@ -257,104 +260,28 @@ interface EditorialDialogProps {
 }
 
 function EditorialDialog({ open, onOpenChange, editorial, onSubmit, isPending }: EditorialDialogProps) {
-    const [language, setLanguage] = useState<ProgrammingLanguage>(editorial?.language ?? "JAVA");
-    const [sourceCode, setSourceCode] = useState(editorial?.sourceCode ?? "");
-
-    const handleOpenChange = (open: boolean) => {
-        if (open) {
-            setLanguage(editorial?.language ?? "JAVA");
-            setSourceCode(editorial?.sourceCode ?? "");
-        }
-        onOpenChange(open);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await onSubmit({ language, sourceCode });
-    };
-
-    const langConfig = LANGUAGE_OPTIONS.find((l) => l.value === language);
-    const isValid = sourceCode.trim().length > 0;
+    const t = useTranslations("codingResources.editorials");
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[92vh] flex flex-col p-0 gap-0">
-                <DialogHeader className="px-6 pt-6 pb-4">
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-h-[calc(100svh-2rem)] max-w-7xl overflow-y-auto p-0">
+                <DialogHeader className="border-b border-border/50 bg-muted/20 px-6 py-5 pr-14">
                     <DialogTitle>
-                        {editorial ? "Edit Editorial" : "Add Editorial"}
+                        {editorial ? t("editTitle") : t("addTitle")}
                     </DialogTitle>
                     <DialogDescription>
-                        Write the solution code with full syntax highlighting and autocomplete.
+                        {t("dialogDescription")}
                     </DialogDescription>
                 </DialogHeader>
-
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-                    {/* Language selector */}
-                    <div className="px-6 pb-4">
-                        <div className="flex items-center gap-3">
-                            <Label className="text-sm font-medium shrink-0">Language:</Label>
-                            <div className="flex items-center gap-1">
-                                {LANGUAGE_OPTIONS.map((opt) => (
-                                    <button
-                                        key={opt.value}
-                                        type="button"
-                                        onClick={() => setLanguage(opt.value)}
-                                        className={cn(
-                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
-                                            language === opt.value
-                                                ? `${LANGUAGE_COLORS[opt.value].bg} ${LANGUAGE_COLORS[opt.value].text} ring-1 ring-current/20`
-                                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                        )}
-                                    >
-                                        <span>{opt.icon}</span>
-                                        {opt.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Monaco Editor — takes remaining space */}
-                    <div className="flex-1 min-h-0 border-y">
-                        <MonacoEditor
-                            height="100%"
-                            language={langConfig?.monacoLang ?? "plaintext"}
-                            value={sourceCode}
-                            onChange={(val) => setSourceCode(val ?? "")}
-                            theme="vs-dark"
-                            options={{
-                                minimap: { enabled: true, maxColumn: 80 },
-                                fontSize: 13,
-                                lineNumbers: "on",
-                                scrollBeyondLastLine: false,
-                                automaticLayout: true,
-                                tabSize: 4,
-                                padding: { top: 12, bottom: 12 },
-                                wordWrap: "off",
-                                renderLineHighlight: "all",
-                                bracketPairColorization: { enabled: true },
-                                guides: { bracketPairs: true },
-                                suggest: { showKeywords: true, showSnippets: true },
-                                quickSuggestions: true,
-                            }}
-                        />
-                    </div>
-
-                    {/* Footer */}
-                    <DialogFooter className="px-6 py-4">
-                        <div className="flex items-center gap-2 mr-auto text-xs text-muted-foreground">
-                            <span>{sourceCode.split("\n").length} lines</span>
-                            <span className="text-muted-foreground/40">|</span>
-                            <span>{sourceCode.length} chars</span>
-                        </div>
-                        <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isPending || !isValid}>
-                            {isPending ? "Saving..." : editorial ? "Save Changes" : "Add Editorial"}
-                        </Button>
-                    </DialogFooter>
-                </form>
+                <div className="px-6 py-5">
+                    <EditorialForm
+                        defaultValues={editorial ?? undefined}
+                        onSubmit={onSubmit}
+                        onCancel={() => onOpenChange(false)}
+                        isPending={isPending}
+                        submitLabel={editorial ? t("saveChanges") : t("add")}
+                    />
+                </div>
             </DialogContent>
         </Dialog>
     );

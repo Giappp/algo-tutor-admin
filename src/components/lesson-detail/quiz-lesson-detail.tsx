@@ -11,15 +11,17 @@ import { DangerZoneCard } from "@/components/lesson-detail/danger-zone-card";
 import { DeleteLessonDialog } from "@/components/lesson-detail/delete-lesson-dialog";
 import { Lesson } from "@/types/learning-path";
 import { useDeleteLesson, useUpdateLesson } from "@/hooks/use-lessons";
+import type { QuizQuestionDraft } from "@/types/admin-ai-lesson";
 
 interface QuizLessonDetailProps {
     lesson: Lesson;
     lessonId: number;
     learningPathId: number;
     updateMutation: ReturnType<typeof useUpdateLesson>;
+    draftQuestions?: QuizQuestionDraft[];
 }
 
-export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutation }: QuizLessonDetailProps) {
+export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutation, draftQuestions = [] }: QuizLessonDetailProps) {
     const t = useTranslations("learningPaths");
     const tCommon = useTranslations("common");
     const router = useRouter();
@@ -76,7 +78,7 @@ export function QuizLessonDetail({ lesson, lessonId, learningPathId, updateMutat
                 </TabsContent>
 
                 <TabsContent value="questions" className="mt-4 focus-visible:outline-none">
-                    <QuestionsTab lessonId={lessonId} />
+                    <QuestionsTab lessonId={lessonId} draftQuestions={draftQuestions} />
                 </TabsContent>
 
                 <TabsContent value="danger" className="mt-4 focus-visible:outline-none">

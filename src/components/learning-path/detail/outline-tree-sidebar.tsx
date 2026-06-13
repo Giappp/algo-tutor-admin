@@ -78,7 +78,7 @@ export function OutlineTreeSidebar({
                             <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground bg-muted/65 px-1.5 py-0.5 rounded-md border border-border/30">
                                 {getLevelText(level)}
                             </span>
-                            <span className="text-muted-foreground/30 text-[9px]">•</span>
+                            <span className="text-muted-foreground/30 text-xs">•</span>
                             <span className={cn(
                                 "text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
                                 isPremium
@@ -215,7 +215,7 @@ function SidebarTopicItem({
                             className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-emerald-500/5 hover:text-emerald-600 group transition-all duration-200"
                         >
                             <PlusCircle className="size-4 text-muted-foreground/75 group-hover:text-emerald-500 shrink-0" />
-                            <span className="text-[11px] text-muted-foreground group-hover:text-emerald-600 font-bold">
+                            <span className="text-xs text-muted-foreground group-hover:text-emerald-600 font-bold">
                                 {t("createFirstLesson")}
                             </span>
                         </div>
@@ -234,7 +234,7 @@ function SidebarTopicItem({
                                 className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer hover:bg-muted/40 group transition-all duration-200 border border-transparent hover:border-border/30 bg-background/20"
                             >
                                 <Plus className="size-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-[9px] text-muted-foreground font-extrabold uppercase tracking-wider group-hover:text-foreground">
+                                <span className="text-xs text-muted-foreground font-extrabold uppercase tracking-wider group-hover:text-foreground">
                                     {t("addLesson")}
                                 </span>
                             </div>

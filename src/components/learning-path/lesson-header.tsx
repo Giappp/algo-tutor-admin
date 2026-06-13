@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {InlineEdit} from "@/components/ui/inline-edit";
 import {Difficulty, LessonType} from "@/types/learning-path";
+import type {ReactNode} from "react";
 
 const LESSON_TYPE_CONFIG: Record<LessonType, {icon: React.ElementType}> = {
     THEORY: {icon: BookOpen},
@@ -33,6 +34,7 @@ interface LessonHeaderProps {
     onTogglePublish: () => void;
     onTitleChange?: (newTitle: string) => void;
     isEditPending?: boolean;
+    action?: ReactNode;
 }
 
 export function LessonHeader({
@@ -41,6 +43,7 @@ export function LessonHeader({
     onTogglePublish,
     onTitleChange,
     isEditPending = false,
+    action,
 }: LessonHeaderProps) {
     const t = useTranslations("learningPaths");
     const tLessonForm = useTranslations("lessonForm");
@@ -105,6 +108,7 @@ export function LessonHeader({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2 pl-11 sm:pl-14 lg:pl-0">
+                    {action}
                     <Button
                         variant="ghost"
                         size="sm"

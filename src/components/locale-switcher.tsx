@@ -39,12 +39,12 @@ export function LocaleSwitcher() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="size-9 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        className="size-9 text-muted-foreground hover:text-primary"
                         disabled={isPending}
                     />
                 }
             >
-                <LanguagesIcon className="size-[18px] text-muted-foreground" />
+                <LanguagesIcon />
                 <span className="sr-only">{t("language")}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={8} className="min-w-[160px]">

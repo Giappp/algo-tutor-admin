@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CodeIcon, FileCode, SettingsIcon } from "lucide-react";
+import { CodeIcon, FileCode, SettingsIcon, Sparkles } from "lucide-react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
+import { CodingLessonForm, type CodingLessonFormHandle } from "@/components/learning-path/coding-lesson-form";
 import { TestCasesTab } from "@/components/learning-path/test-cases-tab";
 import { EditorialsTab } from "@/components/learning-path/editorials-tab";
 import { DangerZoneCard } from "@/components/lesson-detail/danger-zone-card";
@@ -13,21 +13,29 @@ import { TabButton } from "@/components/lesson-detail/tab-button";
 import { Lesson } from "@/types/learning-path";
 import { useDeleteLesson, useUpdateLesson } from "@/hooks/use-lessons";
 import { useRouter } from "next/navigation";
+import {Button} from "@/components/ui/button";
+import {CodingAiStudioDialog} from "@/components/lesson-detail/coding-ai-studio-dialog";
+import {useCreateEditorial} from "@/hooks/use-editorials";
 
 interface CodingLessonPanelsProps {
     lesson: Lesson;
     lessonId: number;
     learningPathId: number;
     updateMutation: ReturnType<typeof useUpdateLesson>;
+    initialAiOpen?: boolean;
 }
 
-export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMutation }: CodingLessonPanelsProps) {
+export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMutation, initialAiOpen = false }: CodingLessonPanelsProps) {
     const t = useTranslations("learningPaths");
     const tCommon = useTranslations("common");
+    const tAi = useTranslations("lessonForm.codingAi");
     const router = useRouter();
     const deleteMutation = useDeleteLesson();
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isAiOpen, setIsAiOpen] = useState(initialAiOpen);
     const [rightTab, setRightTab] = useState<"test-cases" | "editorials" | "settings">("test-cases");
+    const codingFormRef = useRef<CodingLessonFormHandle | null>(null);
+    const createEditorialMutation = useCreateEditorial(lessonId);
 
     const handleDelete = () => {
         deleteMutation.mutate(lessonId, {
@@ -44,7 +52,14 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
                 {/* Left Panel: Content Form */}
                 <ResizablePanel defaultSize={50} minSize={35} maxSize={65} className="flex flex-col">
                     <div className="relative h-full flex-1 overflow-y-auto p-5 scrollbar-thin">
+                        <div className="mb-4 flex justify-end">
+                            <Button variant="ai" size="sm" onClick={() => setIsAiOpen(true)}>
+                                <Sparkles data-icon="inline-start"/>
+                                {tAi("trigger")}
+                            </Button>
+                        </div>
                         <CodingLessonForm
+                            formRef={codingFormRef}
                             defaultValues={{
                                 type: "CODING",
                                 title: lesson.title,
@@ -130,6 +145,17 @@ export function CodingLessonPanels({ lesson, lessonId, learningPathId, updateMut
                 lessonTitle={lesson.title}
                 onConfirm={handleDelete}
                 isPending={deleteMutation.isPending}
+            />
+            <CodingAiStudioDialog
+                lessonId={lessonId}
+                open={isAiOpen}
+                onOpenChange={setIsAiOpen}
+                onApplyProblem={(draft) => codingFormRef.current?.applyDraft(draft)}
+                onApplyStarterCode={(draft) => codingFormRef.current?.applyDraft({starterCode: draft.starterCode})}
+                onApplyEditorial={async (draft) => {
+                    await createEditorialMutation.mutateAsync({language: draft.language, sourceCode: draft.sourceCode});
+                    setRightTab("editorials");
+                }}
             />
         </div>
     );

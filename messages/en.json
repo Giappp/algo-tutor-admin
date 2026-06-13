@@ -44,9 +44,9 @@
     "totalUsers": "Registered Users",
     "totalUsersDesc": "Valid registered accounts",
     "activeSessions": "Active Sessions",
-    "activeSessionsDesc": "Currently online now",
+    "activeSessionsDesc": "Valid authenticated sessions",
     "totalLessons": "Total Lessons",
-    "totalLessonsDesc": "Theory & practical lessons",
+    "totalLessonsDesc": "Theory, coding, and quiz lessons",
     "totalEnrollments": "Total Enrollments",
     "totalEnrollmentsDesc": "Learning path enrollments",
     "totalSubmissions": "Coding Submissions",
@@ -71,8 +71,12 @@
     "apiQuotas": "Active API Quotas & Rate Limits",
     "apiQuotasDesc": "Real-time sliding window rate limiter state in active memory",
     "apiQuotasTitle": "API Quotas System (Sliding Window Limiters)",
-    "apiQuotasSubtitle": "Monitor in-memory rate limiters stored in Redis. The sliding window is updated on each new request, displaying remaining quota and time remaining until reset.",
-    "noActiveQuotasDesc": "No active IP addresses or user accounts are currently being rate-limited in Redis.",
+    "apiQuotasSubtitle": "Monitor the in-memory sliding window rate limiter directly. The table shows current usage and refreshes when each window expires.",
+    "noActiveQuotasDesc": "No accounts are currently present in an active rate limit window.",
+    "quotaSummary": "API quota summary",
+    "activeWindows": "Active windows",
+    "nearLimit": "Near limit",
+    "activeUsers": "Active users",
     "action": "Action",
     "user": "User",
     "usage": "Usage Ratio",
@@ -99,9 +103,14 @@
     "days": "{days} days",
     "seconds": "{seconds}s",
     "guest": "Guest",
-    "redisKey": "Redis Key",
+    "redisKey": "Rate limit key",
     "retryNow": "Retry Now",
+    "refreshData": "Refresh data",
+    "autoRefreshStatus": "Data refreshes automatically in real time",
+    "loadingData": "Loading dashboard data",
+    "loadErrorDescription": "Could not connect to the admin API. Check the backend service or try again.",
     "failedToLoad": "Failed to load dashboard data",
+    "noResults": "No data yet",
     "lessonsCount": "{count} lessons"
   },
   "learningPaths": {
@@ -274,6 +283,9 @@
       "contentTitle": "Lesson content",
       "contentDescription": "Write and preview the lesson in one place. Use a template only when it helps.",
       "contentPlaceholder": "Write the lesson in Markdown...",
+      "estimatedMinutes": "Estimated duration",
+      "estimatedMinutesDescription": "Minutes a learner may need to read and practice the content.",
+      "estimatedMinutesPlaceholder": "12",
       "replaceTemplateConfirm": "Replace the current lesson content with this template?",
       "templates": {
         "concept": {"label": "Concept", "description": "Idea, example, and takeaway"},
@@ -281,23 +293,193 @@
         "code-walkthrough": {"label": "Code walkthrough", "description": "Explain an implementation"}
       }
     },
-    "quiz": {
-      "detailsDescription": "Name the knowledge this assessment checks.",
-      "titlePlaceholder": "Arrays fundamentals check",
-      "rulesTitle": "Passing rules",
-      "rulesDescription": "Set a threshold and add a timer only when speed matters.",
-      "passingScore": "Passing score",
-      "passingDescription": "{score}% required to pass",
-      "timeLimit": "Time limit",
-      "timeDescription": "Leave blank for an untimed quiz",
-      "noLimit": "No limit"
+      "quiz": {
+        "detailsDescription": "Name the knowledge this assessment checks.",
+        "titlePlaceholder": "Arrays fundamentals check",
+        "rulesTitle": "Passing rules",
+        "rulesDescription": "Set a threshold and add a timer only when speed matters.",
+        "passingScore": "Passing score",
+        "passingDescription": "{score}% required to pass",
+        "timeLimit": "Time limit",
+        "timeDescription": "Leave blank for an untimed quiz",
+        "noLimit": "No limit"
+      },
+      "questions": {
+        "title": "Question bank",
+        "description": "Build a focused assessment and review the answer key at a glance.",
+        "generateWithAi": "Generate with AI",
+        "addQuestion": "Add question",
+        "summary": {
+          "questionLabel": "questions",
+          "pointLabel": "total points"
+        },
+        "empty": {
+          "title": "No questions yet",
+          "description": "Add the first question to start building this assessment. Each question can include multiple choices and answer explanations.",
+          "action": "Add first question"
+        },
+        "types": {
+          "SINGLE_CHOICE": "Single choice",
+          "MULTIPLE_CHOICE": "Multiple choice",
+          "TRUE_FALSE": "True / false"
+        },
+        "card": {
+          "points": "{count, plural, one {# point} other {# points}}",
+          "correctCount": "{correct}/{total} correct",
+          "edit": "Edit question",
+          "delete": "Delete question",
+          "explanation": "Explanation:"
+        },
+        "delete": {
+          "title": "Delete this question?",
+          "description": "This question and its answer choices will be permanently removed. This action cannot be undone.",
+          "cancel": "Keep question",
+          "confirm": "Delete question",
+          "deleting": "Deleting..."
+        },
+        "dialog": {
+          "createTitle": "Add a new question",
+          "createDescription": "Write the prompt, choose how answers are scored, and mark the correct choice.",
+          "editTitle": "Edit question",
+          "editDescription": "Update the prompt, score, choices, or explanation.",
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "saveChanges": "Save changes",
+          "addQuestion": "Add question"
+        },
+        "form": {
+          "contentTitle": "Question content",
+          "contentDescription": "Write the prompt and an optional explanation learners see after answering.",
+          "questionLabel": "Question",
+          "questionPlaceholder": "For example: What is the time complexity of binary search?",
+          "explanationLabel": "General explanation",
+          "optional": "Optional",
+          "explanationPlaceholder": "Explain why the correct answer is accurate...",
+          "explanationHint": "Keep it concise and focus on the key idea.",
+          "typeLabel": "Question type",
+          "typeDescription": "Choose whether learners select one or multiple correct answers.",
+          "singleChoice": "One correct answer",
+          "multipleChoice": "Multiple correct answers",
+          "pointsLabel": "Points",
+          "answersTitle": "Answer choices",
+          "multipleChoiceHint": "Mark every correct answer.",
+          "singleChoiceHint": "Mark one correct answer.",
+          "choiceCount": "{count, plural, one {# choice} other {# choices}}",
+          "markCorrect": "Mark answer {number} as correct",
+          "answerNumber": "Answer {number}",
+          "correct": "Correct",
+          "answerContent": "Answer text",
+          "answerPlaceholder": "Enter answer {number}",
+          "answerExplanation": "Choice explanation",
+          "answerExplanationPlaceholder": "Add a short explanation for this choice",
+          "removeAnswer": "Remove answer {number}",
+          "addAnswer": "Add answer choice"
+        },
+        "toast": {
+          "created": "Question added",
+          "updated": "Question updated",
+          "deleted": "Question deleted",
+          "aiAdded": "Added {count} AI-generated questions",
+          "aiAddFailed": "Some questions could not be added"
+        },
+        "aiGenerator": {
+          "title": "Generate questions from lessons",
+          "description": "Ground AI in selected theory lessons, give it a focused brief, then review every question before adding it.",
+          "sources": {
+            "title": "1. Choose source lessons",
+            "description": "Select one or more theory lessons from this learning path.",
+            "search": "Search lesson or topic...",
+            "select": "Select {title}",
+            "draft": "Draft",
+            "characters": "{count} chars",
+            "minutes": "{count} min",
+            "errorTitle": "Could not load theory lessons",
+            "retry": "Try again",
+            "emptyTitle": "No theory lessons available",
+            "emptyDescription": "Create theory content in this learning path before generating grounded questions."
+          },
+          "brief": {
+            "title": "2. Write the generation brief",
+            "description": "Control assessment depth and tell AI what learners should demonstrate.",
+            "noSources": "Select source lessons to establish the knowledge boundary.",
+            "provider": "AI provider",
+            "difficulty": "Difficulty",
+            "questionTypes": "Question types",
+            "count": "Number of questions",
+            "choices": "Choices per question",
+            "explanations": "Generate explanations",
+            "explanationsDescription": "Explain correct answers and useful distractors.",
+            "prompt": "Additional instructions",
+            "promptPlaceholder": "For example: Focus on conceptual understanding, include one scenario-based question, and avoid trivia...",
+            "promptHint": "AI must stay within the selected lesson content. Use this field to emphasize outcomes or exclusions."
+          },
+          "difficulty": {
+            "EASY": "Easy",
+            "MEDIUM": "Medium",
+            "HARD": "Hard"
+          },
+          "types": {
+            "SINGLE_CHOICE": "Single choice",
+            "MULTIPLE_CHOICE": "Multiple choice"
+          },
+          "review": {
+            "title": "3. Review generated questions",
+            "description": "AI drafted {count} questions. Deselect anything you do not want to import.",
+            "select": "Select generated question {number}",
+            "points": "{count, plural, one {# point} other {# points}}"
+          },
+          "actions": {
+            "cancel": "Cancel",
+            "generate": "Generate {count} questions",
+            "generating": "Reading lessons and drafting...",
+            "backToBrief": "Back to brief",
+            "addSelected": "Add selected ({count})",
+            "adding": "Adding questions..."
+          },
+          "validation": {
+            "sourceRequired": "Select at least one theory lesson.",
+            "typeRequired": "Select at least one question type.",
+            "questionRequired": "Select at least one generated question."
+          }
+        }
+      },
+      "ai": {
+      "trigger": "Generate AI draft",
+      "createTitle": "Start the content with AI",
+      "createDescription": "Complete the required fields, then create the lesson and open the AI composer.",
+      "createAction": "Create and write with AI",
+      "title": "Generate lesson draft with AI",
+      "description": "AI uses the current learning path and topic context to create a draft. Nothing is saved until you confirm it in the editor.",
+      "provider": "AI provider",
+      "prompt": "Content request",
+      "promptPlaceholder": "For example: Rewrite this for beginners, add a practical example, and keep the explanation concise...",
+      "promptHint": "Describe the learning goal, audience, and additions you need. AI cannot change the lesson type or order.",
+      "generating": "Generating draft...",
+      "generatingHint": "This may take several seconds. Your current lesson content remains unchanged.",
+      "generate": "Generate draft",
+      "generateAgain": "Generate again",
+      "applyDraft": "Apply to editor",
+      "contextUsed": "Context used",
+      "tokenUsage": "Token usage",
+      "providerMayOmitTokens": "Provider may omit token reporting",
+      "siblingLessons": "Sibling lessons",
+      "theoryStats": "{characters} Markdown characters",
+      "codingStats": "{constraints} constraints · {examples} examples · {hints} hints",
+      "quizStats": "{questions} draft questions",
+      "quizQuestionNotice": "Quiz metadata will be applied to the editor. Draft questions are added only after separate confirmation in the Questions tab.",
+      "questionsReady": "AI draft questions ready for review",
+      "questionsReadyDescription": "Review the draft before adding {count} questions.",
+      "addingQuestions": "Adding...",
+      "addQuestions": "Add {count} questions"
     },
-    "coding": {
+      "coding": {
       "sections": {"basic": "Problem", "constraints": "Limits and constraints", "examples": "Examples", "hints": "Hints", "starterCode": "Starter code"},
       "problemTitle": "Problem title",
       "problemTitleDescription": "Use a short, specific name.",
-      "problemTitlePlaceholder": "Two Sum",
-      "statement": "Problem statement",
+        "problemTitlePlaceholder": "Two Sum",
+        "aiDraftTitle": "Untitled coding challenge",
+        "aiDraftStatement": "Draft problem statement. Use AI Coding Studio to generate the complete problem.",
+        "statement": "Problem statement",
       "statementPlaceholder": "Describe the input, expected output, and task...",
       "timeLimit": "Time limit",
       "timeLimitDescription": "Maximum execution time in milliseconds",
@@ -341,7 +523,288 @@
         "dynamic-programming": {"label": "Dynamic programming", "category": "DP", "description": "Optimize with memoization or tabulation"},
         "graph-traversal": {"label": "Graph", "category": "Graph", "description": "Apply BFS or DFS to a graph"},
         "sorting-searching": {"label": "Binary search", "category": "Search", "description": "Search sorted data efficiently"}
+        }
+      },
+      "codingAi": {
+        "trigger": "AI coding studio",
+        "createTitle": "Continue in AI coding studio",
+        "createDescription": "Create the coding lesson first, then open the studio to draft the problem, editorial, or starter code.",
+        "createAction": "Create and open AI studio",
+        "title": "AI coding studio",
+        "description": "Generate and review problem content, editorial solutions, or starter code. Test cases are intentionally excluded.",
+        "sources": {
+          "title": "Choose knowledge sources",
+          "description": "Use theory lessons to ground terminology and expected concepts.",
+          "empty": "No theory lessons are available. AI can still use the current coding lesson and your prompt.",
+          "error": "Could not load theory lesson sources.",
+          "retry": "Try again"
+        },
+        "brief": {
+          "title": "Generation brief",
+          "description": "Choose one resource to draft and give AI specific constraints."
+        },
+        "asset": {
+          "label": "Resource to generate",
+          "PROBLEM": {
+            "label": "Problem content",
+            "description": "Statement, constraints, examples, and hints",
+            "prompt": "For example: Create an array problem for beginners. Use clear input/output rules and avoid advanced math..."
+          },
+          "EDITORIAL": {
+            "label": "Editorial solution",
+            "description": "Reference implementation and complexity",
+            "prompt": "For example: Prefer an O(n) solution and keep the implementation readable for learners..."
+          },
+          "STARTER_CODE": {
+            "label": "Starter code",
+            "description": "Consistent signatures across languages",
+            "prompt": "For example: Expose a solve method and include only the imports learners need..."
+          }
+        },
+        "provider": "AI provider",
+        "difficulty": "Difficulty",
+        "difficultyValue": {"EASY": "Easy", "MEDIUM": "Medium", "HARD": "Hard"},
+        "languages": "Languages",
+        "exampleCount": "Examples",
+        "hintCount": "Hints",
+        "prompt": "Additional instructions",
+        "promptHint": "AI also receives the current coding lesson. Generated content remains a draft until you apply it.",
+        "actions": {
+          "cancel": "Cancel",
+          "generate": "Generate draft",
+          "generating": "Generating...",
+          "back": "Back to brief",
+          "apply": "Apply draft"
+        },
+        "review": {
+          "problem": "Review problem content",
+          "editorial": "Review editorial solution",
+          "starter": "Review starter code",
+          "constraints": "Constraints",
+          "hints": "Hints",
+          "example": "Example {number}"
+        }
       }
+  },
+  "codingResources": {
+    "testCases": {
+      "title": "Test cases",
+      "description": "Upload input and expected-output pairs used by the judge to validate submissions.",
+      "add": "Add test case",
+      "addFirst": "Add first test case",
+      "emptyTitle": "No test cases yet",
+      "emptyDescription": "Add at least one input and expected-output pair before publishing this coding lesson.",
+      "loadError": "Could not load test cases",
+      "loadErrorDescription": "The judge resources could not be retrieved.",
+      "retry": "Try again",
+      "deleteConfirm": "Delete this test case? This action cannot be undone.",
+      "sample": "Visible sample",
+      "hidden": "Hidden judge case",
+      "weight": "{count} points",
+      "order": "Order {count}",
+      "edit": "Edit test case",
+      "delete": "Delete test case",
+      "moveUp": "Move test case up",
+      "moveDown": "Move test case down",
+      "inputFile": "Input file (.in)",
+      "outputFile": "Expected output (.out)",
+      "viewInput": "Open standard input",
+      "viewOutput": "Open expected output",
+      "summary": {
+        "total": "{count} total",
+        "samples": "{count} visible samples",
+        "hidden": "{count} hidden cases",
+        "weight": "{count} total points"
+      },
+      "dialog": {
+        "addTitle": "Add test case",
+        "editTitle": "Edit test case",
+        "description": "Upload a matching .in input file and .out expected-output file.",
+        "selectBothFiles": "Select both .in and .out files first.",
+        "requestingUpload": "Requesting secure upload credentials...",
+        "uploadingInput": "Uploading input file ({name})...",
+        "uploadingOutput": "Uploading output file ({name})...",
+        "uploadComplete": "Uploads completed",
+        "uploadSuccess": "Files uploaded successfully",
+        "uploadBothFirst": "Upload both input and output files before saving.",
+        "validationFailed": "Check the test case configuration and try again.",
+        "stored": "Uploaded and securely stored",
+        "ready": "{size} · Ready to upload",
+        "invalidInputExtension": "Input file must use the .in extension.",
+        "invalidOutputExtension": "Output file must use the .out extension.",
+        "selectInput": "Select or drag an input file (.in)",
+        "selectOutput": "Select or drag an output file (.out)",
+        "uploadFailed": "Upload failed",
+        "uploadFiles": "Upload judge files",
+        "configuration": "Judge configuration",
+        "scoreWeight": "Score weight",
+        "scoreWeightDescription": "Points contributed by this case.",
+        "sortOrder": "Sort order",
+        "sortOrderDescription": "Execution and presentation priority.",
+        "sample": "Visible sample case",
+        "sampleDescription": "Learners can see this input and output as an example.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveChanges": "Save changes"
+      },
+      "toast": {
+        "created": "Test case created",
+        "updated": "Test case updated",
+        "deleted": "Test case deleted"
+      }
+    },
+    "editorials": {
+      "title": "Editorial solutions",
+      "description": "Maintain reference implementations that explain valid approaches in each supported language.",
+      "add": "Add solution",
+      "addFirst": "Add first solution",
+      "emptyTitle": "No editorial solutions yet",
+      "emptyDescription": "Add a clear reference implementation so learners can review an approach after solving the challenge.",
+      "loadError": "Could not load editorial solutions",
+      "loadErrorDescription": "The reference implementations could not be retrieved.",
+      "retry": "Try again",
+      "deleteConfirm": "Delete this editorial solution? This action cannot be undone.",
+      "solutionTitle": "{language} solution",
+      "lines": "{count} lines",
+      "characters": "{count} characters",
+      "expand": "Expand code",
+      "collapse": "Collapse code",
+      "copy": "Copy code",
+      "copied": "Copied",
+      "edit": "Edit solution",
+      "delete": "Delete solution",
+      "addTitle": "Add editorial solution",
+      "editTitle": "Edit editorial solution",
+      "dialogDescription": "Write a reference implementation with syntax highlighting and autocomplete.",
+      "language": "Language",
+      "languageDescription": "Choose the runtime used by this reference implementation.",
+      "sourceCode": "Reference implementation",
+      "sourceCodeDescription": "Keep the solution clear, complete, and ready for learners to study.",
+      "ready": "Ready",
+      "unsavedChanges": "Unsaved changes",
+      "resetCode": "Reset code",
+      "copyFailed": "Could not copy the source code.",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saveChanges": "Save changes",
+      "toast": {
+        "created": "Editorial solution created",
+        "updated": "Editorial solution updated",
+        "deleted": "Editorial solution deleted"
+      }
+    }
+  },
+  "users": {
+    "administration": "Administration",
+    "title": "User directory",
+    "subtitle": "Manage account access, assign roles and review sign-in status.",
+    "createUser": "Create user",
+    "cancel": "Cancel",
+    "summary": "User summary",
+    "stats": {
+      "total": "Total accounts",
+      "visible": "On this page",
+      "active": "Active in view",
+      "privileged": "Privileged in view"
+    },
+    "searchLabel": "Search users",
+    "searchPlaceholder": "Search username or email...",
+    "clearSearch": "Clear search",
+    "sortUsers": "Sort users",
+    "refreshUsers": "Refresh users",
+    "activeView": "Active view",
+    "searchFilter": "Search: {search}",
+    "sortFilter": "Sort: {sort}",
+    "reset": "Reset",
+    "sort": {
+      "usernameAsc": "Username A-Z",
+      "usernameDesc": "Username Z-A",
+      "emailAsc": "Email A-Z",
+      "activeFirst": "Active first",
+      "blockedFirst": "Blocked first"
+    },
+    "table": {
+      "account": "Account",
+      "role": "Access role",
+      "status": "Status",
+      "note": "Account note"
+    },
+    "actions": "Actions",
+    "loadError": "Could not load users",
+    "tryAgain": "Try again",
+    "empty": {
+      "noMatches": "No matching users",
+      "noUsers": "No users yet",
+      "noMatchesDescription": "Try a different username or email.",
+      "noUsersDescription": "Create the first user to get started."
+    },
+    "avatarAlt": "{username}'s avatar",
+    "you": "You",
+    "status": {
+      "active": "Active",
+      "blocked": "Blocked"
+    },
+    "noRestrictions": "No account restrictions",
+    "actionsFor": "Actions for {username}",
+    "manageUser": "Manage {username}",
+    "changeRole": "Change role",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "roles": {
+      "USER": {"label": "User", "description": "Standard learning access"},
+      "EDITOR": {"label": "Editor", "description": "Can manage learning content"},
+      "ADMIN": {"label": "Admin", "description": "Full administrative access"}
+    },
+    "validation": {
+      "usernameRequired": "Username is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordRequirements": "Password does not meet all requirements",
+      "confirmPasswordRequired": "Confirm the password",
+      "passwordsMismatch": "Passwords do not match",
+      "blockReasonRequired": "A block reason is required"
+    },
+    "dialog": {
+      "createTitle": "Create a new user",
+      "createDescription": "Set up sign-in credentials and choose what this account can access.",
+      "credentialsTitle": "Sign-in credentials",
+      "credentialsDescription": "Identity and initial password",
+      "username": "Username",
+      "usernamePlaceholder": "e.g. minh.nguyen",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "passwordChecks": {
+        "length": "8-16 characters",
+        "case": "Upper and lowercase",
+        "numberSpecial": "Number and special character",
+        "noSpaces": "No spaces"
+      },
+      "accessTitle": "Access and status",
+      "accessDescription": "Choose the account permission level",
+      "role": "Role",
+      "enableAccount": "Enable account",
+      "enabledDescription": "This user can sign in as soon as the account is created.",
+      "disabledDescription": "Create the account without allowing sign-in yet.",
+      "creating": "Creating...",
+      "changeRoleTitle": "Change role",
+      "changeRoleDescription": "Update the access level for {username}.",
+      "updating": "Updating...",
+      "updateRole": "Update role",
+      "blockTitle": "Block user",
+      "blockDescription": "{username} will no longer be able to access the platform.",
+      "reason": "Reason",
+      "reasonPlaceholder": "Describe why this account is being blocked...",
+      "blocking": "Blocking..."
+    },
+    "toast": {
+      "created": "User created successfully",
+      "blocked": "{username} has been blocked",
+      "unblocked": "{username} has been unblocked",
+      "roleChanged": "{username}'s role is now {role}"
     }
   },
   "login": {

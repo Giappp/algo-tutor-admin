@@ -55,6 +55,7 @@ export function TheoryContentForm({
             type: "THEORY",
             title: "",
             content: "",
+            estimatedMinutes: undefined,
             difficulty: undefined,
             displayOrder: undefined,
             ...defaultValues,
@@ -116,6 +117,22 @@ export function TheoryContentForm({
                     onChange={(value) => setValue("difficulty", value, {shouldValidate: true, shouldDirty: true})}
                     disabled={isPending}
                 />
+                <FormField
+                    label={t("theory.estimatedMinutes")}
+                    error={errors.estimatedMinutes?.message}
+                    description={t("theory.estimatedMinutesDescription")}
+                >
+                    <Input
+                        id="theory-estimated-minutes"
+                        type="number"
+                        min={1}
+                        max={1440}
+                        placeholder={t("theory.estimatedMinutesPlaceholder")}
+                        disabled={isPending}
+                        className="max-w-xs"
+                        {...register("estimatedMinutes", {valueAsNumber: true})}
+                    />
+                </FormField>
             </LessonFormSection>
 
             <LessonFormSection

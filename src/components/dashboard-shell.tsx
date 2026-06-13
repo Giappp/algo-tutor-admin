@@ -19,8 +19,11 @@ export function DashboardShell({children}: {children: ReactNode}) {
                 <SiteHeader hideSidebarToggle={isLearningPathWorkspace}/>
                 <div className="flex flex-1">
                     {!isLearningPathWorkspace && <AppSidebar/>}
-                    <SidebarInset>
-                        <div className={cn(isLearningPathWorkspace ? "p-0" : "p-6")}>
+                    <SidebarInset className={cn(
+                        "border-l border-border/55",
+                        isLearningPathWorkspace ? "bg-background" : "bg-main-surface"
+                    )}>
+                        <div className={cn(isLearningPathWorkspace ? "p-0" : "p-4 sm:p-6 lg:p-8")}>
                             {children}
                         </div>
                     </SidebarInset>

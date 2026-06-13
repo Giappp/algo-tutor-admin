@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpenIcon, CodeIcon, FileQuestionIcon, X } from "lucide-react";
+import { BookOpenIcon, CodeIcon, FileQuestionIcon, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {cn} from "@/lib/utils";
-import { TheoryForm } from "@/components/learning-path/theory-form";
-import { CodingLessonForm } from "@/components/learning-path/coding-lesson-form";
-import { QuizForm } from "@/components/quiz/quiz-form";
+import { TheoryForm, type TheoryFormHandle } from "@/components/learning-path/theory-form";
+import { CodingLessonForm, type CodingLessonFormHandle } from "@/components/learning-path/coding-lesson-form";
+import { QuizForm, type QuizFormHandle } from "@/components/quiz/quiz-form";
 import { useCreateLesson } from "@/hooks/use-lessons";
 import { LessonType } from "@/types/learning-path";
 import { CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO } from "@/types/learning-path/schema";
@@ -40,8 +40,14 @@ export function CreateLessonInline({
     onCancel,
 }: CreateLessonInlineProps) {
     const t = useTranslations("learningPaths");
+    const tAi = useTranslations("lessonForm.ai");
+    const tCodingAi = useTranslations("lessonForm.codingAi");
     const createLessonMutation = useCreateLesson(topicId);
     const [selectedType, setSelectedType] = useState<LessonType | null>(null);
+    const createWithAiRef = useRef(false);
+    const theoryFormRef = useRef<TheoryFormHandle | null>(null);
+    const quizFormRef = useRef<QuizFormHandle | null>(null);
+    const codingFormRef = useRef<CodingLessonFormHandle | null>(null);
 
     const getLessonTypeDetails = (type: LessonType) => {
         switch (type) {
@@ -69,7 +75,35 @@ export function CreateLessonInline({
     const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
         const result = await createLessonMutation.mutateAsync(data as LessonRequestDTO);
         if (result && result.id) {
+            if (createWithAiRef.current) {
+                const key = selectedType === "CODING" ? `open-coding-ai-studio:${result.id}` : `open-ai-draft:${result.id}`;
+                sessionStorage.setItem(key, "true");
+            }
             onSuccess(result.id);
+        }
+    };
+
+    const handleCreateWithAi = async () => {
+        if (selectedType === "CODING" && codingFormRef.current) {
+            createWithAiRef.current = true;
+            try {
+                await codingFormRef.current.submitForAi();
+            } finally {
+                createWithAiRef.current = false;
+            }
+            return;
+        }
+
+        const formRef = selectedType === "THEORY"
+            ? theoryFormRef.current
+            : quizFormRef.current;
+        if (!formRef || !(await formRef.trigger())) return;
+
+        createWithAiRef.current = true;
+        try {
+            await formRef.submit();
+        } finally {
+            createWithAiRef.current = false;
         }
     };
 
@@ -131,8 +165,19 @@ export function CreateLessonInline({
                 </div>
             ) : (
                 <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-4 sm:p-5">
+                    <div className="mb-5 flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/[0.035] p-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-xs font-semibold">{selectedType === "CODING" ? tCodingAi("createTitle") : tAi("createTitle")}</p>
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">{selectedType === "CODING" ? tCodingAi("createDescription") : tAi("createDescription")}</p>
+                        </div>
+                        <Button type="button" variant="ai" size="sm" disabled={createLessonMutation.isPending} onClick={() => void handleCreateWithAi()}>
+                            <Sparkles className="size-4"/>
+                            {selectedType === "CODING" ? tCodingAi("createAction") : tAi("createAction")}
+                        </Button>
+                    </div>
                     {selectedType === "THEORY" && (
                         <TheoryForm
+                            formRef={theoryFormRef}
                             onSubmit={handleSubmit}
                             isPending={createLessonMutation.isPending}
                             submitLabel={getLessonTypeDetails("THEORY").submitLabel}
@@ -141,6 +186,7 @@ export function CreateLessonInline({
 
                     {selectedType === "QUIZ" && (
                         <QuizForm
+                            formRef={quizFormRef}
                             onSubmit={handleSubmit}
                             isPending={createLessonMutation.isPending}
                             submitLabel={getLessonTypeDetails("QUIZ").submitLabel}
@@ -149,6 +195,7 @@ export function CreateLessonInline({
 
                     {selectedType === "CODING" && (
                         <CodingLessonForm
+                            formRef={codingFormRef}
                             onSubmit={handleSubmit}
                             isPending={createLessonMutation.isPending}
                             submitLabel={getLessonTypeDetails("CODING").submitLabel}
