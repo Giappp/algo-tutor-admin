@@ -62,7 +62,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
         <>
             {groups.map((group) => (
                 <SidebarGroup key={group.label} className="py-1.5">
-                    <SidebarGroupLabel className="mb-1 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-sidebar-foreground/45">
+                    <SidebarGroupLabel className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70">
                         {group.label}
                     </SidebarGroupLabel>
                     <SidebarMenu className="gap-0.5">
@@ -80,7 +80,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                                         tooltip={item.title}
                                         data-active={active ? "true" : undefined}
                                         render={<Link href={item.url} />}
-                                        className="h-9 rounded-lg text-[13px] font-medium text-sidebar-foreground/72 hover:bg-white/75 hover:text-sidebar-accent-foreground dark:hover:bg-white/5 data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground data-active:shadow-sm data-active:shadow-blue-950/5"
+                                        className="h-9 rounded-lg text-[13px] font-medium text-white/90 hover:bg-white/10 hover:text-white data-active:bg-white/15 data-active:font-semibold data-active:text-white data-active:shadow-[inset_0_1px_0_oklch(1_0_0/0.1),0_8px_20px_-14px_oklch(0.05_0.08_250/0.9)] [&_svg]:text-white/75 data-active:[&_svg]:text-sidebar-primary"
                                     >
                                         {item.icon}
                                         <span>{item.title}</span>
@@ -89,7 +89,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                                         <>
                                             <SidebarMenuAction
                                                 render={<CollapsibleTrigger />}
-                                                className="aria-expanded:rotate-90"
+                                                className="text-white/55 hover:bg-white/10 hover:text-white aria-expanded:rotate-90"
                                             >
                                                 <ChevronRightIcon />
                                                 <span className="sr-only">Toggle</span>
@@ -103,7 +103,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                                                                 <SidebarMenuSubButton
                                                                     data-active={subActive ? "true" : undefined}
                                                                     render={<Link href={subItem.url} />}
-                                                                    className="text-sm h-7"
+                                                                    className="h-7 text-xs text-white/75 hover:bg-white/8 hover:text-white data-active:bg-transparent data-active:font-semibold data-active:text-white"
                                                                 >
                                                                     <span>{subItem.title}</span>
                                                                 </SidebarMenuSubButton>

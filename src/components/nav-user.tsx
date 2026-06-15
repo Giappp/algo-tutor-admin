@@ -16,13 +16,13 @@ export function NavUser() {
 
     return (
         <SidebarMenu className="gap-1">
-            <li className="mb-1 flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2 group-data-[collapsible=icon]:hidden">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent text-xs font-bold uppercase text-sidebar-accent-foreground ring-1 ring-sidebar-primary/10">
+            <li className="mb-1 flex min-w-0 items-center gap-2.5 rounded-xl border border-white/8 bg-white/6 px-3 py-2.5 group-data-[collapsible=icon]:hidden">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-xs font-bold uppercase text-sidebar-primary-foreground shadow-sm shadow-sky-300/15">
                     {username.slice(0, 2) || "AT"}
                 </div>
                 <div className="min-w-0 flex-1 leading-tight">
-                    <p className="truncate text-xs font-semibold text-sidebar-foreground">{username || t("account")}</p>
-                    <p className="truncate text-[10px] text-muted-foreground">{email}</p>
+                    <p className="truncate text-xs font-semibold text-white">{username || t("account")}</p>
+                    <p className="truncate text-[10px] text-white/60">{email}</p>
                 </div>
             </li>
             <SidebarMenuItem>
@@ -30,7 +30,7 @@ export function NavUser() {
                     tooltip={t("account")}
                     data-active={pathname === "/account" ? "true" : undefined}
                     render={<Link href="/account" />}
-                    className="h-9 text-[13px] font-medium text-sidebar-foreground/72 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground"
+                    className="h-9 text-[13px] font-medium text-white/88 hover:bg-white/10 hover:text-white data-active:bg-white/15 data-active:font-semibold data-active:text-white [&_svg]:text-white/72 data-active:[&_svg]:text-sidebar-primary"
                 >
                     <CircleUserRoundIcon/>
                     <span>{t("account")}</span>
@@ -41,7 +41,7 @@ export function NavUser() {
                     tooltip={t("logout")}
                     disabled={isLoggingOut}
                     onClick={() => logout()}
-                    className="h-9 text-[13px] text-muted-foreground hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
+                    className="h-9 text-[13px] text-white/72 hover:bg-red-400/15 hover:text-white"
                 >
                     {isLoggingOut ? <LoaderCircleIcon className="animate-spin"/> : <LogOutIcon/>}
                     <span>{isLoggingOut ? t("loggingOut") : t("logout")}</span>

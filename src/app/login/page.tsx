@@ -4,13 +4,13 @@ import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
     return (
-        <div className="relative min-h-svh flex items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-50 via-indigo-50/30 to-zinc-50 dark:from-zinc-950 dark:via-indigo-950/20 dark:to-zinc-950">
+        <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[linear-gradient(145deg,oklch(0.99_0.004_240),oklch(0.955_0.035_232),oklch(0.985_0.008_248))] dark:bg-[linear-gradient(145deg,oklch(0.15_0.025_248),oklch(0.19_0.055_240),oklch(0.16_0.03_252))]">
             {/* Decorative background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Large gradient blob top right */}
-                <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl" />
+                <div className="absolute -right-40 -top-40 size-96 rounded-full bg-gradient-to-br from-sky-500/15 via-blue-500/8 to-transparent blur-3xl" />
                 {/* Large gradient blob bottom left */}
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-tr from-purple-500/10 via-indigo-500/5 to-transparent blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 size-96 rounded-full bg-gradient-to-tr from-blue-600/12 via-cyan-500/6 to-transparent blur-3xl" />
                 {/* Subtle grid pattern */}
                 <div
                     className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"

@@ -3,6 +3,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
+import {
+    BookOpenText,
+    ImageIcon,
+    LockKeyhole,
+    Settings2,
+    Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,15 +39,49 @@ interface LearningPathFieldsProps {
     setValue: ReturnType<typeof useForm<LearningPathRequestDTO>>["setValue"];
 }
 
-function ErrorMessage({ message }: { message?: string | object }) {
+function ErrorMessage({ id, message }: { id?: string; message?: string | object }) {
     if (!message) return null;
 
     const text = typeof message === "string" ? message : "Invalid value";
 
     return (
-        <p className="mt-1 text-xs font-medium text-destructive">
+        <p id={id} role="alert" className="mt-1 text-xs font-medium text-destructive">
             {text}
         </p>
+    );
+}
+
+function FormSection({
+    icon,
+    title,
+    description,
+    children,
+    className,
+}: {
+    icon: ReactNode;
+    title: string;
+    description: string;
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <section
+            className={cn(
+                "min-w-0 rounded-xl border border-border/70 bg-card shadow-[0_12px_32px_-28px_oklch(0.45_0.12_240/0.45)]",
+                className
+            )}
+        >
+            <div className="flex items-start gap-3 border-b border-border/60 bg-primary/[0.025] px-4 py-4 sm:px-5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/8 text-primary">
+                    {icon}
+                </span>
+                <div className="min-w-0">
+                    <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{description}</p>
+                </div>
+            </div>
+            <div className="p-4 sm:p-5">{children}</div>
+        </section>
     );
 }
 
@@ -61,173 +103,143 @@ export function LearningPathFields({
         "w-full min-w-0 resize-y text-sm leading-relaxed";
 
     return (
-        <FieldGroup className="min-w-0 max-w-full gap-5">
-            {/* Name */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel htmlFor="name" className={labelClassName}>
-                    {t("fieldName")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <Input
-                        id="name"
-                        placeholder={t("fieldNamePlaceholder")}
-                        aria-invalid={!!errors.name}
-                        disabled={isPending}
-                        className={inputClassName}
-                        {...register("name")}
-                    />
-                    <ErrorMessage message={errors.name?.message} />
-                </FieldContent>
-            </Field>
-
-            {/* Description */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel htmlFor="description" className={labelClassName}>
-                    {t("fieldDescription")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <Textarea
-                        id="description"
-                        placeholder={t("fieldDescriptionPlaceholder")}
-                        className={cn(textareaClassName, "min-h-24")}
-                        aria-invalid={!!errors.description}
-                        disabled={isPending}
-                        {...register("description")}
-                    />
-                    <ErrorMessage message={errors.description?.message} />
-                </FieldContent>
-            </Field>
-
-            {/* Goal */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel htmlFor="goal" className={labelClassName}>
-                    {t("fieldGoal")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <Textarea
-                        id="goal"
-                        placeholder={t("fieldGoalPlaceholder")}
-                        className={cn(textareaClassName, "min-h-20")}
-                        aria-invalid={!!errors.goal}
-                        disabled={isPending}
-                        {...register("goal")}
-                    />
-                    <ErrorMessage message={errors.goal?.message} />
-                </FieldContent>
-            </Field>
-
-            {/* Level */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel className={labelClassName}>
-                    {t("fieldLevel")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <LevelSelect
-                        value={watch("level") as Level}
-                        onChange={(val) =>
-                            setValue("level", val, { shouldValidate: true })
-                        }
-                        disabled={isPending}
-                    />
-                    <ErrorMessage message={errors.level?.message} />
-                </FieldContent>
-            </Field>
-
-            {/* Cover Image */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel className={labelClassName}>
-                    {t("fieldCoverImage")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <div className="min-w-0 max-w-full overflow-x-clip rounded-xl">
-                        <ImageUpload
-                            value={thumbnailUrl || ""}
-                            onChange={(url) =>
-                                setValue("thumbnailUrl", url, {
-                                    shouldValidate: true,
-                                })
-                            }
-                            onRemove={() =>
-                                setValue("thumbnailUrl", "", {
-                                    shouldValidate: true,
-                                })
-                            }
-                            disabled={isPending}
-                            aspectRatio="video"
-                        />
-                    </div>
-
-                    <FieldDescription className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                        {t("fieldCoverImageDesc")}
-                    </FieldDescription>
-
-                    <ErrorMessage message={errors.thumbnailUrl?.message} />
-                </FieldContent>
-            </Field>
-
-            {/* Premium Toggle */}
-            <Field className="min-w-0 space-y-1.5">
-                <FieldLabel htmlFor="isPremium" className={labelClassName}>
-                    {t("fieldAccess")}
-                </FieldLabel>
-
-                <FieldContent className="min-w-0">
-                    <button
-                        id="isPremium"
-                        type="button"
-                        role="switch"
-                        aria-checked={isPremium ?? false}
-                        onClick={() =>
-                            setValue("isPremium", !isPremium, {
-                                shouldValidate: true,
-                            })
-                        }
-                        disabled={isPending}
-                        className={cn(
-                            "flex w-full min-w-0 items-center justify-between gap-4 rounded-lg border border-border bg-background p-3 text-left shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition-colors",
-                            "hover:border-foreground/25 active:scale-[0.99]",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                            "disabled:cursor-not-allowed disabled:opacity-50"
-                        )}
-                    >
-                        <span className="flex min-w-0 flex-col gap-0.5">
-                            <span className="truncate text-sm font-semibold text-foreground">
-                                {isPremium
-                                    ? t("fieldAccessPremium")
-                                    : t("fieldAccessFree")}
-                            </span>
-
-                            <span className="text-xs leading-relaxed text-muted-foreground">
-                                {t("fieldAccess")}
-                            </span>
-                        </span>
-
-                        <span
-                            className={cn(
-                                "relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors",
-                                isPremium
-                                    ? "bg-amber-400/90 dark:bg-amber-500/90"
-                                    : "bg-muted-foreground/20 dark:bg-muted-foreground/30"
-                            )}
-                        >
-                            <span
-                                className={cn(
-                                    "pointer-events-none inline-block size-5 rounded-full bg-white shadow-lg transition-transform",
-                                    isPremium ? "translate-x-5" : "translate-x-0"
-                                )}
+        <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.42fr)]">
+            <FormSection
+                icon={<BookOpenText className="size-4" />}
+                title={t("formContentTitle")}
+                description={t("formContentDescription")}
+            >
+                <FieldGroup className="min-w-0 max-w-full gap-5">
+                    <Field className="min-w-0 space-y-1.5">
+                        <FieldLabel htmlFor="name" className={labelClassName}>{t("fieldName")}</FieldLabel>
+                        <FieldContent className="min-w-0">
+                            <Input
+                                id="name"
+                                placeholder={t("fieldNamePlaceholder")}
+                                aria-invalid={!!errors.name}
+                                aria-describedby={errors.name ? "name-error" : undefined}
+                                disabled={isPending}
+                                className={cn(inputClassName, "h-11")}
+                                {...register("name")}
                             />
-                        </span>
-                    </button>
+                            <ErrorMessage id="name-error" message={errors.name?.message} />
+                        </FieldContent>
+                    </Field>
 
-                    <ErrorMessage message={errors.isPremium?.message} />
-                </FieldContent>
-            </Field>
-        </FieldGroup>
+                    <Field className="min-w-0 space-y-1.5">
+                        <FieldLabel htmlFor="description" className={labelClassName}>{t("fieldDescription")}</FieldLabel>
+                        <FieldContent className="min-w-0">
+                            <Textarea
+                                id="description"
+                                placeholder={t("fieldDescriptionPlaceholder")}
+                                className={cn(textareaClassName, "min-h-28")}
+                                aria-invalid={!!errors.description}
+                                aria-describedby={errors.description ? "description-error" : undefined}
+                                disabled={isPending}
+                                {...register("description")}
+                            />
+                            <ErrorMessage id="description-error" message={errors.description?.message} />
+                        </FieldContent>
+                    </Field>
+
+                    <Field className="min-w-0 space-y-1.5">
+                        <FieldLabel htmlFor="goal" className={labelClassName}>{t("fieldGoal")}</FieldLabel>
+                        <FieldContent className="min-w-0">
+                            <Textarea
+                                id="goal"
+                                placeholder={t("fieldGoalPlaceholder")}
+                                className={cn(textareaClassName, "min-h-28")}
+                                aria-invalid={!!errors.goal}
+                                aria-describedby={errors.goal ? "goal-error" : undefined}
+                                disabled={isPending}
+                                {...register("goal")}
+                            />
+                            <ErrorMessage id="goal-error" message={errors.goal?.message} />
+                        </FieldContent>
+                    </Field>
+                </FieldGroup>
+            </FormSection>
+
+            <div className="min-w-0 space-y-5 lg:sticky lg:top-5">
+                <FormSection
+                    icon={<ImageIcon className="size-4" />}
+                    title={t("formPresentationTitle")}
+                    description={t("formPresentationDescription")}
+                >
+                    <Field className="min-w-0 space-y-1.5">
+                        <FieldLabel className={labelClassName}>{t("fieldCoverImage")}</FieldLabel>
+                        <FieldContent className="min-w-0">
+                            <div className="min-w-0 max-w-full overflow-x-clip rounded-lg">
+                                <ImageUpload
+                                    value={thumbnailUrl || ""}
+                                    onChange={(url) => setValue("thumbnailUrl", url, {shouldValidate: true, shouldDirty: true})}
+                                    onRemove={() => setValue("thumbnailUrl", "", {shouldValidate: true, shouldDirty: true})}
+                                    disabled={isPending}
+                                    aspectRatio="video"
+                                />
+                            </div>
+                            <FieldDescription className="mt-1">{t("fieldCoverImageDesc")}</FieldDescription>
+                            <ErrorMessage message={errors.thumbnailUrl?.message} />
+                        </FieldContent>
+                    </Field>
+                </FormSection>
+
+                <FormSection
+                    icon={<Settings2 className="size-4" />}
+                    title={t("formSettingsTitle")}
+                    description={t("formSettingsDescription")}
+                >
+                    <FieldGroup className="min-w-0 max-w-full gap-5">
+                        <Field className="min-w-0 space-y-1.5">
+                            <FieldLabel className={labelClassName}>{t("fieldLevel")}</FieldLabel>
+                            <FieldContent className="min-w-0">
+                                <LevelSelect
+                                    value={watch("level") as Level}
+                                    onChange={(val) => setValue("level", val, {shouldValidate: true, shouldDirty: true})}
+                                    disabled={isPending}
+                                />
+                                <ErrorMessage message={errors.level?.message} />
+                            </FieldContent>
+                        </Field>
+
+                        <Field className="min-w-0 space-y-1.5">
+                            <FieldLabel htmlFor="isPremium" className={labelClassName}>{t("fieldAccess")}</FieldLabel>
+                            <FieldContent className="min-w-0">
+                                <button
+                                    id="isPremium"
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={isPremium ?? false}
+                                    onClick={() => setValue("isPremium", !isPremium, {shouldValidate: true, shouldDirty: true})}
+                                    disabled={isPending}
+                                    className={cn(
+                                        "flex w-full min-w-0 items-center gap-3 rounded-lg border p-3 text-left transition-all",
+                                        "border-border bg-background hover:border-primary/30 hover:bg-primary/[0.025] active:translate-y-px",
+                                        "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20",
+                                        isPremium && "border-primary/30 bg-primary/[0.045]",
+                                        "disabled:cursor-not-allowed disabled:opacity-50"
+                                    )}
+                                >
+                                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary">
+                                        {isPremium ? <Sparkles className="size-4" /> : <LockKeyhole className="size-4" />}
+                                    </span>
+                                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                        <span className="text-sm font-semibold text-foreground">{isPremium ? t("premium") : t("free")}</span>
+                                        <span className="text-xs leading-relaxed text-muted-foreground">
+                                            {isPremium ? t("fieldAccessPremium") : t("fieldAccessFree")}
+                                        </span>
+                                    </span>
+                                    <span className={cn("relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors", isPremium ? "bg-primary" : "bg-muted-foreground/25")}>
+                                        <span className={cn("pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm transition-transform", isPremium ? "translate-x-5" : "translate-x-0")} />
+                                    </span>
+                                </button>
+                                <ErrorMessage message={errors.isPremium?.message} />
+                            </FieldContent>
+                        </Field>
+                    </FieldGroup>
+                </FormSection>
+            </div>
+        </div>
     );
 }
 

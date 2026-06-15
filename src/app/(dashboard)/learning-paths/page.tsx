@@ -131,7 +131,7 @@ export default function LearningPathsPage() {
     return (
         <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto stagger-children">
             {/* Ambient Background Glows */}
-            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.55_0.22_272/0.04)_0%,transparent_70%)] pointer-events-none -z-10 animate-gradient-shift" />
+            <div className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 size-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.62_0.15_225/0.06)_0%,transparent_70%)] animate-gradient-shift" />
 
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5">
@@ -179,7 +179,7 @@ export default function LearningPathsPage() {
                     <Separator orientation="vertical" className="h-7 bg-border/40" />
 
                     <div className="flex items-center gap-2.5 text-xs">
-                        <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
+                        <div className="shrink-0 rounded-lg border border-blue-500/20 bg-blue-500/10 p-1.5 text-blue-700 dark:text-blue-300">
                             <BookOpenIcon className="size-4" />
                         </div>
                         <div className="flex flex-col">
@@ -191,7 +191,7 @@ export default function LearningPathsPage() {
                     <Separator orientation="vertical" className="h-7 bg-border/40" />
 
                     <div className="flex items-center gap-2.5 text-xs">
-                        <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
+                        <div className="shrink-0 rounded-lg border border-cyan-500/20 bg-cyan-500/10 p-1.5 text-cyan-700 dark:text-cyan-300">
                             <UsersIcon className="size-4" />
                         </div>
                         <div className="flex flex-col">
@@ -203,23 +203,23 @@ export default function LearningPathsPage() {
             )}
 
             {/* Toolbar: Search + Filters + View Toggle */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+            <div className="flex flex-col gap-3 rounded-xl border border-border/75 bg-card p-3 shadow-[0_10px_30px_-28px_oklch(0.42_0.12_240/0.35)] sm:flex-row sm:items-center sm:p-4">
                 <div className="relative flex-1">
                     <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/80 pointer-events-none" />
                     <Input
                         placeholder={t("searchPlaceholder")}
                         value={params.search ?? ""}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-10 h-10 rounded-xl bg-card border-border/40 focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all"
+                        className="h-10 rounded-lg border-input bg-background pl-10 transition-all focus:border-primary/60"
                     />
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
                     <Select
                         value={params.level ?? "ALL"}
                         onValueChange={(v) => handleLevelChange(v ?? "ALL")}
                     >
-                        <SelectTrigger className="w-36 h-10 rounded-xl bg-card border-border/40 font-semibold text-xs text-foreground/80">
+                        <SelectTrigger className="h-10 w-36 rounded-lg border-input bg-background text-xs font-medium text-foreground/80">
                             <SelectValue placeholder={t("allLevels")} />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border/40">
@@ -235,7 +235,7 @@ export default function LearningPathsPage() {
                         value={String(params.size ?? 10)}
                         onValueChange={(v) => handlePageSizeChange(Number(v ?? 10))}
                     >
-                        <SelectTrigger className="w-32 h-10 rounded-xl bg-card border-border/40 font-semibold text-xs text-foreground/80">
+                        <SelectTrigger className="h-10 w-32 rounded-lg border-input bg-background text-xs font-medium text-foreground/80">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border/40">
@@ -248,11 +248,11 @@ export default function LearningPathsPage() {
                     </Select>
 
                     {/* View Toggle */}
-                    <div className="flex items-center rounded-xl border border-border/40 bg-muted/40 p-0.5 shrink-0">
+                    <div className="flex shrink-0 items-center rounded-lg border border-border/70 bg-muted/35 p-0.5">
                         <button
                             onClick={() => setViewMode("list")}
                             className={`inline-flex items-center justify-center rounded-lg p-2 transition-all duration-200 ${viewMode === "list"
-                                ? "bg-background text-foreground shadow-sm font-bold border border-border/20"
+                                ? "border border-border/40 bg-card text-primary shadow-sm"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
                             aria-label="List view"
@@ -262,7 +262,7 @@ export default function LearningPathsPage() {
                         <button
                             onClick={() => setViewMode("grid")}
                             className={`inline-flex items-center justify-center rounded-lg p-2 transition-all duration-200 ${viewMode === "grid"
-                                ? "bg-background text-foreground shadow-sm font-bold border border-border/20"
+                                ? "border border-border/40 bg-card text-primary shadow-sm"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
                             aria-label="Grid view"
@@ -382,7 +382,7 @@ export default function LearningPathsPage() {
 
             {/* Pagination */}
             {data && data.totalPages > 1 && (
-                <div className="border border-border/40 rounded-2xl overflow-hidden bg-card/50 backdrop-blur-md shadow-sm">
+                <div className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_14px_40px_-32px_oklch(0.42_0.12_240/0.35)]">
                     <Pagination
                         meta={{
                             page: data.currentPage,

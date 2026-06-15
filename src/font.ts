@@ -1,13 +1,9 @@
-import { Sora, Plus_Jakarta_Sans } from "next/font/google";
+import {Be_Vietnam_Pro} from "next/font/google";
 
-export const sora = Sora({
-    variable: "--font-sora",
-    subsets: ["latin", "latin-ext"],
+export const beVietnamPro = Be_Vietnam_Pro({
+    variable: "--font-be-vietnam-pro",
+    subsets: ["latin", "latin-ext", "vietnamese"],
     weight: ["400", "500", "600", "700", "800"],
-});
-
-export const plusJakartaSans = Plus_Jakarta_Sans({
-    variable: "--font-jakarta",
-    subsets: ["latin", "latin-ext"],
-    weight: ["400", "500", "600", "700"],
+    display: "swap",
+    fallback: ["Arial", "sans-serif"],
 });

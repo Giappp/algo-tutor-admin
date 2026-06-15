@@ -46,8 +46,8 @@ export function Pagination({ meta, onPageChange, isLoading }: PaginationProps) {
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-border/30 bg-muted/10 backdrop-blur-sm">
-            <p className="text-xs font-semibold text-muted-foreground">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-border/60 bg-primary/[0.018] px-4 py-3 sm:flex-row sm:px-5">
+            <p className="text-xs font-medium text-muted-foreground">
                 {t("showing")}{" "}
                 <span className="font-bold font-mono text-foreground select-none">
                     {page * size + 1}
@@ -68,7 +68,7 @@ export function Pagination({ meta, onPageChange, isLoading }: PaginationProps) {
                     onClick={() => onPageChange(page - 1)}
                     disabled={!hasPrevious || isLoading}
                     aria-label="Previous page"
-                    className="size-8 rounded-lg hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border/20 shadow-sm"
+                    className="size-8 rounded-md border border-border/60 bg-card text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
                 >
                     <ChevronLeftIcon className="size-3.5" />
                 </Button>
@@ -87,8 +87,8 @@ export function Pagination({ meta, onPageChange, isLoading }: PaginationProps) {
                             disabled={isLoading}
                             className={`size-8 rounded-lg font-mono text-xs transition-all duration-150 ${
                                 p === page
-                                    ? "bg-primary text-primary-foreground shadow-sm font-bold border border-primary/20"
-                                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-transparent"
+                                    ? "border border-primary/20 bg-primary text-primary-foreground shadow-sm font-bold"
+                                    : "border border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                             }`}
                         >
                             {(p as number) + 1}
@@ -102,7 +102,7 @@ export function Pagination({ meta, onPageChange, isLoading }: PaginationProps) {
                     onClick={() => onPageChange(page + 1)}
                     disabled={!hasNext || isLoading}
                     aria-label="Next page"
-                    className="size-8 rounded-lg hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border/20 shadow-sm"
+                    className="size-8 rounded-md border border-border/60 bg-card text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
                 >
                     <ChevronRightIcon className="size-3.5" />
                 </Button>

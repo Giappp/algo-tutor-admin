@@ -2,16 +2,11 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { get, post } from "@/api/core/http";
-import { clearAuthenticated, setAuthenticated } from "@/store/authStore";
+import {AppError} from "@/api/core/api-error";
+import {clearAuthenticated, isAdminUser, setAuthenticated, UserPayload} from "@/store/authStore";
 import { LoginCredentials } from "@/types/auth/auth";
 import { SignInSchema } from "@/types/auth/schema";
 import { useRouter } from "next/navigation";
-
-type UserInfoResponse = {
-    userId: number;
-    email: string;
-    userName: string; // Note: API uses userName, Store uses username
-};
 
 export function useAuth() {
     const router = useRouter();
@@ -21,15 +16,25 @@ export function useAuth() {
         mutationFn: async (credentials: LoginCredentials) => {
             const body = SignInSchema.parse(credentials);
             await post("/api/v1/iam/signin", body);
-            return await get<UserInfoResponse>("/api/v1/iam/me");
+            const userInfo = await get<UserPayload>("/api/v1/iam/me");
+
+            if (!isAdminUser(userInfo)) {
+                try {
+                    await post("/api/v1/iam/logout");
+                } finally {
+                    throw new AppError("Chỉ tài khoản ADMIN mới được phép truy cập.", 403);
+                }
+            }
+
+            return userInfo;
         },
         onSuccess: (userInfo) => {
-            setAuthenticated({
-                userId: userInfo.userId,
-                email: userInfo.email,
-                username: userInfo.userName,
-            });
-            router.push("/");
+            setAuthenticated(userInfo);
+            router.replace("/");
+        },
+        onError: () => {
+            clearAuthenticated();
+            queryClient.clear();
         },
     });
 
@@ -52,8 +57,7 @@ export function useAuth() {
     });
 
     return {
-        // Switched to mutate for consistency and to avoid unhandled promise rejections
-        login: loginMutation.mutate,
+        login: loginMutation.mutateAsync,
         loginError: loginMutation.error,
         isLoggingIn: loginMutation.isPending,
         logout: logoutMutation.mutate,

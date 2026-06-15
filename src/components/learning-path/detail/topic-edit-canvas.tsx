@@ -77,10 +77,10 @@ export function TopicEditCanvas({
             <div className="absolute inset-0 noise-overlay opacity-[0.005] pointer-events-none" />
 
             {/* Topic Dashboard Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-transparent p-6 border border-indigo-500/10 shadow-sm">
+            <div className="relative overflow-hidden rounded-2xl border border-blue-500/10 bg-gradient-to-br from-blue-500/7 via-sky-500/5 to-transparent p-6 shadow-sm">
                 <div className="relative flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="size-12 rounded-xl bg-background/90 backdrop-blur-sm shadow-sm border border-border/50 flex items-center justify-center text-indigo-500 shrink-0">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-background/90 text-primary shadow-sm backdrop-blur-sm">
                             <BookOpen className="size-6" />
                         </div>
                         <div className="min-w-0">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { plusJakartaSans, sora } from "@/font";
+import {beVietnamPro} from "@/font";
 import { QueryProvider } from "@/components/shared/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NextIntlClientProvider } from "next-intl";
@@ -24,7 +24,7 @@ export default async function RootLayout({
     return (
         <html
             lang={locale} suppressHydrationWarning
-            className={cn("font-sans antialiased", sora.variable, plusJakartaSans.variable)}
+            className={cn("font-sans antialiased", beVietnamPro.variable)}
         >
             <body>
                 <NextIntlClientProvider messages={messages}>

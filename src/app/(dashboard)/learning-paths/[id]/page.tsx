@@ -130,9 +130,9 @@ export default function LearningPathDetailPage() {
     };
 
     return (
-        <div className="flex min-h-[calc(100dvh-var(--header-height))] w-full flex-col gap-4 p-3 sm:p-4 xl:p-5 stagger-children">
+        <div className="flex min-h-[calc(100dvh-3rem)] w-full flex-col gap-4 p-3 sm:p-4 xl:p-5 stagger-children">
             {/* Ambient Background Glows */}
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.55_0.22_272/0.03)_0%,transparent_70%)] pointer-events-none -z-10 animate-gradient-shift" />
+            <div className="pointer-events-none absolute left-[-10%] top-[-10%] -z-10 size-[500px] rounded-full bg-[radial-gradient(circle,oklch(0.62_0.15_225/0.05)_0%,transparent_70%)] animate-gradient-shift" />
 
             {/* Workspace Title & Quick Stats */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-5">
@@ -165,7 +165,7 @@ export default function LearningPathDetailPage() {
             {/* Workspace Layout */}
             <div className="grid flex-1 grid-cols-1 items-start gap-4 lg:grid-cols-[19rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
                 {/* Left Column: Outline Tree Sidebar */}
-                <div className="relative flex min-h-[550px] flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/60 shadow-sm backdrop-blur-md lg:sticky lg:top-[calc(var(--header-height)+1rem)] lg:max-h-[calc(100dvh-var(--header-height)-2rem)]">
+                <div className="relative flex min-h-[550px] flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/60 shadow-sm backdrop-blur-md lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)]">
                     <div className="absolute inset-0 noise-overlay opacity-[0.01] pointer-events-none" />
                     <OutlineTreeSidebar
                         topics={lp.topics ?? []}
@@ -180,7 +180,7 @@ export default function LearningPathDetailPage() {
                 </div>
 
                 {/* Right Column: Editor Canvas */}
-                <div className="relative flex min-h-[650px] min-w-0 flex-col overflow-y-auto rounded-2xl border border-border/40 bg-card p-4 shadow-sm sm:p-5 xl:p-6 lg:max-h-[calc(100dvh-var(--header-height)-2rem)]">
+                <div className="relative flex min-h-[650px] min-w-0 flex-col overflow-y-auto rounded-2xl border border-border/40 bg-card p-4 shadow-sm sm:p-5 xl:p-6 lg:max-h-[calc(100dvh-2rem)]">
                     <div className="absolute inset-0 noise-overlay opacity-[0.01] pointer-events-none" />
                     {activeItem.type === "path" && (
                         <div className="space-y-6 flex-1">

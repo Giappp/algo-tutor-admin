@@ -16,6 +16,7 @@ import {
 import {THEORY_TEMPLATES} from "@/components/learning-path/theory-templates";
 import {MarkdownSplitEditor} from "@/components/ui/markdown-split-editor";
 import {useLessonFormAutosave} from "@/hooks/use-lesson-form-autosave";
+import {useGenerateLessonContent} from "@/hooks/use-admin-ai-lesson";
 import {CreateTheoryLessonSchema, type TheoryLessonDTO} from "@/types/learning-path/schema";
 
 export type TheoryContentFormHandle = {
@@ -30,6 +31,7 @@ interface TheoryContentFormProps {
     enableAutosave?: boolean;
     submitLabel?: string;
     formRef?: React.RefObject<TheoryContentFormHandle | null>;
+    lessonId?: number;
 }
 
 export function TheoryContentForm({
@@ -39,10 +41,12 @@ export function TheoryContentForm({
     enableAutosave = false,
     submitLabel,
     formRef: externalFormRef,
+    lessonId,
 }: TheoryContentFormProps) {
     const t = useTranslations("lessonForm");
     const internalFormRef = useRef<TheoryContentFormHandle | null>(null);
     const formRef = externalFormRef ?? internalFormRef;
+    const aiMutation = useGenerateLessonContent(lessonId ?? 0, "THEORY");
     const {
         register,
         handleSubmit,
@@ -168,6 +172,20 @@ export function TheoryContentForm({
                         placeholder={t("theory.contentPlaceholder")}
                         disabled={isPending}
                         minHeight="500px"
+                        onAiGenerate={lessonId ? async ({prompt, content: currentContent, selection}) => {
+                            const context = selection || currentContent;
+                            const result = await aiMutation.mutateAsync({
+                                prompt: [
+                                    prompt,
+                                    "",
+                                    selection
+                                        ? "Only rewrite or expand the selected Markdown excerpt below. Return the replacement as the lesson content."
+                                        : "Revise the current Markdown lesson according to the request.",
+                                    context.slice(0, 3000),
+                                ].join("\n").slice(0, 5000),
+                            });
+                            return result.content.type === "THEORY" ? result.content.content : currentContent;
+                        } : undefined}
                     />
                 </FormField>
             </LessonFormSection>

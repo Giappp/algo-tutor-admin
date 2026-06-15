@@ -60,13 +60,13 @@ function getActivityLabel(type: ActivityItem["type"]) {
 function getActivityTypeColor(type: ActivityItem["type"]) {
   switch (type) {
     case "problem":
-      return "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+      return "bg-blue-500/10 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
     case "user":
       return "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
     case "model":
       return "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
     case "tag":
-      return "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
+      return "bg-cyan-500/10 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300"
     default:
       return "bg-zinc-500/10 text-zinc-600 dark:bg-zinc-500/20 dark:text-zinc-400"
   }
@@ -109,7 +109,7 @@ export function RecentActivityTable({ title, activities, icon: Icon }: RecentAct
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5 max-w-xs">
-                      <span className="font-medium text-sm text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.title}</span>
+                      <span className="text-sm font-medium text-foreground transition-colors group-hover:text-primary">{item.title}</span>
                       <span className="text-xs text-muted-foreground truncate">
                         {item.description}
                       </span>

@@ -109,12 +109,12 @@ export function LearningPathTable({
                 accessorKey: "name",
                 header: t("pathName"),
                 cell: ({ row }) => (
-                    <div className="flex flex-col gap-1 min-w-[220px] max-w-[320px]">
-                        <span className="font-semibold text-xs sm:text-sm text-foreground leading-tight group-hover:text-primary transition-colors">
+                    <div className="flex min-w-[220px] max-w-[340px] flex-col gap-1">
+                        <span className="text-sm font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
                             {row.original.name}
                         </span>
                         {row.original.description && (
-                            <span className="text-[11px] text-muted-foreground line-clamp-1">
+                            <span className="line-clamp-1 text-xs text-muted-foreground">
                                 {row.original.description}
                             </span>
                         )}
@@ -129,7 +129,7 @@ export function LearningPathTable({
                     const levelClass = LEVEL_COLORS[row.original.level];
                     return (
                         <span
-                            className={`inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${levelClass}`}
+                            className={`inline-flex items-center rounded-md border px-2 py-1 text-[10px] font-semibold ${levelClass}`}
                         >
                             {getLevelText(row.original.level)}
                         </span>
@@ -141,17 +141,17 @@ export function LearningPathTable({
                 header: t("content"),
                 size: 180,
                 cell: ({ row }) => (
-                    <div className="flex items-center gap-3 text-[11px] font-semibold text-muted-foreground">
-                        <span className="inline-flex items-center gap-1" title={t("topicsCountTitle")}>
-                            <LayersIcon className="size-3.5" />
+                    <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5" title={t("topicsCountTitle")}>
+                            <LayersIcon className="size-3.5 text-primary/65" />
                             {row.original.topicCount}
                         </span>
-                        <span className="inline-flex items-center gap-1" title={t("lessons")}>
-                            <BookOpenIcon className="size-3.5" />
+                        <span className="inline-flex items-center gap-1.5" title={t("lessons")}>
+                            <BookOpenIcon className="size-3.5 text-primary/65" />
                             {row.original.publishedLessonCount}/{row.original.totalLessonCount}
                         </span>
-                        <span className="inline-flex items-center gap-1" title={t("enrollments")}>
-                            <UsersIcon className="size-3.5" />
+                        <span className="inline-flex items-center gap-1.5" title={t("enrollments")}>
+                            <UsersIcon className="size-3.5 text-primary/65" />
                             {row.original.enrollmentCount}
                         </span>
                     </div>
@@ -163,12 +163,12 @@ export function LearningPathTable({
                 size: 110,
                 cell: ({ row }) =>
                     row.original.isPublished ? (
-                        <Badge className="bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 text-[10px] font-bold py-0.5 rounded-lg">
+                        <Badge className="rounded-md border border-emerald-500/20 bg-emerald-500/10 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">
                             <GlobeIcon className="mr-1 size-3" />
                             {t("published")}
                         </Badge>
                     ) : (
-                        <Badge variant="secondary" className="text-muted-foreground text-[10px] font-bold py-0.5 rounded-lg border border-border/20 bg-muted/50">
+                        <Badge variant="secondary" className="rounded-md border border-border/50 bg-muted/45 py-1 text-[10px] font-semibold text-muted-foreground">
                             {t("draft")}
                         </Badge>
                     ),
@@ -178,12 +178,12 @@ export function LearningPathTable({
                 header: () => <span className="sr-only">Actions</span>,
                 size: 140,
                 cell: ({ row }) => (
-                    <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1 opacity-70 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100" onClick={(e) => e.stopPropagation()}>
                         {/* Preview */}
                         <Button
                             variant="ghost"
                             size="icon-sm"
-                            className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg size-8 transition-colors"
+                            className="size-8 rounded-md text-muted-foreground transition-colors hover:bg-primary/8 hover:text-primary"
                             onClick={() => onPreview?.(row.original)}
                             title={t("preview")}
                         >
@@ -196,8 +196,8 @@ export function LearningPathTable({
                             size="icon-sm"
                             className={
                                 row.original.isPublished
-                                    ? "text-emerald-600 hover:text-amber-600 hover:bg-amber-500/10 dark:text-emerald-400 dark:hover:text-amber-400 rounded-lg size-8"
-                                    : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg size-8"
+                                    ? "size-8 rounded-md text-emerald-600 hover:bg-amber-500/10 hover:text-amber-600 dark:text-emerald-400 dark:hover:text-amber-400"
+                                    : "size-8 rounded-md text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400"
                             }
                             onClick={() => onTogglePublish(row.original.id)}
                             title={row.original.isPublished ? t("unpublish") : t("publish")}
@@ -209,7 +209,7 @@ export function LearningPathTable({
                         <DropdownMenu>
                             <DropdownMenuTrigger
                                 render={
-                                    <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:bg-muted rounded-lg size-8" />
+                                    <Button variant="ghost" size="icon-sm" className="size-8 rounded-md text-muted-foreground hover:bg-muted" />
                                 }
                             >
                                 <MoreHorizontal className="size-4" />
@@ -246,12 +246,12 @@ export function LearningPathTable({
 
     if (isLoading) {
         return (
-            <div className="border border-border/40 rounded-2xl overflow-hidden bg-card shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_14px_40px_-32px_oklch(0.42_0.12_240/0.35)]">
                 <Table>
-                    <TableHeader className="bg-muted/50 border-b border-border/30">
+                    <TableHeader>
                         <TableRow className="hover:bg-transparent">
                             {Array.from({ length: 6 }).map((_, i) => (
-                                <TableHead key={i} className="py-4 pl-6">
+                                <TableHead key={i}>
                                     <div className="h-4 w-20 rounded-md bg-muted animate-pulse" />
                                 </TableHead>
                             ))}
@@ -259,9 +259,9 @@ export function LearningPathTable({
                     </TableHeader>
                     <TableBody>
                         {Array.from({ length: 5 }).map((_, i) => (
-                            <TableRow key={i} className="border-b border-border/20 last:border-0">
+                            <TableRow key={i}>
                                 {Array.from({ length: 6 }).map((_, j) => (
-                                    <TableCell key={j} className="py-4 pl-6">
+                                    <TableCell key={j}>
                                         <div className="h-4 w-24 rounded-md bg-muted animate-pulse" />
                                     </TableCell>
                                 ))}
@@ -275,9 +275,8 @@ export function LearningPathTable({
 
     if (data.length === 0) {
         return (
-            <div className="border border-border/40 rounded-2xl p-12 text-center bg-card shadow-sm relative overflow-hidden flex flex-col items-center">
-                <div className="absolute inset-0 noise-overlay opacity-[0.012] pointer-events-none" />
-                <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-muted border border-border/30 text-muted-foreground/80 shadow-inner">
+            <div className="relative flex flex-col items-center overflow-hidden rounded-xl border border-dashed border-border bg-card p-12 text-center">
+                <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-xl border border-primary/15 bg-primary/7 text-primary">
                     <Globe className="size-6" />
                 </div>
                 <p className="text-base font-bold text-foreground">{t("noLearningPathsFound")}</p>
@@ -298,17 +297,15 @@ export function LearningPathTable({
     }
 
     return (
-        <div className="border border-border/40 rounded-2xl overflow-hidden bg-card shadow-sm relative">
-            <div className="absolute inset-0 noise-overlay opacity-[0.01]" pointer-events-none="true" />
+        <div className="relative overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_14px_40px_-32px_oklch(0.42_0.12_240/0.35)]">
             <Table>
-                <TableHeader className="bg-muted/50 border-b border-border/30">
+                <TableHeader>
                     {table.getHeaderGroups().map((hg) => (
                         <TableRow key={hg.id} className="hover:bg-transparent">
                             {hg.headers.map((header) => (
                                 <TableHead
                                     key={header.id}
                                     style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
-                                    className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80 h-11 pl-6"
                                 >
                                     {header.isPlaceholder
                                         ? null
@@ -322,13 +319,20 @@ export function LearningPathTable({
                     {table.getRowModel().rows.map((row) => (
                         <TableRow
                             key={row.id}
-                            className="group cursor-pointer transition-colors hover:bg-muted/30 border-b border-border/20 last:border-0"
+                            data-state={selectedIds.includes(row.original.id) ? "selected" : undefined}
+                            className="group cursor-pointer outline-none focus-visible:bg-primary/[0.045] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/25"
+                            tabIndex={0}
                             onClick={() => router.push(`/learning-paths/${row.original.id}`)}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    router.push(`/learning-paths/${row.original.id}`);
+                                }
+                            }}
                         >
                             {row.getVisibleCells().map((cell) => (
                                 <TableCell
                                     key={cell.id}
-                                    className="py-4 pl-6"
                                     onClick={
                                         cell.column.id === "select" || cell.column.id === "actions"
                                             ? (e) => e.stopPropagation()

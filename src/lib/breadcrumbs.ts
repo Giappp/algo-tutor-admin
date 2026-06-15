@@ -4,71 +4,46 @@ export interface BreadcrumbItem {
 }
 
 const BREADCRUMB_MAP: Record<string, BreadcrumbItem[]> = {
-  "/dashboard": [{ label: "Dashboard" }],
-  "/dashboard/learning-paths": [
-    { label: "Dashboard", href: "/dashboard" },
+  "/": [{ label: "Dashboard" }],
+  "/learning-paths": [
+    { label: "Dashboard", href: "/" },
     { label: "Learning Paths" },
   ],
-  "/dashboard/learning-paths/create": [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Learning Paths", href: "/dashboard/learning-paths" },
+  "/learning-paths/create": [
+    { label: "Dashboard", href: "/" },
+    { label: "Learning Paths", href: "/learning-paths" },
     { label: "Create" },
   ],
-  "/dashboard/problems": [{ label: "Dashboard", href: "/dashboard" }, { label: "Problems" }],
-  "/dashboard/problems/create": [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Problems", href: "/dashboard/problems" },
-    { label: "Create" },
-  ],
-  "/dashboard/tags": [{ label: "Dashboard", href: "/dashboard" }, { label: "Tags" }],
-  "/dashboard/analytics": [{ label: "Dashboard", href: "/dashboard" }, { label: "Analytics" }],
-  "/dashboard/users": [{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }],
-  "/dashboard/models": [{ label: "Dashboard", href: "/dashboard" }, { label: "AI Models" }],
-  "/dashboard/settings": [{ label: "Dashboard", href: "/dashboard" }, { label: "Settings" }],
+  "/users": [{ label: "Dashboard", href: "/" }, { label: "Users" }],
+  "/models": [{ label: "Dashboard", href: "/" }, { label: "AI Models" }],
+  "/settings": [{ label: "Dashboard", href: "/" }, { label: "Settings" }],
   "/account": [{ label: "Dashboard", href: "/" }, { label: "Account" }],
-  "/dashboard/playground": [{ label: "Dashboard", href: "/dashboard" }, { label: "Playground" }],
 }
 
 const DYNAMIC_PATTERNS: Array<{ pattern: RegExp; build: (matches: string[]) => BreadcrumbItem[] }> = [
   {
-    pattern: /^\/dashboard\/learning-paths\/(\d+)$/,
+    pattern: /^\/learning-paths\/(\d+)$/,
     build: () => [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Learning Paths", href: "/dashboard/learning-paths" },
+      { label: "Dashboard", href: "/" },
+      { label: "Learning Paths", href: "/learning-paths" },
       { label: "Details" },
     ],
   },
   {
-    pattern: /^\/dashboard\/learning-paths\/(\d+)\/lessons\/(\d+)$/,
+    pattern: /^\/learning-paths\/(\d+)\/lessons\/(\d+)$/,
     build: () => [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Learning Paths", href: "/dashboard/learning-paths" },
+      { label: "Dashboard", href: "/" },
+      { label: "Learning Paths", href: "/learning-paths" },
       { label: "Lesson" },
     ],
   },
   {
-    pattern: /^\/dashboard\/learning-paths\/(\d+)\/topics\/(\d+)\/lessons\/create$/,
+    pattern: /^\/learning-paths\/(\d+)\/topics\/(\d+)\/lessons\/create$/,
     build: (matches) => [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Learning Paths", href: "/dashboard/learning-paths" },
-      { label: "Details", href: `/dashboard/learning-paths/${matches[1]}` },
+      { label: "Dashboard", href: "/" },
+      { label: "Learning Paths", href: "/learning-paths" },
+      { label: "Details", href: `/learning-paths/${matches[1]}` },
       { label: "Add Lesson" },
-    ],
-  },
-  {
-    pattern: /^\/dashboard\/problems\/([^/]+)$/,
-    build: () => [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Problems", href: "/dashboard/problems" },
-      { label: "Edit" },
-    ],
-  },
-  {
-    pattern: /^\/dashboard\/users\/([^/]+)$/,
-    build: (matches) => [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Users", href: "/dashboard/users" },
-      { label: matches[1] ?? "Details" },
     ],
   },
 ]

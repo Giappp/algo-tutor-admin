@@ -7,7 +7,7 @@ export function LessonPageSkeleton() {
     return (
         <div className="flex flex-col gap-6">
             {/* Header skeleton */}
-            <div className="rounded-2xl bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-transparent p-6">
+            <div className="rounded-2xl bg-gradient-to-br from-blue-500/7 via-sky-500/5 to-transparent p-6">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
                         <Skeleton className="size-10 rounded-xl"/>

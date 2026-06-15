@@ -1,72 +1,29 @@
 "use client";
 
+import {Check, Gauge, GraduationCap, Sprout} from "lucide-react";
+import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
 import {Level} from "@/types/learning-path";
 
 const LEVEL_OPTIONS: {
     value: Level;
-    label: string;
-    description: string;
-    icon: React.ReactNode;
-    iconBg: string;
-    iconColor: string;
-    borderColor: string;
-    activeBg: string;
+    translationKey: "beginner" | "intermediate" | "advanced";
+    icon: typeof Sprout;
 }[] = [
     {
         value: "BEGINNER",
-        label: "Beginner",
-        description: "New to the topic",
-        icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                 strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4"/>
-                <path d="M12 8h.01"/>
-            </svg>
-        ),
-        iconBg: "bg-emerald-100 dark:bg-emerald-900/50",
-        iconColor: "text-emerald-600 dark:text-emerald-400",
-        borderColor: "data-[state=on]:border-emerald-500/60",
-        activeBg: "data-[state=on]:bg-emerald-50 dark:data-[state=on]:bg-emerald-950/40",
+        translationKey: "beginner",
+        icon: Sprout,
     },
     {
         value: "INTERMEDIATE",
-        label: "Intermediate",
-        description: "Some experience",
-        icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                 strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v4"/>
-                <path d="M12 18v4"/>
-                <path d="M4.93 4.93l2.83 2.83"/>
-                <path d="M16.24 16.24l2.83 2.83"/>
-                <path d="M2 12h4"/>
-                <path d="M18 12h4"/>
-                <path d="M4.93 19.07l2.83-2.83"/>
-                <path d="M16.24 7.76l2.83-2.83"/>
-            </svg>
-        ),
-        iconBg: "bg-amber-100 dark:bg-amber-900/50",
-        iconColor: "text-amber-600 dark:text-amber-400",
-        borderColor: "data-[state=on]:border-amber-500/60",
-        activeBg: "data-[state=on]:bg-amber-50 dark:data-[state=on]:bg-amber-950/40",
+        translationKey: "intermediate",
+        icon: Gauge,
     },
     {
         value: "ADVANCED",
-        label: "Advanced",
-        description: "Expert level",
-        icon: (
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                 strokeLinecap="round" strokeLinejoin="round">
-                <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-        ),
-        iconBg: "bg-rose-100 dark:bg-rose-900/50",
-        iconColor: "text-rose-600 dark:text-rose-400",
-        borderColor: "data-[state=on]:border-rose-500/60",
-        activeBg: "data-[state=on]:bg-rose-50 dark:data-[state=on]:bg-rose-950/40",
+        translationKey: "advanced",
+        icon: GraduationCap,
     },
 ];
 
@@ -78,42 +35,43 @@ interface LevelSelectProps {
 }
 
 export function LevelSelect({value, onChange, disabled, className}: LevelSelectProps) {
+    const t = useTranslations("learningPaths");
+
     return (
-        <div className={cn("grid w-full grid-cols-3 gap-3", className)}>
-            {LEVEL_OPTIONS.map((opt) => (
-                <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => !disabled && onChange(opt.value)}
-                    disabled={disabled}
-                    aria-pressed={value === opt.value}
-                    aria-label={`${opt.label}: ${opt.description}`}
-                    data-state={value === opt.value ? "on" : "off"}
-                    className={cn(
-                        "relative flex flex-col items-center justify-center gap-2 rounded-lg border py-3.5 px-2 cursor-pointer transition-all duration-200",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        "data-[state=off]:border-border data-[state=off]:bg-background hover:border-foreground/25",
-                        opt.borderColor,
-                        opt.activeBg,
-                        disabled && "opacity-50 cursor-not-allowed"
-                    )}
-                >
-                    <div
+        <div role="radiogroup" aria-label={t("fieldLevel")} className={cn("grid w-full gap-2", className)}>
+            {LEVEL_OPTIONS.map((opt) => {
+                const selected = value === opt.value;
+                const Icon = opt.icon;
+
+                return (
+                    <button
+                        key={opt.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => !disabled && onChange(opt.value)}
+                        disabled={disabled}
                         className={cn(
-                            "flex size-10 items-center justify-center rounded-md transition-transform duration-200",
-                            opt.iconBg,
-                            opt.iconColor,
-                            value === opt.value && "scale-110"
+                            "flex min-h-12 items-center gap-3 rounded-lg border border-border bg-background p-2.5 text-left transition-all",
+                            "hover:border-primary/30 hover:bg-primary/[0.025] active:translate-y-px",
+                            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20",
+                            selected && "border-primary/35 bg-primary/[0.055] text-primary",
+                            disabled && "cursor-not-allowed opacity-50"
                         )}
                     >
-                        {opt.icon}
-                    </div>
-                    <div className="text-center">
-                        <span className="block text-sm font-semibold">{opt.label}</span>
-                        <span className="block text-[10px] text-muted-foreground leading-tight">{opt.description}</span>
-                    </div>
-                </button>
-            ))}
+                        <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground", selected && "bg-primary/10 text-primary")}>
+                            <Icon className="size-4"/>
+                        </span>
+                        <span className="min-w-0 flex-1">
+                            <span className="block text-xs font-semibold text-foreground">{t(opt.translationKey)}</span>
+                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{t(`levelDescription.${opt.translationKey}`)}</span>
+                        </span>
+                        <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-full border border-border", selected && "border-primary bg-primary text-primary-foreground")}>
+                            {selected && <Check className="size-3"/>}
+                        </span>
+                    </button>
+                );
+            })}
         </div>
     );
 }

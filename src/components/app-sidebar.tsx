@@ -74,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return (
         <Sidebar
-            className="top-(--header-height) h-[calc(100svh-var(--header-height))]! [&_[data-slot=sidebar-inner]]:bg-[linear-gradient(180deg,oklch(0.985_0.012_248),var(--sidebar)_28%)] dark:[&_[data-slot=sidebar-inner]]:bg-[linear-gradient(180deg,oklch(0.21_0.04_252),var(--sidebar)_28%)]"
+            className="top-0 h-svh! [&_[data-slot=sidebar-inner]]:bg-[radial-gradient(circle_at_top_left,oklch(0.43_0.16_235/0.55),transparent_30%),linear-gradient(180deg,oklch(0.27_0.115_247),var(--sidebar)_72%)]"
             {...props}
         >
             <SidebarHeader className="p-3 pb-1">
@@ -84,14 +84,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             size="lg"
                             tooltip="AlgoTutor"
                             render={<Link href="/" />}
-                            className="h-16 rounded-xl border border-sidebar-border/75 bg-white/70 px-3 shadow-sm shadow-blue-950/5 backdrop-blur-sm hover:border-primary/20 hover:bg-white dark:bg-white/5 dark:hover:bg-white/8 group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none"
+                            className="h-16 rounded-xl border border-white/12 bg-white/8 px-3 shadow-[inset_0_1px_0_oklch(1_0_0/0.1),0_12px_30px_-20px_oklch(0.05_0.08_250/0.8)] backdrop-blur-sm hover:border-white/20 hover:bg-white/12 group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none"
                         >
-                            <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/25">
-                                <CodeIcon className="size-4.5 text-white" />
+                            <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-sidebar-primary shadow-md shadow-sky-300/20">
+                                <CodeIcon className="size-4.5 text-sidebar-primary-foreground" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-heading font-semibold tracking-tight text-foreground">AlgoTutor</span>
-                                <span className="truncate text-[11px] font-medium text-primary/80">{t("adminWorkspace")}</span>
+                                <span className="truncate font-heading font-semibold tracking-tight text-white">AlgoTutor</span>
+                                <span className="truncate text-[11px] font-medium text-sky-200/75">{t("adminWorkspace")}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -101,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavMain groups={groups} />
                 <NavSecondary items={navSecondary} className="mt-auto" />
             </SidebarContent>
-            <SidebarFooter className="border-t border-sidebar-border/70 bg-sidebar/50 pt-2 backdrop-blur-sm">
+            <SidebarFooter className="border-t border-white/10 bg-black/8 pt-2 backdrop-blur-sm">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

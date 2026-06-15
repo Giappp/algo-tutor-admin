@@ -15,6 +15,7 @@ interface TheoryFormProps {
     isPending?: boolean;
     submitLabel?: string;
     formRef?: React.RefObject<TheoryFormHandle | null>;
+    lessonId?: number;
 }
 
 export function TheoryForm(props: TheoryFormProps) {

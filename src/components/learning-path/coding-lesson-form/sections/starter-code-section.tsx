@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {KeyboardEvent, useState} from "react";
 import {Control, Controller, useWatch} from "react-hook-form";
 import dynamic from "next/dynamic";
 import {CheckIcon, CopyIcon, FileCode2Icon, RotateCcwIcon, TerminalSquareIcon} from "lucide-react";
@@ -40,6 +40,21 @@ export function StarterCodeSection({control, isPending}: StarterCodeSectionProps
     const activeCode = starterCode?.[activeLang] ?? DEFAULT_STARTER_CODE[activeLang];
     const lineCount = activeCode ? activeCode.split("\n").length : 0;
 
+    const selectLanguageFromKeyboard = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+        let nextIndex = index;
+
+        if (event.key === "ArrowLeft") nextIndex = index === 0 ? STARTER_CODE_LANGUAGES.length - 1 : index - 1;
+        else if (event.key === "ArrowRight") nextIndex = index === STARTER_CODE_LANGUAGES.length - 1 ? 0 : index + 1;
+        else if (event.key === "Home") nextIndex = 0;
+        else if (event.key === "End") nextIndex = STARTER_CODE_LANGUAGES.length - 1;
+        else return;
+
+        event.preventDefault();
+        const nextLanguage = STARTER_CODE_LANGUAGES[nextIndex];
+        setActiveLang(nextLanguage);
+        document.getElementById(`starter-code-tab-${nextLanguage}`)?.focus();
+    };
+
     const copyCode = async () => {
         try {
             await navigator.clipboard.writeText(activeCode);
@@ -66,18 +81,21 @@ export function StarterCodeSection({control, isPending}: StarterCodeSectionProps
 
             <div className="overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm">
                 <div className="grid border-b border-border/40 bg-muted/20 sm:grid-cols-3" role="tablist" aria-label={t("coding.sections.starterCode")}>
-                    {STARTER_CODE_LANGUAGES.map((lang) => {
+                    {STARTER_CODE_LANGUAGES.map((lang, index) => {
                         const config = LANGUAGE_CONFIG[lang];
                         const isActive = activeLang === lang;
                         const code = starterCode?.[lang] ?? DEFAULT_STARTER_CODE[lang];
                         return (
                             <button
                                 key={lang}
+                                id={`starter-code-tab-${lang}`}
                                 type="button"
                                 role="tab"
                                 aria-selected={isActive}
                                 aria-controls={`starter-code-panel-${lang}`}
+                                tabIndex={isActive ? 0 : -1}
                                 onClick={() => setActiveLang(lang)}
+                                onKeyDown={(event) => selectLanguageFromKeyboard(event, index)}
                                 className={cn(
                                     "group relative flex items-center gap-3 border-b border-border/30 px-4 py-3.5 text-left transition-colors last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0",
                                     isActive ? "bg-background" : "hover:bg-muted/35"
@@ -124,6 +142,8 @@ export function StarterCodeSection({control, isPending}: StarterCodeSectionProps
                         key={lang}
                         id={`starter-code-panel-${lang}`}
                         role="tabpanel"
+                        aria-labelledby={`starter-code-tab-${lang}`}
+                        hidden={activeLang !== lang}
                         className={cn(activeLang === lang ? "block" : "hidden")}
                     >
                         <Controller

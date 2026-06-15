@@ -39,7 +39,7 @@ export function LoginForm({
     const onSubmit = async (data: LoginCredentials) => {
         try {
             setServerError(null);
-            login(data);
+            await login(data);
         } catch (error) {
             const appError = toAppError(error);
             setServerError(appError.message);
@@ -54,7 +54,7 @@ export function LoginForm({
             <div className="flex flex-col items-center gap-3 text-center">
                 <div className="relative">
                     <div
-                        className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
+                        className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 shadow-lg shadow-blue-600/25">
                         <Sparkles className="w-7 h-7 text-white"/>
                     </div>
                     <div
@@ -73,7 +73,7 @@ export function LoginForm({
             </div>
 
             {/* ── Card with Form ── */}
-            <Card className="border-0 shadow-xl shadow-zinc-200/50 dark:shadow-zinc-900/50 overflow-hidden">
+            <Card className="overflow-hidden border border-blue-100/80 shadow-xl shadow-blue-950/8 dark:border-blue-300/10 dark:shadow-black/25">
                 <CardContent className="p-8">
                     <form
                         onSubmit={handleSubmit(onSubmit)}
@@ -135,7 +135,7 @@ export function LoginForm({
                                     </FieldLabel>
                                     <Link
                                         href="#"
-                                        className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+                                        className="text-xs font-medium text-primary transition-colors hover:text-primary/80"
                                     >
                                         {t("forgotPassword")}
                                     </Link>
@@ -160,7 +160,7 @@ export function LoginForm({
                             <Field className="pt-2">
                                 <Button
                                     type="submit"
-                                    className="w-full h-11 rounded-xl font-semibold text-sm bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                                    className="h-11 w-full rounded-xl bg-gradient-to-r from-blue-700 to-sky-600 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all duration-200 hover:from-blue-800 hover:to-sky-700 hover:shadow-blue-600/35 active:scale-[0.99]"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
@@ -194,13 +194,13 @@ export function LoginForm({
                                 {t.rich("termsNotice", {
                                     terms: (chunks) => (
                                         <Link href="#"
-                                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                              className="font-medium text-primary hover:underline">
                                             {chunks}
                                         </Link>
                                     ),
                                     privacy: (chunks) => (
                                         <Link href="#"
-                                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                              className="font-medium text-primary hover:underline">
                                             {chunks}
                                         </Link>
                                     ),

@@ -3,7 +3,7 @@
 import type {ReactNode} from "react";
 import {usePathname} from "next/navigation";
 import {AppSidebar} from "@/components/app-sidebar";
-import {SiteHeader} from "@/components/site-header";
+import {ContentContextBar} from "@/components/content-context-bar";
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {cn} from "@/lib/utils";
 
@@ -14,18 +14,25 @@ export function DashboardShell({children}: {children: ReactNode}) {
     const isLearningPathWorkspace = LEARNING_PATH_WORKSPACE_PATTERN.test(pathname);
 
     return (
-        <div className="[--header-height:calc(--spacing(14))]">
-            <SidebarProvider className="flex flex-col" defaultOpen={!isLearningPathWorkspace}>
-                <SiteHeader hideSidebarToggle={isLearningPathWorkspace}/>
-                <div className="flex flex-1">
+        <div>
+            <SidebarProvider defaultOpen={!isLearningPathWorkspace}>
+                <div className="flex min-h-svh flex-1">
                     {!isLearningPathWorkspace && <AppSidebar/>}
                     <SidebarInset className={cn(
-                        "border-l border-border/55",
+                        "border-l border-border/70",
                         isLearningPathWorkspace ? "bg-background" : "bg-main-surface"
                     )}>
-                        <div className={cn(isLearningPathWorkspace ? "p-0" : "p-4 sm:p-6 lg:p-8")}>
-                            {children}
-                        </div>
+                        {isLearningPathWorkspace ? (
+                            <>
+                                <ContentContextBar hideSidebarToggle flush/>
+                                <div>{children}</div>
+                            </>
+                        ) : (
+                            <div className="p-4 sm:p-6 lg:p-8 xl:p-10">
+                                <ContentContextBar/>
+                                {children}
+                            </div>
+                        )}
                     </SidebarInset>
                 </div>
             </SidebarProvider>

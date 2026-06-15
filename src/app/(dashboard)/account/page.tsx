@@ -9,7 +9,7 @@ export default function AccountPage() {
     return (
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
             <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-400">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                     AlgoTutor Admin
                 </p>
                 <h1 className="font-heading text-3xl font-semibold tracking-tight">Tài khoản</h1>
@@ -18,9 +18,9 @@ export default function AccountPage() {
                 </p>
             </div>
 
-            <section className="overflow-hidden rounded-2xl border border-indigo-200/70 bg-card shadow-sm shadow-indigo-950/5 dark:border-indigo-400/15">
-                <div className="flex items-center gap-4 bg-indigo-50/80 px-6 py-5 dark:bg-indigo-400/10">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-indigo-600 text-sm font-bold uppercase text-white shadow-md shadow-indigo-600/20">
+            <section className="overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-sm shadow-blue-950/5">
+                <div className="flex items-center gap-4 bg-primary/7 px-6 py-5">
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-sm font-bold uppercase text-white shadow-md shadow-primary/20">
                         {username.slice(0, 2) || "AT"}
                     </div>
                     <div className="min-w-0">
@@ -31,14 +31,14 @@ export default function AccountPage() {
 
                 <dl className="grid gap-px bg-border sm:grid-cols-2">
                     <div className="flex items-center gap-3 bg-card px-6 py-5">
-                        <CircleUserRoundIcon className="size-5 text-indigo-600 dark:text-indigo-400"/>
+                        <CircleUserRoundIcon className="size-5 text-primary"/>
                         <div>
                             <dt className="text-xs text-muted-foreground">Tên đăng nhập</dt>
                             <dd className="mt-0.5 text-sm font-medium">{username || "Chưa cập nhật"}</dd>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 bg-card px-6 py-5">
-                        <MailIcon className="size-5 text-indigo-600 dark:text-indigo-400"/>
+                        <MailIcon className="size-5 text-primary"/>
                         <div className="min-w-0">
                             <dt className="text-xs text-muted-foreground">Email</dt>
                             <dd className="mt-0.5 truncate text-sm font-medium">{email || "Chưa cập nhật"}</dd>

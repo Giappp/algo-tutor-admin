@@ -261,7 +261,7 @@ function TestCaseCard({ testCase: tc, index, total, onEdit, onDelete, onMoveUp, 
                                     </Badge>
                                 ) : (
                                     <Badge variant="outline"
-                                        className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20">
+                                        className="border-blue-500/20 bg-blue-500/10 text-[10px] text-blue-700 dark:text-blue-300">
                                         {t("hidden")}
                                     </Badge>
                                 )}
@@ -591,7 +591,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                 </Button>
                             </div>
                         ) : (
-                            <div className="relative flex items-center justify-center p-4 border-2 border-dashed rounded-lg bg-muted/20 border-muted-foreground/20 hover:border-indigo-500/50 hover:bg-muted/40 transition-all cursor-pointer">
+                            <div className="relative flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 bg-muted/20 p-4 transition-all hover:border-primary/50 hover:bg-muted/40">
                                 <input
                                     type="file"
                                     accept=".in"
@@ -669,7 +669,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                                 </Button>
                             </div>
                         ) : (
-                            <div className="relative flex items-center justify-center p-4 border-2 border-dashed rounded-lg bg-muted/20 border-muted-foreground/20 hover:border-indigo-500/50 hover:bg-muted/40 transition-all cursor-pointer">
+                            <div className="relative flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 bg-muted/20 p-4 transition-all hover:border-primary/50 hover:bg-muted/40">
                                 <input
                                     type="file"
                                     accept=".out"
@@ -700,7 +700,7 @@ function TestCaseDialog({ open, onOpenChange, testCase, onSubmit, isPending, les
                     {uploadStatus === "uploading" && (
                         <div className="p-4 rounded-xl border bg-muted/30 space-y-3">
                             <div className="flex items-center justify-between text-xs font-semibold">
-                                <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
+                                <span className="flex items-center gap-1.5 text-primary">
                                     <Loader2 className="size-3.5 animate-spin" />
                                     {uploadStep}
                                 </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback, useRef} from "react";
+import {useRef} from "react";
 import {useTranslations} from "next-intl";
 import {
     Bold,
@@ -10,14 +10,13 @@ import {
     ImageIcon,
     Italic,
     Link,
+    Loader2,
     Table,
     Terminal,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {cn} from "@/lib/utils";
-import {uploadService} from "@/api/services/upload-services";
-import {toast} from "sonner";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,6 +35,8 @@ export interface MarkdownToolbarProps {
     onInsert: (action: InsertAction) => void;
     disabled?: boolean;
     className?: string;
+    onImageFile?: (file: File) => void;
+    isUploadingImage?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -154,35 +155,24 @@ const CONSTRAINT_SNIPPET = `**Constraints:**
 // Component
 // ---------------------------------------------------------------------------
 
-export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbarProps) {
+export function MarkdownToolbar({
+    onInsert,
+    disabled,
+    className,
+    onImageFile,
+    isUploadingImage,
+}: MarkdownToolbarProps) {
     const t = useTranslations("lessonForm");
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleImageUpload = useCallback(
-        async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            e.target.value = "";
-
-            try {
-                const result = await uploadService.uploadImage(file);
-                onInsert({
-                    before: `![${file.name}](${result.url})`,
-                    after: "",
-                });
-            } catch {
-                toast.error(t("markdown.imageUploadFailed"));
-            }
-        },
-        [onInsert, t]
-    );
 
     return (
         <div
             className={cn(
-                "flex items-center gap-0.5 px-2 py-1.5 border-b border-border bg-muted/30 flex-wrap",
+                "flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto px-2 py-1.5",
                 className
             )}
+            role="toolbar"
+            aria-label={t("markdown.formattingToolbar")}
         >
             {TOOLBAR_GROUPS.map((group, gi) => (
                 <div key={group.id} className="flex items-center gap-0.5">
@@ -196,6 +186,7 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                                 variant="ghost"
                                 size="icon-xs"
                                 title={t(`markdown.toolbar.${item.id}`)}
+                                aria-label={t(`markdown.toolbar.${item.id}`)}
                                 disabled={disabled}
                                 onClick={() => onInsert(item.action)}
                                 className="size-7 rounded-md"
@@ -215,17 +206,24 @@ export function MarkdownToolbar({onInsert, disabled, className}: MarkdownToolbar
                 variant="ghost"
                 size="icon-xs"
                 title={t("markdown.toolbar.uploadImage")}
-                disabled={disabled}
+                aria-label={t("markdown.toolbar.uploadImage")}
+                disabled={disabled || isUploadingImage}
                 onClick={() => fileInputRef.current?.click()}
-                className="size-7 rounded-md"
+                className="size-7 rounded-md text-primary"
             >
-                <ImageIcon className="size-3.5"/>
+                {isUploadingImage
+                    ? <Loader2 className="size-3.5 animate-spin"/>
+                    : <ImageIcon className="size-3.5"/>}
             </Button>
             <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={handleImageUpload}
+                onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) onImageFile?.(file);
+                    event.target.value = "";
+                }}
                 className="hidden"
             />
 

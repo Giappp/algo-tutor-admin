@@ -61,6 +61,7 @@ export function TheoryLessonDetail({ lesson, lessonId, learningPathId, updateMut
                                 }}
                                 isPending={updateMutation.isPending}
                                 enableAutosave
+                                lessonId={lessonId}
                             />
                     </div>
                 </TabsContent>

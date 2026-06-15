@@ -111,7 +111,7 @@ export function ImageUpload({
                     />
 
                     {/* Hover overlay with actions */}
-                    <div className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-colors hover:bg-black/50 hover:opacity-100 focus-within:bg-black/50 focus-within:opacity-100">
                         <Button
                             type="button"
                             size="sm"
@@ -157,14 +157,24 @@ export function ImageUpload({
         <div className="flex flex-col gap-2">
             <div
                 onClick={() => !disabled && !isUploading && inputRef.current?.click()}
+                onKeyDown={(event) => {
+                    if ((event.key === "Enter" || event.key === " ") && !disabled && !isUploading) {
+                        event.preventDefault();
+                        inputRef.current?.click();
+                    }
+                }}
                 onDragOver={(e) => {
                     e.preventDefault();
                     if (!disabled && !isUploading) setIsDragging(true);
                 }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
+                role="button"
+                tabIndex={disabled || isUploading ? -1 : 0}
+                aria-disabled={disabled || isUploading}
+                aria-label="Upload cover image"
                 className={cn(
-                    "relative flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed cursor-pointer transition-all",
+                    "relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed transition-all focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20",
                     aspectClasses[aspectRatio],
                     isDragging
                         ? "border-primary bg-primary/5"

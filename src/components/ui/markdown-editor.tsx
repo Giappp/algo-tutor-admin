@@ -15,6 +15,10 @@ import {InsertAction} from "@/components/ui/markdown-toolbar";
 export interface MarkdownEditorHandle {
     /** Insert text at the current cursor position, wrapping any selection */
     insert: (action: InsertAction) => void;
+    /** Replace the current selection, or insert at the cursor */
+    replaceSelection: (content: string) => void;
+    /** Return the current selected text */
+    getSelection: () => string;
     /** Focus the editor */
     focus: () => void;
 }
@@ -30,6 +34,7 @@ interface MarkdownEditorProps {
     disabled?: boolean;
     className?: string;
     minHeight?: string;
+    onImageFile?: (file: File) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -45,6 +50,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
             disabled,
             className,
             minHeight = "320px",
+            onImageFile,
         },
         ref
     ) {
@@ -61,8 +67,26 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
                     ".cm-gutters": {border: "none", background: "transparent"},
                     ".cm-placeholder": {color: "hsl(var(--muted-foreground))"},
                 }),
+                EditorView.domEventHandlers({
+                    paste(event) {
+                        const image = Array.from(event.clipboardData?.files ?? [])
+                            .find((file) => file.type.startsWith("image/"));
+                        if (!image || !onImageFile) return false;
+                        event.preventDefault();
+                        onImageFile(image);
+                        return true;
+                    },
+                    drop(event) {
+                        const image = Array.from(event.dataTransfer?.files ?? [])
+                            .find((file) => file.type.startsWith("image/"));
+                        if (!image || !onImageFile) return false;
+                        event.preventDefault();
+                        onImageFile(image);
+                        return true;
+                    },
+                }),
             ],
-            []
+            [onImageFile]
         );
 
         const handleChange = useCallback(
@@ -90,6 +114,23 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
                     },
                 });
                 view.focus();
+            },
+            replaceSelection: (content: string) => {
+                const view = cmRef.current?.view;
+                if (!view) return;
+
+                const {from, to} = view.state.selection.main;
+                view.dispatch({
+                    changes: {from, to, insert: content},
+                    selection: {anchor: from + content.length},
+                });
+                view.focus();
+            },
+            getSelection: () => {
+                const view = cmRef.current?.view;
+                if (!view) return "";
+                const {from, to} = view.state.selection.main;
+                return view.state.sliceDoc(from, to);
             },
             focus: () => {
                 cmRef.current?.view?.focus();

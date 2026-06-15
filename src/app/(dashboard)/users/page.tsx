@@ -62,14 +62,14 @@ const SORT_OPTIONS = [
 ] as const;
 
 const ROLE_STYLES: Record<AdminUserRole, string> = {
-    ADMIN: "border-indigo-500/20 bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300",
+    ADMIN: "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
     EDITOR: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
     USER: "border-border/60 bg-muted/50 text-muted-foreground",
 };
 
 function UserTableSkeleton() {
     return Array.from({length: 6}, (_, index) => (
-        <TableRow key={index}>
+            <TableRow key={index} className="hover:bg-transparent">
             <TableCell><div className="flex items-center gap-3"><Skeleton className="size-8 rounded-full" /><Skeleton className="h-9 w-44" /></div></TableCell>
             <TableCell><Skeleton className="h-5 w-16" /></TableCell>
             <TableCell><Skeleton className="h-5 w-20" /></TableCell>
@@ -128,7 +128,7 @@ export default function UsersPage() {
 
     return (
         <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 stagger-children">
-            <div className="pointer-events-none absolute -right-32 -top-40 -z-10 size-[28rem] rounded-full bg-[radial-gradient(circle,oklch(0.55_0.22_272/0.045)_0%,transparent_68%)]" />
+            <div className="pointer-events-none absolute -right-32 -top-40 -z-10 size-[28rem] rounded-full bg-[radial-gradient(circle,oklch(0.62_0.15_225/0.055)_0%,transparent_68%)]" />
 
             <header className="flex flex-col gap-4 border-b border-border/40 pb-5 sm:flex-row sm:items-end sm:justify-between">
                 <div className="flex flex-col gap-1.5">
@@ -173,9 +173,9 @@ export default function UsersPage() {
                 </section>
             )}
 
-            <section className="overflow-hidden rounded-2xl border border-border/40 bg-card shadow-sm">
-                <div className="flex flex-col gap-3 border-b border-border/40 bg-muted/15 p-4 sm:flex-row sm:items-center">
-                    <InputGroup className="w-full sm:max-w-md">
+            <section className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_14px_40px_-32px_oklch(0.42_0.12_240/0.35)]">
+                <div className="flex flex-col gap-3 border-b border-border/70 bg-primary/[0.025] p-3 sm:flex-row sm:items-center sm:p-4">
+                    <InputGroup className="w-full rounded-lg border-input bg-card sm:max-w-md">
                         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                         <InputGroupInput
                             aria-label={t("searchLabel")}
@@ -202,7 +202,7 @@ export default function UsersPage() {
                             setPage(0);
                         }}
                     >
-                        <SelectTrigger aria-label={t("sortUsers")} className="w-full sm:ml-auto sm:w-44">
+                        <SelectTrigger aria-label={t("sortUsers")} className="w-full border-input bg-card sm:ml-auto sm:w-44">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -217,20 +217,20 @@ export default function UsersPage() {
                         aria-label={t("refreshUsers")}
                         onClick={() => usersQuery.refetch()}
                         disabled={usersQuery.isFetching}
-                        className="shrink-0"
+                        className="shrink-0 bg-card"
                     >
                         <RefreshCwIcon className={usersQuery.isFetching ? "animate-spin" : ""} />
                     </Button>
                 </div>
 
                 {(search || sort !== "username,asc") && (
-                    <div className="flex flex-wrap items-center gap-2 border-b border-border/30 px-4 py-2.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("activeView")}</span>
+                    <div className="flex flex-wrap items-center gap-2 border-b border-border/60 bg-muted/10 px-4 py-2.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{t("activeView")}</span>
                         {search && (
                             <button
                                 type="button"
                                 onClick={() => setSearchInput("")}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/7 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/12"
+                                className="inline-flex items-center gap-1.5 rounded-md border border-primary/15 bg-primary/7 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/12"
                             >
                                 {t("searchFilter", {search})}
                                 <XIcon className="size-3" />
@@ -240,7 +240,7 @@ export default function UsersPage() {
                             <button
                                 type="button"
                                 onClick={() => setSort("username,asc")}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
                                 {t("sortFilter", {sort: activeSortLabel})}
                                 <XIcon className="size-3" />
@@ -263,9 +263,9 @@ export default function UsersPage() {
 
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader className="bg-muted/25">
+                        <TableHeader>
                             <TableRow className="hover:bg-transparent">
-                                <TableHead className="pl-5">{t("table.account")}</TableHead>
+                                <TableHead>{t("table.account")}</TableHead>
                                 <TableHead>{t("table.role")}</TableHead>
                                 <TableHead>{t("table.status")}</TableHead>
                                 <TableHead>{t("table.note")}</TableHead>
@@ -302,39 +302,39 @@ export default function UsersPage() {
                             ) : users.map((user) => {
                                 const currentUser = isCurrentUser(user);
                                 return (
-                                    <TableRow key={user.id} className="group border-border/30 transition-colors hover:bg-muted/25">
-                                        <TableCell className="py-3 pl-5">
+                                    <TableRow key={user.id} className="group">
+                                        <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <Avatar size="sm" className="rounded-xl ring-1 ring-border/60">
+                                                <Avatar size="sm" className="rounded-lg ring-1 ring-border/70">
                                                     <AvatarImage src={user.avatar ?? undefined} alt={t("avatarAlt", {username: user.username})} />
-                                                    <AvatarFallback className="rounded-xl bg-primary/8 text-xs font-bold text-primary">{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                    <AvatarFallback className="rounded-lg bg-primary/8 text-xs font-bold text-primary">{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0">
                                                     <div className="flex items-center gap-2">
                                                         <span className="truncate text-sm font-semibold transition-colors group-hover:text-primary">{user.username}</span>
-                                                        {currentUser && <Badge variant="outline" className="h-4 rounded-md px-1.5 text-[9px] font-bold uppercase tracking-wider">{t("you")}</Badge>}
+                                                        {currentUser && <Badge variant="outline" className="h-4 rounded-sm border-primary/20 bg-primary/5 px-1.5 text-[9px] font-semibold text-primary">{t("you")}</Badge>}
                                                     </div>
                                                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="outline" className={`rounded-lg text-[10px] font-bold tracking-wide ${ROLE_STYLES[user.role]}`}>
+                                            <Badge variant="outline" className={`rounded-md py-1 text-[10px] font-semibold ${ROLE_STYLES[user.role]}`}>
                                                 {t(`roles.${user.role}.label`)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="inline-flex items-center gap-2 text-xs font-semibold">
-                                                <span className={`size-1.5 rounded-full ${user.enabled ? "bg-emerald-500 shadow-[0_0_0_3px_oklch(0.7_0.17_155/0.12)]" : "bg-destructive shadow-[0_0_0_3px_oklch(0.55_0.22_27/0.12)]"}`} />
+                                            <span className="inline-flex items-center gap-2 text-xs font-medium">
+                                                <span className={`size-1.5 rounded-full ${user.enabled ? "bg-emerald-500 shadow-[0_0_0_3px_oklch(0.7_0.17_155/0.1)]" : "bg-destructive shadow-[0_0_0_3px_oklch(0.55_0.22_27/0.1)]"}`} />
                                                 {user.enabled ? t("status.active") : t("status.blocked")}
                                             </span>
                                         </TableCell>
                                         <TableCell className="max-w-64 truncate text-xs text-muted-foreground" title={user.blockReason ?? undefined}>
                                             {user.blockReason || <span className="text-muted-foreground/45">{t("noRestrictions")}</span>}
                                         </TableCell>
-                                        <TableCell className="pr-4">
+                                        <TableCell className="text-right">
                                             <DropdownMenu>
-                                                <DropdownMenuTrigger render={<Button variant="ghost" className="size-8 rounded-lg p-0 text-muted-foreground opacity-70 transition-opacity group-hover:opacity-100" />}>
+                                                <DropdownMenuTrigger render={<Button variant="ghost" className="size-8 rounded-md p-0 text-muted-foreground opacity-60 transition-opacity hover:bg-primary/8 hover:text-primary group-hover:opacity-100 group-focus-within:opacity-100" />}>
                                                     <MoreHorizontalIcon />
                                                     <span className="sr-only">{t("actionsFor", {username: user.username})}</span>
                                                 </DropdownMenuTrigger>
