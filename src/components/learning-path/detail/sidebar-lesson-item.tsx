@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Draggable } from "@hello-pangea/dnd";
-import { BookOpen, Code2, FileQuestion, GripVertical } from "lucide-react";
+import { BookOpen, Code2, FileQuestion, GripVertical, PlaySquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Lesson } from "@/types/learning-path";
 
@@ -22,6 +22,11 @@ const LESSON_TYPE_CONFIG = {
         icon: Code2,
         iconClass: "text-emerald-500",
         bgClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
+    },
+    VIDEO: {
+        icon: PlaySquare,
+        iconClass: "text-violet-500",
+        bgClass: "bg-violet-500/10 border-violet-500/20 text-violet-500",
     },
 };
 

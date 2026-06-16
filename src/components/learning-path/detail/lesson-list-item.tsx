@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Code2, FileQuestion, GlobeIcon, Pencil, Rocket, Trash2 } from "lucide-react";
+import { BookOpen, Code2, FileQuestion, GlobeIcon, Pencil, PlaySquare, Rocket, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Difficulty, Lesson, LessonType } from "@/types/learning-path";
@@ -22,6 +22,11 @@ const LESSON_TYPE_CONFIG: Record<LessonType, { icon: React.ElementType; label: s
         icon: Code2,
         label: "Coding",
         className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    },
+    VIDEO: {
+        icon: PlaySquare,
+        label: "Video",
+        className: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
     },
 };
 
@@ -116,6 +121,7 @@ export function LessonListItem({
                             : "text-muted-foreground border-border hover:text-emerald-600 hover:bg-emerald-500/10 hover:border-emerald-500/30"
                     }
                     title={lesson.isPublished ? "Unpublish" : "Publish"}
+                    disabled={!lesson.isPublished && lesson.type === "VIDEO" && lesson.processingStatus !== "READY"}
                 >
                     <Rocket className="size-3.5" />
                 </Button>

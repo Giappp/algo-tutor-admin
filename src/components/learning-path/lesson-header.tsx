@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, Rocket} from "lucide-react";
+import {ArrowLeft, BookOpen, Code2, Eye, FileQuestion, PlaySquare, Rocket} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
@@ -13,6 +13,7 @@ const LESSON_TYPE_CONFIG: Record<LessonType, {icon: React.ElementType}> = {
     THEORY: {icon: BookOpen},
     QUIZ: {icon: FileQuestion},
     CODING: {icon: Code2},
+    VIDEO: {icon: PlaySquare},
 };
 
 const DIFFICULTY_CONFIG: Record<Difficulty, {class: string; translationKey: "easy" | "medium" | "hard"}> = {
@@ -35,6 +36,8 @@ interface LessonHeaderProps {
     onTitleChange?: (newTitle: string) => void;
     isEditPending?: boolean;
     action?: ReactNode;
+    publishDisabled?: boolean;
+    publishDisabledReason?: string;
 }
 
 export function LessonHeader({
@@ -44,11 +47,13 @@ export function LessonHeader({
     onTitleChange,
     isEditPending = false,
     action,
+    publishDisabled = false,
+    publishDisabledReason,
 }: LessonHeaderProps) {
     const t = useTranslations("learningPaths");
     const tLessonForm = useTranslations("lessonForm");
     const TypeIcon = LESSON_TYPE_CONFIG[lesson.type].icon;
-    const typeKey = lesson.type === "THEORY" ? "theory" : lesson.type === "QUIZ" ? "quiz" : "coding";
+    const typeKey = lesson.type === "THEORY" ? "theory" : lesson.type === "QUIZ" ? "quiz" : lesson.type === "CODING" ? "coding" : "video";
 
     return (
         <header className="relative overflow-hidden rounded-2xl border border-border/70 bg-card px-4 py-5 shadow-[0_18px_50px_-44px_rgba(0,0,0,0.5)] sm:px-6">
@@ -123,7 +128,8 @@ export function LessonHeader({
                         variant={lesson.isPublished ? "outline" : "default"}
                         size="sm"
                         onClick={onTogglePublish}
-                        disabled={isEditPending}
+                        disabled={isEditPending || publishDisabled}
+                        title={publishDisabledReason}
                     >
                         <Rocket className="size-4"/>
                         {lesson.isPublished ? t("unpublish") : t("publish")}

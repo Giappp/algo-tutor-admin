@@ -1,7 +1,7 @@
 "use client";
 
 import type {ElementType, ReactNode} from "react";
-import {BookOpen, Check, Code2, FileQuestion, Loader2, Save} from "lucide-react";
+import {BookOpen, Check, Code2, FileQuestion, Loader2, PlaySquare, Save} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -10,10 +10,11 @@ import {SaveStatusIndicator} from "@/components/ui/save-status-indicator";
 import type {AutosaveStatus} from "@/hooks/use-autosave";
 import type {Difficulty, LessonType} from "@/types/learning-path";
 
-const LESSON_META: Record<LessonType, {icon: ElementType; translationKey: "theory" | "quiz" | "coding"}> = {
+const LESSON_META: Record<LessonType, {icon: ElementType; translationKey: "theory" | "quiz" | "coding" | "video"}> = {
     THEORY: {icon: BookOpen, translationKey: "theory"},
     QUIZ: {icon: FileQuestion, translationKey: "quiz"},
     CODING: {icon: Code2, translationKey: "coding"},
+    VIDEO: {icon: PlaySquare, translationKey: "video"},
 };
 
 const DIFFICULTIES: {value: Difficulty; translationKey: "easy" | "medium" | "hard"}[] = [

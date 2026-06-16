@@ -2,7 +2,9 @@ export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
 export type Difficulty = "EASY" | "MEDIUM" | "HARD";
 
-export type LessonType = "THEORY" | "QUIZ" | "CODING";
+export type LessonType = "THEORY" | "QUIZ" | "CODING" | "VIDEO";
+
+export type VideoProcessingStatus = "PENDING_UPLOAD" | "UPLOADING" | "READY" | "FAILED";
 
 export type QuestionType = "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "TRUE_FALSE";
 
@@ -68,6 +70,7 @@ export interface Lesson {
     displayOrder: number;
     isPublished: boolean;
     difficulty?: Difficulty;
+    description?: string | null;
     // Coding-specific
     statement?: string;
     baseTimeLimitMs?: number;
@@ -82,6 +85,13 @@ export interface Lesson {
     passingScore?: number;
     timeLimitMinutes?: number;
     questions?: QuizQuestion[];
+    // Video-specific
+    sourceObjectKey?: string | null;
+    thumbnailObjectKey?: string | null;
+    durationSeconds?: number | null;
+    fileSizeBytes?: number | null;
+    mimeType?: string | null;
+    processingStatus?: VideoProcessingStatus;
     // Editorials
     editorials?: Editorial[];
     createdAt?: string;
@@ -178,6 +188,8 @@ export interface CreateLessonRequest {
     passingScore?: number;
     timeLimitMinutes?: number;
     questions?: Omit<QuizQuestion, "id" | "createdAt" | "updatedAt">[];
+    // Video
+    description?: string;
 }
 
 export type UpdateLessonRequest = CreateLessonRequest;

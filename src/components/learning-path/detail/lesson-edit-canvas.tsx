@@ -3,7 +3,7 @@
 import {useLesson, useTogglePublishLesson, useUpdateLesson} from "@/hooks/use-lessons";
 import {LessonHeader} from "@/components/learning-path/lesson-header";
 import {LessonPageSkeleton} from "@/components/learning-path/lesson-skeleton";
-import {CodingLessonPanels, QuizLessonDetail, TheoryLessonDetail} from "@/components/lesson-detail";
+import {CodingLessonPanels, QuizLessonDetail, TheoryLessonDetail, VideoLessonDetail} from "@/components/lesson-detail";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
 import {Button} from "@/components/ui/button";
 import {AlertCircle, ArrowLeft, Sparkles} from "lucide-react";
@@ -26,6 +26,7 @@ export function LessonEditCanvas({
                                  }: LessonEditCanvasProps) {
     const {data: lesson, isLoading, error} = useLesson(lessonId);
     const tAi = useTranslations("lessonForm.ai");
+    const tVideo = useTranslations("lessonForm.video");
     const updateMutation = useUpdateLesson();
     const togglePublishMutation = useTogglePublishLesson();
     const [isAiOpen, setIsAiOpen] = useState(false);
@@ -100,13 +101,18 @@ export function LessonEditCanvas({
                     content: lesson.content,
                     estimatedMinutes: lesson.estimatedMinutes,
                 }
-                : {
+                : lesson.type === "QUIZ" ? {
                     type: "QUIZ" as const,
                     title: newTitle,
                     difficulty: lesson.difficulty,
                     passingScore: lesson.passingScore,
                     timeLimitMinutes: lesson.timeLimitMinutes,
                     questions: lesson.questions,
+                } : {
+                    type: "VIDEO" as const,
+                    title: newTitle,
+                    difficulty: lesson.difficulty,
+                    description: lesson.description ?? undefined,
                 };
 
         updateMutation.mutate({id: lessonId, data: baseData as LessonRequestDTO});
@@ -121,7 +127,9 @@ export function LessonEditCanvas({
                 onTogglePublish={() => togglePublishMutation.mutate(lessonId)}
                 onTitleChange={handleTitleChange}
                 isEditPending={togglePublishMutation.isPending || updateMutation.isPending}
-                action={lesson.type !== "CODING" ? (
+                publishDisabled={lesson.type === "VIDEO" && !lesson.isPublished && lesson.processingStatus !== "READY"}
+                publishDisabledReason={lesson.type === "VIDEO" && !lesson.isPublished && lesson.processingStatus !== "READY" ? tVideo("publishDisabled") : undefined}
+                action={lesson.type !== "CODING" && lesson.type !== "VIDEO" ? (
                     <Button variant="ai" size="sm" onClick={() => setIsAiOpen(true)}>
                         <Sparkles className="size-4"/>
                         {tAi("trigger")}
@@ -162,7 +170,16 @@ export function LessonEditCanvas({
                 />
             )}
 
-            {lesson.type !== "CODING" && (
+            {editorLesson.type === "VIDEO" && (
+                <VideoLessonDetail
+                    lesson={editorLesson}
+                    lessonId={lessonId}
+                    learningPathId={learningPathId}
+                    updateMutation={updateMutation}
+                />
+            )}
+
+            {lesson.type !== "CODING" && lesson.type !== "VIDEO" && (
                 <AiLessonDraftDialog
                     lessonId={lessonId}
                     lessonType={lesson.type}

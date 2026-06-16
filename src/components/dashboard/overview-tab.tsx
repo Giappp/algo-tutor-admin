@@ -90,6 +90,7 @@ export function OverviewTab({ overview }: OverviewTabProps) {
     const getLessonLabel = (name: string) => {
         switch (name) {
             case "CODING": return t("coding");
+            case "VIDEO": return t("video");
             case "THEORY": return t("theory");
             case "QUIZ": return t("quiz");
             default: return name;

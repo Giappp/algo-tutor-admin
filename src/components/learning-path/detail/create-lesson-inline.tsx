@@ -2,15 +2,16 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpenIcon, CodeIcon, FileQuestionIcon, Sparkles, X } from "lucide-react";
+import { BookOpenIcon, CodeIcon, FileQuestionIcon, PlaySquareIcon, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import { TheoryForm, type TheoryFormHandle } from "@/components/learning-path/theory-form";
 import { CodingLessonForm, type CodingLessonFormHandle } from "@/components/learning-path/coding-lesson-form";
 import { QuizForm, type QuizFormHandle } from "@/components/quiz/quiz-form";
+import {VideoLessonForm, type VideoLessonFormHandle} from "@/components/learning-path/video-lesson-form";
 import { useCreateLesson } from "@/hooks/use-lessons";
 import { LessonType } from "@/types/learning-path";
-import { CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO } from "@/types/learning-path/schema";
+import { CodingLessonDTO, LessonRequestDTO, QuizLessonDTO, TheoryLessonDTO, VideoLessonDTO } from "@/types/learning-path/schema";
 
 const LESSON_TYPES = [
     {
@@ -24,6 +25,10 @@ const LESSON_TYPES = [
     {
         type: "CODING" as const,
         icon: CodeIcon,
+    },
+    {
+        type: "VIDEO" as const,
+        icon: PlaySquareIcon,
     },
 ];
 
@@ -48,6 +53,7 @@ export function CreateLessonInline({
     const theoryFormRef = useRef<TheoryFormHandle | null>(null);
     const quizFormRef = useRef<QuizFormHandle | null>(null);
     const codingFormRef = useRef<CodingLessonFormHandle | null>(null);
+    const videoFormRef = useRef<VideoLessonFormHandle | null>(null);
 
     const getLessonTypeDetails = (type: LessonType) => {
         switch (type) {
@@ -69,10 +75,16 @@ export function CreateLessonInline({
                     description: t("codingDesc"),
                     submitLabel: t("createCodingLesson"),
                 };
+            case "VIDEO":
+                return {
+                    label: t("video"),
+                    description: t("videoDesc"),
+                    submitLabel: t("createVideoLesson"),
+                };
         }
     };
 
-    const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO) => {
+    const handleSubmit = async (data: CodingLessonDTO | TheoryLessonDTO | QuizLessonDTO | VideoLessonDTO) => {
         const result = await createLessonMutation.mutateAsync(data as LessonRequestDTO);
         if (result && result.id) {
             if (createWithAiRef.current) {
@@ -96,7 +108,9 @@ export function CreateLessonInline({
 
         const formRef = selectedType === "THEORY"
             ? theoryFormRef.current
-            : quizFormRef.current;
+            : selectedType === "QUIZ"
+                ? quizFormRef.current
+                : videoFormRef.current;
         if (!formRef || !(await formRef.trigger())) return;
 
         createWithAiRef.current = true;
@@ -130,7 +144,7 @@ export function CreateLessonInline({
             </div>
 
             {/* Type Selector Tabs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
                 {LESSON_TYPES.map((item) => {
                     const Icon = item.icon;
                     const isActive = selectedType === item.type;
@@ -165,7 +179,7 @@ export function CreateLessonInline({
                 </div>
             ) : (
                 <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-4 sm:p-5">
-                    <div className="mb-5 flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/[0.035] p-3 sm:flex-row sm:items-center sm:justify-between">
+                    {selectedType !== "VIDEO" && <div className="mb-5 flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/[0.035] p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p className="text-xs font-semibold">{selectedType === "CODING" ? tCodingAi("createTitle") : tAi("createTitle")}</p>
                             <p className="mt-0.5 text-[11px] text-muted-foreground">{selectedType === "CODING" ? tCodingAi("createDescription") : tAi("createDescription")}</p>
@@ -174,7 +188,7 @@ export function CreateLessonInline({
                             <Sparkles className="size-4"/>
                             {selectedType === "CODING" ? tCodingAi("createAction") : tAi("createAction")}
                         </Button>
-                    </div>
+                    </div>}
                     {selectedType === "THEORY" && (
                         <TheoryForm
                             formRef={theoryFormRef}
@@ -199,6 +213,15 @@ export function CreateLessonInline({
                             onSubmit={handleSubmit}
                             isPending={createLessonMutation.isPending}
                             submitLabel={getLessonTypeDetails("CODING").submitLabel}
+                        />
+                    )}
+
+                    {selectedType === "VIDEO" && (
+                        <VideoLessonForm
+                            formRef={videoFormRef}
+                            onSubmit={handleSubmit}
+                            isPending={createLessonMutation.isPending}
+                            submitLabel={getLessonTypeDetails("VIDEO").submitLabel}
                         />
                     )}
                 </div>

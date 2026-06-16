@@ -96,6 +96,7 @@
     "coding": "Coding",
     "theory": "Theory",
     "quiz": "Quiz",
+    "video": "Video",
     "rank": "Rank",
     "totalConsumption": "Total Consumption",
     "input": "Input",
@@ -216,10 +217,13 @@
     "quizDesc": "Multiple choice or true/false questions",
     "coding": "Coding",
     "codingDesc": "Coding problem with starter code & test cases",
+    "video": "Video",
+    "videoDesc": "A video lesson uploaded directly to secure storage",
     "selectLessonType": "Select a lesson type above to show the editor",
     "createTheoryLesson": "Create Theory Lesson",
     "createQuizLesson": "Create Quiz Lesson",
     "createCodingLesson": "Create Coding Lesson",
+    "createVideoLesson": "Create Video Lesson",
     "topicDetails": "Topic Details",
     "topicNotFound": "Topic Not Found",
     "topicNotFoundDesc": "The selected topic could not be loaded or has been deleted.",
@@ -245,11 +249,68 @@
     "types": {
       "theory": {"label": "Theory lesson", "description": "Explain one idea clearly and reinforce it with examples."},
       "quiz": {"label": "Quiz assessment", "description": "Set the assessment rules. Questions are managed separately."},
-      "coding": {"label": "Coding challenge", "description": "Define the problem, examples, limits, and starter code."}
+      "coding": {"label": "Coding challenge", "description": "Define the problem, examples, limits, and starter code."},
+      "video": {"label": "Video lesson", "description": "Set lesson metadata, then upload and verify the source video."}
     },
     "details": {"title": "Lesson details", "description": "Set a clear title and expected difficulty."},
     "fields": {"title": "Title"},
     "difficulty": {"label": "Difficulty", "easy": "Easy", "medium": "Medium", "hard": "Hard"},
+    "video": {
+      "detailsTitle": "Video lesson details",
+      "detailsDescription": "Set the metadata first. The source video is uploaded after the lesson is created.",
+      "title": "Title",
+      "titlePlaceholder": "e.g. Visual introduction to Binary Search",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe what learners will understand after watching this video.",
+      "createAction": "Create video lesson",
+      "saveMetadata": "Save metadata",
+      "sourceTitle": "Source video",
+      "sourceDescription": "MP4 or MOV, up to 2 GiB. Parts upload directly to S3.",
+      "fileSize": "File size",
+      "duration": "Duration",
+      "mimeType": "MIME type",
+      "notAvailable": "Not available",
+      "progressLabel": "Video upload progress",
+      "retryFailedParts": "Retry failed parts",
+      "cancelUpload": "Cancel upload",
+      "replaceSource": "Replace source video",
+      "uploadSource": "Upload source video",
+      "publishHint": "Publish becomes available after S3 verification finishes.",
+      "publishDisabled": "Upload and verify the video before publishing.",
+      "chooseVideo": "Choose video",
+      "processingStatus": {
+        "PENDING_UPLOAD": "Pending upload",
+        "UPLOADING": "Uploading",
+        "READY": "Ready",
+        "FAILED": "Failed"
+      },
+      "phase": {
+        "preparing": "Preparing multipart upload...",
+        "uploading": "Uploading video parts: {progress}%",
+        "completing": "Verifying uploaded video...",
+        "aborting": "Cancelling upload...",
+        "success": "Upload completed."
+      },
+      "toast": {
+        "uploaded": "Video uploaded successfully",
+        "cancelled": "Video upload cancelled"
+      },
+      "errors": {
+        "duration": "Could not read video duration.",
+        "unsupportedType": "Only MP4 and MOV videos are supported.",
+        "invalidSize": "Video size must be greater than 0 and at most 2 GiB.",
+        "partsFailed": "{count, plural, one {# video part failed to upload.} other {# video parts failed to upload.}}",
+        "uploadFailed": "Video upload failed.",
+        "retryFailed": "Video upload retry failed.",
+        "cancelFailed": "Could not cancel video upload."
+      }
+    },
+    "toast": {
+      "created": "Lesson created successfully",
+      "updated": "Lesson updated successfully",
+      "deleted": "Lesson deleted successfully",
+      "publishUpdated": "Lesson publish status updated"
+    },
     "actions": {
       "saveChanges": "Save changes",
       "createLesson": "Create lesson",

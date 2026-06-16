@@ -2,6 +2,7 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
+import {useTranslations} from "next-intl";
 import {queryKeys} from "@/api/query-keys";
 import {lessonService, LessonListParams} from "@/api/services/lesson-services";
 import {LessonRequestDTO} from "@/types/learning-path/schema";
@@ -35,13 +36,14 @@ export function useLessonBySlug(slug: string) {
 // ─── Mutations ───────────────────────────────────────────────────────────────
 
 export function useCreateLesson(topicId: number) {
+    const t = useTranslations("lessonForm.toast");
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (data: LessonRequestDTO) =>
             lessonService.create(topicId, data),
         onSuccess: () => {
-            toast.success("Lesson created successfully");
+            toast.success(t("created"));
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.byTopic(topicId)});
             queryClient.invalidateQueries({queryKey: queryKeys.topics.detail(topicId)});
         },
@@ -49,13 +51,14 @@ export function useCreateLesson(topicId: number) {
 }
 
 export function useUpdateLesson() {
+    const t = useTranslations("lessonForm.toast");
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: ({id, data}: { id: number; data: LessonRequestDTO }) =>
             lessonService.update(id, data),
         onSuccess: (_, {id}) => {
-            toast.success("Lesson updated successfully");
+            toast.success(t("updated"));
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.detail(id)});
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
         },
@@ -63,12 +66,13 @@ export function useUpdateLesson() {
 }
 
 export function useDeleteLesson(topicId?: number) {
+    const t = useTranslations("lessonForm.toast");
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (lessonId: number) => lessonService.delete(lessonId),
         onSuccess: () => {
-            toast.success("Lesson deleted successfully");
+            toast.success(t("deleted"));
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
             if (topicId) {
                 queryClient.invalidateQueries({queryKey: queryKeys.topics.detail(topicId)});
@@ -78,12 +82,13 @@ export function useDeleteLesson(topicId?: number) {
 }
 
 export function useTogglePublishLesson() {
+    const t = useTranslations("lessonForm.toast");
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (lessonId: number) => lessonService.togglePublish(lessonId),
         onSuccess: (_, lessonId) => {
-            toast.success("Lesson publish status updated");
+            toast.success(t("publishUpdated"));
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.detail(lessonId)});
             queryClient.invalidateQueries({queryKey: queryKeys.lessons.all});
         },

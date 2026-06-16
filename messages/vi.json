@@ -96,6 +96,7 @@
     "coding": "Lập trình",
     "theory": "Lý thuyết",
     "quiz": "Trắc nghiệm",
+    "video": "Video",
     "rank": "Hạng",
     "totalConsumption": "Tổng tiêu thụ",
     "input": "Đầu vào",
@@ -216,10 +217,13 @@
     "quizDesc": "Các câu hỏi lựa chọn đáp án hoặc đúng/sai",
     "coding": "Lập trình",
     "codingDesc": "Bài tập lập trình với mã ban đầu và các bộ test case",
+    "video": "Video",
+    "videoDesc": "Bài học video được tải trực tiếp lên kho lưu trữ bảo mật",
     "selectLessonType": "Chọn một loại bài học ở trên để hiển thị trình chỉnh sửa",
     "createTheoryLesson": "Tạo bài học lý thuyết",
     "createQuizLesson": "Tạo bài học trắc nghiệm",
     "createCodingLesson": "Tạo bài học lập trình",
+    "createVideoLesson": "Tạo bài học video",
     "topicDetails": "Thông tin chi tiết chủ đề",
     "topicNotFound": "Không tìm thấy chủ đề",
     "topicNotFoundDesc": "Chủ đề đã chọn không thể tải được hoặc đã bị xóa.",
@@ -245,11 +249,68 @@
     "types": {
       "theory": {"label": "Bài học lý thuyết", "description": "Giải thích rõ một ý tưởng và củng cố bằng ví dụ."},
       "quiz": {"label": "Bài kiểm tra", "description": "Thiết lập quy tắc chấm điểm. Câu hỏi được quản lý riêng."},
-      "coding": {"label": "Bài tập lập trình", "description": "Định nghĩa đề bài, ví dụ, giới hạn và mã khởi tạo."}
+      "coding": {"label": "Bài tập lập trình", "description": "Định nghĩa đề bài, ví dụ, giới hạn và mã khởi tạo."},
+      "video": {"label": "Bài học video", "description": "Thiết lập thông tin, sau đó tải lên và xác minh video nguồn."}
     },
     "details": {"title": "Thông tin bài học", "description": "Đặt tiêu đề rõ ràng và mức độ phù hợp."},
     "fields": {"title": "Tiêu đề"},
     "difficulty": {"label": "Mức độ", "easy": "Dễ", "medium": "Trung bình", "hard": "Khó"},
+    "video": {
+      "detailsTitle": "Thông tin bài học video",
+      "detailsDescription": "Thiết lập thông tin trước. Video nguồn sẽ được tải lên sau khi tạo bài học.",
+      "title": "Tiêu đề",
+      "titlePlaceholder": "Ví dụ: Giới thiệu trực quan về tìm kiếm nhị phân",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Mô tả kiến thức học viên sẽ hiểu sau khi xem video.",
+      "createAction": "Tạo bài học video",
+      "saveMetadata": "Lưu thông tin",
+      "sourceTitle": "Video nguồn",
+      "sourceDescription": "Hỗ trợ MP4 hoặc MOV, tối đa 2 GiB. Các phần được tải trực tiếp lên S3.",
+      "fileSize": "Dung lượng",
+      "duration": "Thời lượng",
+      "mimeType": "Loại MIME",
+      "notAvailable": "Chưa có",
+      "progressLabel": "Tiến trình tải video",
+      "retryFailedParts": "Thử lại các phần lỗi",
+      "cancelUpload": "Hủy tải lên",
+      "replaceSource": "Thay video nguồn",
+      "uploadSource": "Tải video nguồn lên",
+      "publishHint": "Có thể xuất bản sau khi S3 xác minh video thành công.",
+      "publishDisabled": "Hãy tải lên và xác minh video trước khi xuất bản.",
+      "chooseVideo": "Chọn video",
+      "processingStatus": {
+        "PENDING_UPLOAD": "Chờ tải lên",
+        "UPLOADING": "Đang tải lên",
+        "READY": "Sẵn sàng",
+        "FAILED": "Thất bại"
+      },
+      "phase": {
+        "preparing": "Đang chuẩn bị phiên tải lên...",
+        "uploading": "Đang tải các phần video: {progress}%",
+        "completing": "Đang xác minh video đã tải lên...",
+        "aborting": "Đang hủy tải lên...",
+        "success": "Đã tải video lên thành công."
+      },
+      "toast": {
+        "uploaded": "Đã tải video lên thành công",
+        "cancelled": "Đã hủy tải video lên"
+      },
+      "errors": {
+        "duration": "Không thể đọc thời lượng video.",
+        "unsupportedType": "Chỉ hỗ trợ video MP4 và MOV.",
+        "invalidSize": "Dung lượng video phải lớn hơn 0 và không vượt quá 2 GiB.",
+        "partsFailed": "Không thể tải lên {count} phần video.",
+        "uploadFailed": "Tải video lên thất bại.",
+        "retryFailed": "Thử tải lại video thất bại.",
+        "cancelFailed": "Không thể hủy tải video lên."
+      }
+    },
+    "toast": {
+      "created": "Đã tạo bài học thành công",
+      "updated": "Đã cập nhật bài học thành công",
+      "deleted": "Đã xóa bài học thành công",
+      "publishUpdated": "Đã cập nhật trạng thái xuất bản"
+    },
     "actions": {
       "saveChanges": "Lưu thay đổi",
       "createLesson": "Tạo bài học",

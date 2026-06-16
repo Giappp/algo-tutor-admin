@@ -121,6 +121,10 @@ const CodingLessonFields = {
     examples: z.array(LessonExampleSchema).max(5).optional(),
 };
 
+const VideoLessonFields = {
+    description: z.string().optional(),
+};
+
 export const CreateTheoryLessonSchema = z.object({
     type: z.literal("THEORY"),
     ...BaseLessonFields,
@@ -151,6 +155,12 @@ export const CreateCodingLessonSchema = z.object({
     ...CodingLessonFields,
 });
 
+export const CreateVideoLessonSchema = z.object({
+    type: z.literal("VIDEO"),
+    ...BaseLessonFields,
+    ...VideoLessonFields,
+});
+
 /**
  * Schema for editing coding lesson content only (without test case validation).
  * Used in the edit page where test cases are managed in a separate tab.
@@ -171,6 +181,7 @@ export const CreateLessonSchema = z.discriminatedUnion("type", [
     CreateTheoryLessonSchema,
     CreateQuizLessonSchema,
     CreateCodingLessonSchema,
+    CreateVideoLessonSchema,
 ]);
 
 
@@ -188,3 +199,4 @@ export type EditorialRequestDTO = z.infer<typeof CreateEditorialSchema>;
 export type CodingLessonDTO = z.infer<typeof CreateCodingLessonSchema>;
 export type QuizLessonDTO = z.infer<typeof CreateQuizLessonSchema>;
 export type TheoryLessonDTO = z.infer<typeof CreateTheoryLessonSchema>;
+export type VideoLessonDTO = z.infer<typeof CreateVideoLessonSchema>;
